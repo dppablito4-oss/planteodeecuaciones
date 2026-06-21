@@ -847,18 +847,13 @@ window.exportSolutionsToPDF = () => {
  * Cards that don't have a data-yt-id attribute are skipped automatically.
  */
 const YT_CHANNEL_NAMES = {
-    'R3L08T3T19A': 'Profe Alex',
-    'F0J5G1cK_98': 'Profe Alex',
-    'kYJ5oQ6jGk8': 'Profe Alex',
-    'LhK9T85_Ym4': 'Profe Alex',
+    'CJEsybfPQSE': 'Profe Alex',
     'CN4n6Tfc5WI': 'Susi Profe',
-    '9g0nJ6v-J1g': 'JulioProfe',
-    'W-Lq3jB-iYg': 'El Traductor',
-    'R9n94N5-t9Q': 'JulioProfe',
-    'F3q3U0e3yA0': 'JulioProfe',
-    'Lp0-mCBMj6I': 'Academia Vonex',
-    '3-zV0s-P8eA': 'Ricardo Collantes',
-    'R9K1wS_nJ1o': 'Ricardo Collantes'
+    'F1d5vGkHlT8': 'JulioProfe',
+    'K3t1XN1gN7c': 'JulioProfe',
+    'R9H7nJ7yU38': 'JulioProfe',
+    'kYJ53u0aJ8o': 'El Traductor',
+    'F71H4y2t5aY': 'Academia Vonex'
 };
 
 let _previewTimers = {};
@@ -920,7 +915,7 @@ function initCardPreviews() {
                 const src = [
                     `https://www.youtube.com/embed/${ytId}`,
                     `?autoplay=1`,
-                    `&mute=0`,
+                    `&mute=1`,
                     `&controls=0`,
                     `&modestbranding=1`,
                     `&rel=0`,
