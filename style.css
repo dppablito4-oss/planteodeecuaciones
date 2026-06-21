@@ -992,15 +992,80 @@ body {
 }
 
 .presenter-bar {
-    height: 64px;
+    height: 80px;
     background: rgba(0,0,0,0.8);
     backdrop-filter: blur(8px);
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: var(--space-6);
-    border-top: 1px solid rgba(255,255,255,0.06);
+    gap: var(--space-4);
+    padding: 0 var(--space-8);
+    border-top: 1px solid rgba(255,255,255,0.05);
 }
+
+.presenter-bar .btn {
+    font-size: 1.2rem;
+    padding: 12px 24px;
+}
+#pbar-indicator {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin: 0 20px;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════ */
+/* OPTIMIZACIÓN DE PROYECTOR MULTIMEDIA (10+ METROS) PARA MODO PRESENTADOR   */
+/* ══════════════════════════════════════════════════════════════════════════ */
+
+#presenter-overlay .presenter-slide-inner {
+    max-width: 1600px;
+    min-height: 75vh;
+    padding: 60px 80px;
+}
+#presenter-overlay h2 { font-size: 3.5rem !important; }
+#presenter-overlay h2 span { font-size: 4rem !important; }
+#presenter-overlay p { font-size: 1.8rem !important; line-height: 1.6 !important; }
+#presenter-overlay .modal-math-box { font-size: 2rem !important; padding: 40px !important; margin: 30px 0 !important; }
+#presenter-overlay .modal-math-box .modal-step-pill { font-size: 1.4rem !important; padding: 10px 20px !important; }
+#presenter-overlay .modal-solution-tag { font-size: 2.2rem !important; margin-top: 40px !important; }
+#presenter-overlay .modal-table th, #presenter-overlay .modal-table td { font-size: 1.8rem !important; padding: 24px !important; }
+
+/* Escalar de forma inteligente los estilos inline inyectados en app.js */
+#presenter-overlay [style*="font-size:0.7rem"],
+#presenter-overlay [style*="font-size: 0.7rem"] { font-size: 1.4rem !important; }
+#presenter-overlay [style*="font-size:0.8rem"],
+#presenter-overlay [style*="font-size: 0.8rem"] { font-size: 1.5rem !important; }
+#presenter-overlay [style*="font-size:0.85rem"],
+#presenter-overlay [style*="font-size: 0.85rem"] { font-size: 1.6rem !important; }
+#presenter-overlay [style*="font-size:0.9rem"],
+#presenter-overlay [style*="font-size: 0.9rem"] { font-size: 1.7rem !important; }
+#presenter-overlay [style*="font-size:1rem"],
+#presenter-overlay [style*="font-size: 1rem"] { font-size: 1.8rem !important; }
+#presenter-overlay [style*="font-size:1.05rem"],
+#presenter-overlay [style*="font-size: 1.05rem"] { font-size: 2rem !important; }
+#presenter-overlay [style*="font-size:1.1rem"],
+#presenter-overlay [style*="font-size: 1.1rem"] { font-size: 2.2rem !important; }
+#presenter-overlay [style*="font-size:1.2rem"],
+#presenter-overlay [style*="font-size: 1.2rem"] { font-size: 2.4rem !important; }
+#presenter-overlay [style*="font-size:1.4rem"],
+#presenter-overlay [style*="font-size: 1.4rem"] { font-size: 2.8rem !important; }
+#presenter-overlay [style*="font-size:1.5rem"],
+#presenter-overlay [style*="font-size: 1.5rem"] { font-size: 3rem !important; }
+#presenter-overlay [style*="font-size:2rem"],
+#presenter-overlay [style*="font-size: 2rem"] { font-size: 4rem !important; }
+#presenter-overlay [style*="font-size:2.5rem"],
+#presenter-overlay [style*="font-size: 2.5rem"] { font-size: 5rem !important; }
+#presenter-overlay [style*="font-size:3rem"],
+#presenter-overlay [style*="font-size: 3rem"] { font-size: 6rem !important; }
+#presenter-overlay [style*="font-size:5rem"],
+#presenter-overlay [style*="font-size: 5rem"] { font-size: 8rem !important; }
+
+/* Separaciones mayores para proyectores */
+#presenter-overlay [style*="margin-bottom:12px"] { margin-bottom: 24px !important; }
+#presenter-overlay [style*="margin-bottom:16px"] { margin-bottom: 32px !important; }
+#presenter-overlay [style*="margin-bottom:20px"] { margin-bottom: 40px !important; }
+#presenter-overlay [style*="padding:20px"] { padding: 40px !important; }
+#presenter-overlay [style*="padding:24px"] { padding: 48px !important; }
 
 .pbar-btn {
     padding: var(--space-2) var(--space-6);
