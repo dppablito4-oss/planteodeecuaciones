@@ -1,119 +1,631 @@
-// --- SERVICIO DE INTELIGENCIA ARTIFICIAL (AIService) ---
-// Abstracción que gestiona la comunicación con la IA (Supabase Edge Functions / Gemini / Fallback Local)
+// ═══════════════════════════════════════════════════════════════════════════
+// ECUACIONES.IO — LÓGICA DE LA APLICACIÓN ESTILO NETFLIX
+// ═══════════════════════════════════════════════════════════════════════════
 
+// ── Supabase Configuration ──────────────────────────────────────────────────
 const SUPABASE_CONFIG = {
-    url: "https://dyuadrzdrphzywbnxnhz.supabase.co",      // Se llenará cuando el usuario provee las credenciales
+    url: "https://dyuadrzdrphzywbnxnhz.supabase.co",
     anonKey: "sb_publishable_rCwOvgVa1kGlO5PFAa8tRg_E1KIWKWX",
     useEdgeFunctions: true
 };
 
-// Base de datos de problemas mock de alta calidad para pruebas offline (5 Pasos de Oro)
+// ── Slide Data (contenido de cada diapositiva para modal y presentador) ─────
+const SLIDES_DATA = {
+    'slide-planteo': {
+        title: '¿Qué significa "Plantear"?',
+        icon: '🎓',
+        heroColor: 'linear-gradient(135deg, #1a0000, #2d0000)',
+        description: 'Proceso riguroso de traducción lingüística y conceptual del lenguaje cotidiano al lenguaje formal matemático.',
+        content: `
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:center;">
+                <div>
+                    <p style="font-size:1.05rem;color:var(--color-text-secondary);margin-bottom:20px;">
+                        Plantear una ecuación es un riguroso proceso de <strong>traducción lingüística y conceptual</strong>.
+                    </p>
+                    <div class="modal-math-box" style="text-align:center;">
+                        <span style="font-size:1.1rem;font-weight:700;">Lenguaje Verbal (Mundo Real)</span><br>
+                        <span style="font-size:2rem;color:var(--color-accent);display:block;margin:8px 0;">↓</span>
+                        <span style="font-size:1.1rem;font-weight:700;color:var(--color-accent);">Lenguaje Formal (Ecuación)</span>
+                    </div>
+                    <p style="color:var(--color-text-muted);font-size:0.9rem;margin-top:16px;">
+                        Es la base fundamental del modelado de sistemas físicos, económicos y astronómicos.
+                    </p>
+                </div>
+                <div style="background:rgba(229,9,20,0.04);border-radius:12px;padding:24px;text-align:center;border:1px solid rgba(229,9,20,0.1);">
+                    <div style="font-size:5rem;margin-bottom:16px;">📝</div>
+                    <div style="font-family:var(--font-mono);color:var(--color-accent);font-size:1.2rem;">"La suma de dos números es 48"</div>
+                    <div style="font-size:1.5rem;color:var(--color-text-muted);margin:12px 0;">↓</div>
+                    <div style="font-family:var(--font-mono);color:#fff;font-size:1.4rem;">$x + y = 48$</div>
+                </div>
+            </div>`
+    },
+    'slide-pasos': {
+        title: 'Los 5 Pasos de Oro',
+        icon: '✅',
+        heroColor: 'linear-gradient(135deg, #001a0d, #002614)',
+        description: 'La metodología probada para plantear cualquier ecuación de forma sistemática y sin errores.',
+        content: `
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:16px;">
+                ${[
+                    ['🔍','1. Identificar','Aislar y definir claramente las variables o incógnitas del sistema.'],
+                    ['🗣️','2. Traducir','Mapear los conectores lógicos de cantidad a operadores algebraicos.'],
+                    ['⚖️','3. Igualar','Establecer el punto de balance o igualdad de la ecuación.']
+                ].map(([icon,title,desc]) => `
+                    <div style="background:rgba(229,9,20,0.05);border:1px solid rgba(229,9,20,0.15);border-radius:10px;padding:20px;text-align:center;">
+                        <div style="font-size:2.5rem;margin-bottom:12px;">${icon}</div>
+                        <div style="font-weight:700;font-family:var(--font-heading);margin-bottom:8px;color:var(--color-accent);">${title}</div>
+                        <p style="font-size:0.8rem;color:var(--color-text-muted);">${desc}</p>
+                    </div>`).join('')}
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px;">
+                ${[
+                    ['📐','4. Coherencia','Asegurar homogeneidad dimensional de todos los términos (unidades).'],
+                    ['✔️','5. Comprobar','Validar la consistencia lógica del resultado en el contexto original.']
+                ].map(([icon,title,desc]) => `
+                    <div style="background:rgba(229,9,20,0.05);border:1px solid rgba(229,9,20,0.15);border-radius:10px;padding:20px;text-align:center;">
+                        <div style="font-size:2.5rem;margin-bottom:12px;">${icon}</div>
+                        <div style="font-weight:700;font-family:var(--font-heading);margin-bottom:8px;color:var(--color-accent);">${title}</div>
+                        <p style="font-size:0.8rem;color:var(--color-text-muted);">${desc}</p>
+                    </div>`).join('')}
+            </div>`
+    },
+    'slide-diccionario': {
+        title: 'Diccionario de Traducción Rápida',
+        icon: '📖',
+        heroColor: 'linear-gradient(135deg, #00102d, #001a45)',
+        description: 'Referencia rápida de palabras clave y sus operadores matemáticos equivalentes.',
+        content: `
+            <table class="modal-table">
+                <thead>
+                    <tr>
+                        <th>Término Verbal Común</th>
+                        <th>Operador Matemático</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>"El doble de un valor", "El triple de un valor"</td><td class="mono">$2x$ / $3x$</td></tr>
+                    <tr><td>"Aumentado en", "Disminuido en", "Excede a"</td><td class="mono">$+k$ / $-k$ / $A - B = k$</td></tr>
+                    <tr><td>"Tres números consecutivos"</td><td class="mono">$x, x+1, x+2$</td></tr>
+                    <tr><td>"Es equivalente a", "Representa", "Nos da"</td><td class="mono">$=$</td></tr>
+                    <tr><td>"La mitad de", "La tercera parte de"</td><td class="mono">$x/2$ / $x/3$</td></tr>
+                    <tr><td>"Más que", "Menos que"</td><td class="mono">$A + k$ / $A - k$</td></tr>
+                </tbody>
+            </table>`
+    },
+    'slide-errores': {
+        title: '¡Cuidado! Evita estos Errores',
+        icon: '⚠️',
+        heroColor: 'linear-gradient(135deg, #1a0000, #2d0000)',
+        description: 'Los tres errores más frecuentes al plantear ecuaciones y cómo evitarlos.',
+        content: `
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;">
+                ${[
+                    ['❌','Olvidar Paréntesis','Al multiplicar el "doble de la suma", el multiplicador afecta a todos los términos dentro.'],
+                    ['⚠️','Mezclar Unidades','No operes minutos con horas o metros con centímetros sin antes hacer la conversión.'],
+                    ['🤔','Resultados Absurdos','Si el cálculo de una edad da fraccionario o negativo, revisa el planteamiento original.']
+                ].map(([icon,title,desc]) => `
+                    <div style="background:rgba(229,9,20,0.08);border:1px solid rgba(229,9,20,0.25);border-radius:12px;padding:24px;text-align:center;">
+                        <div style="font-size:3rem;margin-bottom:12px;">${icon}</div>
+                        <h3 style="font-weight:700;font-family:var(--font-heading);margin-bottom:10px;color:#fff;">${title}</h3>
+                        <p style="font-size:0.85rem;color:var(--color-text-muted);">${desc}</p>
+                    </div>`).join('')}
+            </div>`
+    },
+    'slide-resumen': {
+        title: 'En Resumen...',
+        icon: '🏆',
+        heroColor: 'linear-gradient(135deg, #0a1a00, #102400)',
+        description: 'Las 4 claves fundamentales que garantizan el éxito en el planteo de ecuaciones.',
+        content: `
+            <ul style="list-style:none;display:flex;flex-direction:column;gap:20px;">
+                ${[
+                    'Lee el problema al menos 3 veces antes de estructurar variables.',
+                    'Traduce palabra por palabra metódicamente al lenguaje formal.',
+                    'Conserva el orden en cada una de las operaciones algebraicas.',
+                    'Comprueba siempre el valor obtenido con el enunciado original.'
+                ].map(tip => `
+                    <li style="display:flex;align-items:center;gap:16px;font-size:1.05rem;color:var(--color-text-secondary);">
+                        <span style="color:#46d369;font-size:1.5rem;flex-shrink:0;">✓</span>
+                        ${tip}
+                    </li>`).join('')}
+            </ul>`
+    },
+    'slide-ej1': {
+        title: 'Ejemplo 1: Suma de Consecutivos',
+        icon: '1️⃣',
+        heroColor: 'linear-gradient(135deg, #00102d, #001a45)',
+        description: 'Problema clásico de aritmética: la suma de tres números enteros consecutivos es 72.',
+        content: `
+            <h3 style="font-size:1.1rem;color:var(--color-text-secondary);margin-bottom:20px;">
+                <strong>Problema:</strong> La suma de tres números consecutivos es 72. Hallar los números.
+            </h3>
+            <div class="modal-math-box">
+                <p><span class="modal-step-pill">Paso 1</span> Variables: Sean los números $x$, $x+1$, $x+2$</p>
+                <p style="margin-top:10px;"><span class="modal-step-pill">Paso 2</span> Ecuación: $$x + (x+1) + (x+2) = 72$$</p>
+                <p style="margin-top:10px;"><span class="modal-step-pill">Paso 3</span> Simplificar: $$3x + 3 = 72 \\Rightarrow 3x = 69 \\Rightarrow x = 23$$</p>
+            </div>
+            <div class="modal-solution-tag">
+                <i class="fa-solid fa-circle-check"></i>
+                Solución: Los números son <strong style="margin-left:4px;">23, 24 y 25</strong>.
+            </div>`
+    },
+    'slide-ej2': {
+        title: 'Ejemplo 2: Operadores Combinados',
+        icon: '2️⃣',
+        heroColor: 'linear-gradient(135deg, #00102d, #001a45)',
+        description: 'El doble de un número aumentado en 5 es igual a 21. Encuentra el número.',
+        content: `
+            <h3 style="font-size:1.1rem;color:var(--color-text-secondary);margin-bottom:20px;">
+                <strong>Problema:</strong> El doble de un número aumentado en 5 es igual a 21.
+            </h3>
+            <div class="modal-math-box">
+                <p><span class="modal-step-pill">Ecuación</span> $$2x + 5 = 21$$</p>
+                <p style="margin-top:12px;"><span class="modal-step-pill">Solución</span> $$2x = 16 \\Rightarrow x = 8$$</p>
+            </div>
+            <p style="font-size:0.85rem;color:var(--color-text-muted);margin-top:16px;background:rgba(229,9,20,0.05);padding:12px;border-radius:8px;border-left:3px solid var(--color-accent);">
+                ⚠️ Un error común es interpretar el enunciado como $2(x+5)$, lo cual alteraría el resultado.
+            </p>
+            <div class="modal-solution-tag"><i class="fa-solid fa-circle-check"></i> Solución: el número es <strong style="margin-left:4px;">8</strong>.</div>`
+    },
+    'slide-ej3': {
+        title: 'Ejemplo 3: Edades (Línea Temporal)',
+        icon: '3️⃣',
+        heroColor: 'linear-gradient(135deg, #002014, #001a10)',
+        description: 'Problema clásico de edades con desplazamiento temporal futuro.',
+        content: `
+            <h3 style="font-size:1rem;color:var(--color-text-secondary);margin-bottom:16px;">
+                <strong>Problema:</strong> La edad de Ana es el triple de la de su hijo. Dentro de 10 años será el doble. ¿Qué edad tiene cada uno?
+            </h3>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+                <div style="background:rgba(255,255,255,0.04);border-radius:8px;padding:16px;text-align:center;">
+                    <div style="font-size:0.7rem;text-transform:uppercase;color:var(--color-text-faint);font-weight:700;margin-bottom:10px;">Estado Actual</div>
+                    <p style="font-family:var(--font-mono);">Hijo: $x$</p>
+                    <p style="font-family:var(--font-mono);">Ana: $3x$</p>
+                </div>
+                <div style="background:rgba(255,255,255,0.04);border-radius:8px;padding:16px;text-align:center;">
+                    <div style="font-size:0.7rem;text-transform:uppercase;color:var(--color-text-faint);font-weight:700;margin-bottom:10px;">En 10 años</div>
+                    <p style="font-family:var(--font-mono);">Hijo: $x + 10$</p>
+                    <p style="font-family:var(--font-mono);">Ana: $3x + 10$</p>
+                </div>
+            </div>
+            <div class="modal-math-box">
+                <p><span class="modal-step-pill">Igualdad</span> $$3x + 10 = 2(x + 10) \\Rightarrow x = 10$$</p>
+            </div>
+            <div class="modal-solution-tag"><i class="fa-solid fa-circle-check"></i> Ana tiene <strong style="margin:0 4px;">30 años</strong>; su hijo tiene <strong style="margin:0 4px;">10 años</strong>.</div>`
+    },
+    'slide-ej4': {
+        title: 'Ejemplo 4: Modelado Geométrico',
+        icon: '4️⃣',
+        heroColor: 'linear-gradient(135deg, #00102d, #001a45)',
+        description: 'Hallar las dimensiones de un rectángulo dado su perímetro.',
+        content: `
+            <h3 style="font-size:1rem;color:var(--color-text-secondary);margin-bottom:16px;">
+                <strong>Problema:</strong> En un rectángulo, el largo es 4 cm mayor que el ancho y su perímetro es 32 cm.
+            </h3>
+            <div class="modal-math-box">
+                <p>Ancho: $x$ · Largo: $x + 4$</p>
+                <p style="margin-top:8px;"><span class="modal-step-pill">Perímetro</span> $$2(x) + 2(x + 4) = 32$$</p>
+                <p style="margin-top:8px;"><span class="modal-step-pill">Cálculo</span> $$4x + 8 = 32 \\Rightarrow 4x = 24 \\Rightarrow x = 6$$</p>
+            </div>
+            <div class="modal-solution-tag"><i class="fa-solid fa-circle-check"></i> Ancho = <strong style="margin:0 4px;">6 cm</strong> · Largo = <strong style="margin:0 4px;">10 cm</strong>.</div>`
+    },
+    'slide-ej5': {
+        title: 'Ejemplo 5: Reparto de Cantidades',
+        icon: '5️⃣',
+        heroColor: 'linear-gradient(135deg, #002014, #001a10)',
+        description: 'Se reparten 50 caramelos entre dos niños: uno recibe 10 más que el otro.',
+        content: `
+            <h3 style="font-size:1rem;color:var(--color-text-secondary);margin-bottom:16px;">
+                <strong>Problema:</strong> Se reparten 50 caramelos entre dos niños de modo que uno recibe 10 más que el otro.
+            </h3>
+            <div class="modal-math-box">
+                <p>Niño A: $x$ · Niño B: $x + 10$</p>
+                <p style="margin-top:8px;"><span class="modal-step-pill">Ecuación</span> $$x + (x + 10) = 50$$</p>
+                <p style="margin-top:8px;"><span class="modal-step-pill">Solución</span> $$2x = 40 \\Rightarrow x = 20$$</p>
+            </div>
+            <div class="modal-solution-tag"><i class="fa-solid fa-circle-check"></i> Niño A = <strong style="margin:0 4px;">20</strong> · Niño B = <strong style="margin:0 4px;">30</strong> caramelos.</div>`
+    },
+    'slide-ej6': {
+        title: 'Reto UNI I — Edades en el Tiempo',
+        icon: '⭐',
+        heroColor: 'linear-gradient(135deg, #1a0030, #0d0020)',
+        description: 'Problema de preselección UNI con razones temporales. Calcular a+b.',
+        content: `
+            <p style="font-size:0.9rem;color:var(--color-text-muted);margin-bottom:16px;border-left:3px solid #a78bfa;padding-left:12px;">
+                <strong>Problema (UNI):</strong> La edad de A hace $a$ años era a la de B como 5:4. Dentro de $b$ años la razón será 7:6. La suma de edades es 46 y la diferencia es 4. Calcule $a+b$.
+            </p>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                <div style="background:rgba(167,139,250,0.05);border:1px solid rgba(167,139,250,0.2);border-radius:10px;padding:16px;">
+                    <p style="font-weight:700;color:#a78bfa;margin-bottom:8px;font-size:0.85rem;">1. Invariante Temporal:</p>
+                    <div class="modal-math-box" style="border-color:#a78bfa;background:rgba(167,139,250,0.04);">
+                        $$A - B = 4 \\quad \\land \\quad A + B = 46$$
+                        <p style="color:#46d369;font-weight:700;text-align:center;margin-top:8px;">A = 25 años, B = 21 años</p>
+                    </div>
+                </div>
+                <div style="background:rgba(167,139,250,0.05);border:1px solid rgba(167,139,250,0.2);border-radius:10px;padding:16px;">
+                    <p style="font-weight:700;color:#a78bfa;margin-bottom:8px;font-size:0.85rem;">2. Razones Temporales:</p>
+                    <div class="modal-math-box" style="border-color:#a78bfa;background:rgba(167,139,250,0.04);">
+                        <p style="font-size:0.85rem;">Pasado: $$\\frac{25-a}{21-a} = \\frac{5}{4} \\Rightarrow a=5$$</p>
+                        <p style="font-size:0.85rem;">Futuro: $$\\frac{25+b}{21+b} = \\frac{7}{6} \\Rightarrow b=3$$</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-solution-tag"><i class="fa-solid fa-circle-check"></i> Resultado: $a + b = 5 + 3 = $ <strong style="margin-left:6px;font-size:1.3rem;color:#46d369;">8</strong></div>`
+    },
+    'slide-ej7': {
+        title: 'Reto UNI II — Modelado Diofántico',
+        icon: '⭐⭐',
+        heroColor: 'linear-gradient(135deg, #1a0030, #0d0020)',
+        description: 'Ecuación diofántica con restricción de enteros positivos. Cantidad máxima de textos.',
+        content: `
+            <p style="font-size:0.9rem;color:var(--color-text-muted);margin-bottom:16px;border-left:3px solid #a78bfa;padding-left:12px;">
+                <strong>Problema (UNI):</strong> Textos de Física a $30 y de Química a $20. Gastó $500. Los de Química exceden al doble de Física. Determina la cantidad máxima de textos de Química.
+            </p>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                <div style="background:rgba(167,139,250,0.05);border:1px solid rgba(167,139,250,0.2);border-radius:10px;padding:16px;">
+                    <p style="font-weight:700;color:#a78bfa;margin-bottom:8px;font-size:0.85rem;">1. Ecuación Diofántica:</p>
+                    <div class="modal-math-box" style="border-color:#a78bfa;background:rgba(167,139,250,0.04);">
+                        $$30x + 20y = 500 \\Rightarrow 3x + 2y = 50$$
+                        <p style="font-size:0.8rem;color:var(--color-text-muted);margin-top:8px;">$y = 25 - 1.5x$. Para $y$ entero, $x$ debe ser par.</p>
+                    </div>
+                </div>
+                <div style="background:rgba(167,139,250,0.05);border:1px solid rgba(167,139,250,0.2);border-radius:10px;padding:16px;">
+                    <p style="font-weight:700;color:#a78bfa;margin-bottom:8px;font-size:0.85rem;">2. Restricción $y > 2x$:</p>
+                    <ul style="list-style:none;font-size:0.82rem;color:var(--color-text-muted);display:flex;flex-direction:column;gap:6px;">
+                        <li>$x=2 \\Rightarrow y=22$ ✓ <span style="color:#46d369;font-weight:700;">(Cumple: 22 > 4)</span></li>
+                        <li>$x=4 \\Rightarrow y=19$ ✓ <span style="color:#46d369;">(Cumple: 19 > 8)</span></li>
+                        <li>$x=6 \\Rightarrow y=16$ ✓ <span style="color:#46d369;">(Cumple: 16 > 12)</span></li>
+                        <li>$x=8 \\Rightarrow y=13$ ✗ <span style="color:#e50914;">(No cumple: 13 ≯ 16)</span></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="modal-solution-tag"><i class="fa-solid fa-circle-check"></i> Máximo de textos de Química: <strong style="margin-left:6px;font-size:1.3rem;color:#46d369;">22</strong></div>`
+    }
+};
+
+// All slides in presenter order
+const PRESENTER_SLIDES = [
+    'slide-planteo', 'slide-pasos', 'slide-diccionario',
+    'slide-ej1', 'slide-ej2', 'slide-ej3', 'slide-ej4', 'slide-ej5',
+    'slide-ej6', 'slide-ej7', 'slide-errores', 'slide-resumen'
+];
+
+// ── State ────────────────────────────────────────────────────────────────────
+let activeProfile = null;
+let presenterIndex = 0;
+let carouselOffsets = {};
+let lastSolutionHtml = '';
+
+// ── Profile Selection ────────────────────────────────────────────────────────
+function selectProfile(name, avatarSrc, accentColor) {
+    activeProfile = { name, avatarSrc, accentColor };
+
+    // Update header avatar
+    const headerAvatar = document.getElementById('header-avatar');
+    if (headerAvatar) {
+        if (avatarSrc) {
+            headerAvatar.outerHTML = `<div class="header-profile-mini-icon" id="header-avatar" style="background:${accentColor}22;" title="${name}">
+                <img src="${avatarSrc}" alt="${name}" style="width:100%;height:100%;object-fit:cover;border-radius:4px;" onerror="this.outerHTML='🎓'">
+            </div>`;
+        } else {
+            headerAvatar.style.background = `${accentColor}22`;
+            headerAvatar.textContent = '👤';
+            headerAvatar.title = name;
+        }
+    }
+
+    // Fade out profile screen, fade in app
+    const profileScreen = document.getElementById('profile-screen');
+    const mainApp = document.getElementById('main-app');
+
+    profileScreen.classList.add('fade-out');
+
+    setTimeout(() => {
+        profileScreen.style.display = 'none';
+        mainApp.classList.add('visible');
+
+        // Init scroll reveal
+        initScrollReveal();
+        renderAllMath();
+    }, 800);
+}
+
+// ── Carousel Logic ───────────────────────────────────────────────────────────
+function slideCarousel(rowId, direction) {
+    const track = document.getElementById(`track-${rowId}`);
+    if (!track) return;
+
+    const cardWidth = 280 + 8; // card width + gap
+    const visibleCount = Math.floor(track.parentElement.offsetWidth / cardWidth);
+    const totalCards = track.children.length;
+    const maxOffset = Math.max(0, totalCards - visibleCount);
+
+    if (!carouselOffsets[rowId]) carouselOffsets[rowId] = 0;
+    carouselOffsets[rowId] = Math.max(0, Math.min(carouselOffsets[rowId] + direction, maxOffset));
+
+    track.style.transform = `translateX(-${carouselOffsets[rowId] * cardWidth}px)`;
+}
+
+// ── Slide Modal ───────────────────────────────────────────────────────────────
+function openSlideModal(slideId) {
+    const data = SLIDES_DATA[slideId];
+    if (!data) return;
+
+    const modal = document.getElementById('slide-modal');
+    const content = document.getElementById('modal-content');
+
+    content.innerHTML = `
+        <div class="modal-hero" style="background:${data.heroColor};">
+            <div class="modal-hero-bg">${data.icon}</div>
+            <div class="modal-hero-content">
+                <h2 class="modal-hero-title">${data.title}</h2>
+                <div class="modal-hero-actions">
+                    <button class="btn-play" style="font-size:0.9rem;padding:10px 20px;" onclick="closeSlideModal();startPresenterFromSlide('${slideId}')">
+                        <i class="fa-solid fa-play"></i> Presentar
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="modal-bottom">
+            <div class="modal-bottom-grid">
+                <div>
+                    <p class="modal-description">${data.description}</p>
+                </div>
+                <div class="modal-meta">
+                    <p><span class="modal-meta-label">Tema: </span><span class="modal-meta-value">Planteo de Ecuaciones</span></p>
+                    <p><span class="modal-meta-label">Nivel: </span><span class="modal-meta-value">Básico–UNI</span></p>
+                </div>
+            </div>
+            <div class="modal-content-area">
+                ${data.content}
+            </div>
+        </div>`;
+
+    modal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+
+    // Render math
+    setTimeout(() => renderAllMath(), 50);
+}
+
+function closeSlideModal(e) {
+    if (e && e.target !== document.getElementById('slide-modal')) return;
+    const modal = document.getElementById('slide-modal');
+    modal.classList.remove('open');
+    document.body.style.overflow = '';
+}
+
+// ── Presenter Mode ────────────────────────────────────────────────────────────
+function startPresenterMode() {
+    presenterIndex = 0;
+    renderPresenterSlide();
+    document.getElementById('presenter-overlay').classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function startPresenterFromSlide(slideId) {
+    const idx = PRESENTER_SLIDES.indexOf(slideId);
+    presenterIndex = idx >= 0 ? idx : 0;
+    renderPresenterSlide();
+    document.getElementById('presenter-overlay').classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function exitPresenterMode() {
+    document.getElementById('presenter-overlay').classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+function renderPresenterSlide() {
+    const slideId = PRESENTER_SLIDES[presenterIndex];
+    const data = SLIDES_DATA[slideId];
+    if (!data) return;
+
+    const container = document.getElementById('presenter-slide-content');
+    const indicator = document.getElementById('pbar-indicator');
+
+    container.innerHTML = `
+        <h2 style="font-family:var(--font-heading);font-size:1.8rem;font-weight:800;margin-bottom:20px;display:flex;align-items:center;gap:12px;padding-bottom:12px;border-bottom:2px solid var(--color-accent);">
+            <span>${data.icon}</span> ${data.title}
+        </h2>
+        <p style="font-size:1rem;color:var(--color-text-muted);margin-bottom:24px;">${data.description}</p>
+        <div style="font-size:1.05rem;line-height:1.8;">${data.content}</div>`;
+
+    indicator.textContent = `${presenterIndex + 1} / ${PRESENTER_SLIDES.length}`;
+    setTimeout(() => renderAllMath(), 50);
+}
+
+function presenterNext() {
+    if (presenterIndex < PRESENTER_SLIDES.length - 1) {
+        presenterIndex++;
+        renderPresenterSlide();
+    } else {
+        showToast('Llegaste a la última diapositiva.', 'info');
+    }
+}
+
+function presenterPrev() {
+    if (presenterIndex > 0) {
+        presenterIndex--;
+        renderPresenterSlide();
+    } else {
+        showToast('Estás en la primera diapositiva.', 'info');
+    }
+}
+
+// Keyboard navigation for presenter mode
+window.addEventListener('keydown', (e) => {
+    if (!document.getElementById('presenter-overlay').classList.contains('active')) return;
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); presenterNext(); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); presenterPrev(); }
+    else if (e.key === 'Escape') exitPresenterMode();
+});
+
+// ── Scroll Reveal ─────────────────────────────────────────────────────────────
+function initScrollReveal() {
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) entry.target.classList.add('visible');
+        });
+    }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+}
+
+// ── Header scroll effect ──────────────────────────────────────────────────────
+window.addEventListener('scroll', () => {
+    const header = document.getElementById('netflix-header');
+    if (header) {
+        header.classList.toggle('scrolled', window.scrollY > 80);
+    }
+});
+
+// ── KaTeX Math Rendering ──────────────────────────────────────────────────────
+function renderAllMath() {
+    if (window.renderMathInElement) {
+        window.renderMathInElement(document.body, {
+            delimiters: [
+                { left: '$$', right: '$$', display: true },
+                { left: '$', right: '$', display: false }
+            ],
+            throwOnError: false
+        });
+    }
+}
+
+// ── Toast Notifications ───────────────────────────────────────────────────────
+function showToast(message, type = 'info') {
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+
+    const toast = document.createElement('div');
+    const colors = {
+        error:   { bg: 'rgba(229,9,20,0.9)', icon: 'fa-triangle-exclamation' },
+        warning: { bg: 'rgba(180,130,0,0.9)', icon: 'fa-circle-exclamation' },
+        success: { bg: 'rgba(70,211,105,0.15)', icon: 'fa-circle-check' },
+        info:    { bg: 'rgba(40,40,40,0.95)', icon: 'fa-circle-info' }
+    };
+    const c = colors[type] || colors.info;
+
+    toast.style.cssText = `
+        background:${c.bg};
+        border:1px solid rgba(255,255,255,0.15);
+        color:#fff;
+        padding:10px 16px;
+        border-radius:6px;
+        font-size:0.82rem;
+        font-weight:600;
+        display:flex;
+        align-items:center;
+        gap:8px;
+        box-shadow:0 4px 20px rgba(0,0,0,0.5);
+        opacity:0;
+        transform:translateY(8px);
+        transition:all 0.3s ease;
+        backdrop-filter:blur(8px);`;
+    toast.innerHTML = `<i class="fa-solid ${c.icon}"></i> <span>${message}</span>`;
+    container.appendChild(toast);
+
+    requestAnimationFrame(() => {
+        toast.style.opacity = '1';
+        toast.style.transform = 'translateY(0)';
+    });
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(4px)';
+        setTimeout(() => toast.remove(), 300);
+    }, 4000);
+}
+
+// ── AI Service ────────────────────────────────────────────────────────────────
 const MOCK_PROBLEMS = {
     "Edades": {
         "Básico": {
             problem: "La edad de un padre es el triple de la edad de su hijo. Si la suma de ambas edades es 48 años, ¿cuál es la edad de cada uno?",
-            solution: `
-                <div class="space-y-3">
-                    <p><span class="step-pill">Paso 1: Identificar</span> Variable: Edad del hijo = $x$. Edad del padre = $3x$.</p>
-                    <p><span class="step-pill">Paso 2: Traducir</span> La suma es 48: $x + 3x = 48$.</p>
-                    <p><span class="step-pill">Paso 3: Igualar</span> Ecuación: $4x = 48$.</p>
-                    <p><span class="step-pill">Paso 4: Coherencia</span> Resolviendo: $x = 12$.</p>
-                    <p><span class="step-pill">Paso 5: Comprobar</span> El hijo tiene 12 años y el padre $3(12) = 36$ años. $12 + 36 = 48$. ¡Correcto!</p>
-                </div>
-            `
+            solution: `<div style="display:flex;flex-direction:column;gap:10px;">
+                <p><span class="step-pill">Paso 1</span> Variable: Edad del hijo = $x$. Edad del padre = $3x$.</p>
+                <p><span class="step-pill">Paso 2</span> La suma es 48: $x + 3x = 48$.</p>
+                <p><span class="step-pill">Paso 3</span> Ecuación: $4x = 48$.</p>
+                <p><span class="step-pill">Paso 4</span> Resolviendo: $x = 12$.</p>
+                <p><span class="step-pill">Paso 5</span> El hijo tiene 12 años y el padre $3(12) = 36$ años. $12 + 36 = 48$ ✓</p>
+            </div>`
         },
         "Intermedio": {
             problem: "Hace 5 años la edad de María era el doble de la de su prima Lucía. Si hoy sus edades suman 40 años, ¿cuántos años tiene María actualmente?",
-            solution: `
-                <div class="space-y-3">
-                    <p><span class="step-pill">Paso 1: Identificar</span> Hace 5 años: Lucía = $y$, María = $2y$. Hoy: Lucía = $y+5$, María = $2y+5$.</p>
-                    <p><span class="step-pill">Paso 2: Traducir</span> La suma actual es 40: $(2y+5) + (y+5) = 40$.</p>
-                    <p><span class="step-pill">Paso 3: Igualar</span> Ecuación: $3y + 10 = 40 \\Rightarrow 3y = 30 \\Rightarrow y = 10$.</p>
-                    <p><span class="step-pill">Paso 4: Coherencia</span> Edad actual de María: $2(10) + 5 = 25$ años.</p>
-                    <p><span class="step-pill">Paso 5: Comprobar</span> Hoy María tiene 25 y Lucía 15 ($10+5$). Suman $25+15 = 40$. Hace 5 años tenían 20 y 10 (María era el doble). ¡Correcto!</p>
-                </div>
-            `
+            solution: `<div style="display:flex;flex-direction:column;gap:10px;">
+                <p><span class="step-pill">Paso 1</span> Hace 5 años: Lucía = $y$, María = $2y$. Hoy: Lucía = $y+5$, María = $2y+5$.</p>
+                <p><span class="step-pill">Paso 2</span> La suma actual: $(2y+5) + (y+5) = 40$.</p>
+                <p><span class="step-pill">Paso 3</span> $3y + 10 = 40 \\Rightarrow y = 10$.</p>
+                <p><span class="step-pill">Paso 4</span> María = $2(10) + 5 = 25$ años.</p>
+                <p><span class="step-pill">Paso 5</span> $25 + 15 = 40$ ✓</p>
+            </div>`
         },
         "Avanzado": {
-            problem: "La edad de un abuelo es hoy el cuádruple de la de su nieto. Hace 10 años era el séxtuple. ¿Dentro de cuántos años la edad del abuelo será el triple de la del nieto?",
-            solution: `
-                <div class="space-y-3">
-                    <p><span class="step-pill">Paso 1: Identificar</span> Hoy: Nieto = $x$, Abuelo = $4x$. Hace 10 años: Nieto = $x-10$, Abuelo = $4x-10$.</p>
-                    <p><span class="step-pill">Paso 2: Traducir</span> Hace 10 años era el séxtuple: $4x - 10 = 6(x - 10)$.</p>
-                    <p><span class="step-pill">Paso 3: Igualar</span> $4x - 10 = 6x - 60 \\Rightarrow 2x = 50 \\Rightarrow x = 25$. Nieto tiene 25, Abuelo 100.</p>
-                    <p><span class="step-pill">Paso 4: Coherencia</span> Buscamos los años futuros $N$ para triple edad: $100 + N = 3(25 + N) \\Rightarrow 100 + N = 75 + 3N \\Rightarrow 2N = 25 \\Rightarrow N = 12.5$ años.</p>
-                    <p><span class="step-pill">Paso 5: Comprobar</span> En 12.5 años: Nieto = 37.5, Abuelo = 112.5. $112.5 / 37.5 = 3$. ¡Correcto!</p>
-                </div>
-            `
+            problem: "Un abuelo hoy cuadruplica la edad de su nieto. Hace 10 años era el séxtuple. ¿En cuántos años la edad del abuelo será el triple de la del nieto?",
+            solution: `<div style="display:flex;flex-direction:column;gap:10px;">
+                <p><span class="step-pill">Paso 1</span> Nieto = $x$, Abuelo = $4x$. Hace 10: $4x-10 = 6(x-10)$.</p>
+                <p><span class="step-pill">Paso 2</span> $4x-10=6x-60 \\Rightarrow 2x=50 \\Rightarrow x=25$. Abuelo=100.</p>
+                <p><span class="step-pill">Paso 3</span> Buscamos $N$: $100+N = 3(25+N) \\Rightarrow N=12.5$ años.</p>
+                <p><span class="step-pill">Paso 5</span> En 12.5 años: Nieto=37.5, Abuelo=112.5. $112.5/37.5=3$ ✓</p>
+            </div>`
         }
     },
     "Geometría": {
         "Básico": {
             problem: "El perímetro de un cuadrado es de 36 cm. ¿Cuánto mide su área?",
-            solution: `
-                <div class="space-y-3">
-                    <p><span class="step-pill">Paso 1: Identificar</span> Lado del cuadrado = $L$. Perímetro = $4L$. Área = $L^2$.</p>
-                    <p><span class="step-pill">Paso 2: Traducir</span> $4L = 36$.</p>
-                    <p><span class="step-pill">Paso 3: Igualar</span> Lado: $L = 9\\text{ cm}$.</p>
-                    <p><span class="step-pill">Paso 4: Coherencia</span> Área: $Area = 9^2 = 81\\text{ cm}^2$.</p>
-                    <p><span class="step-pill">Paso 5: Comprobar</span> El perímetro es $9+9+9+9=36$ y el área $9 \\times 9 = 81$. ¡Correcto!</p>
-                </div>
-            `
+            solution: `<div style="display:flex;flex-direction:column;gap:10px;">
+                <p><span class="step-pill">Paso 1</span> Lado = $L$. Perímetro = $4L$. Área = $L^2$.</p>
+                <p><span class="step-pill">Paso 2</span> $4L = 36$.</p>
+                <p><span class="step-pill">Paso 3</span> $L = 9$ cm.</p>
+                <p><span class="step-pill">Paso 4</span> Área: $9^2 = 81$ cm².</p>
+                <p><span class="step-pill">Paso 5</span> Perímetro: $9 \\times 4 = 36$ ✓</p>
+            </div>`
         },
         "Intermedio": {
-            problem: "El largo de un rectángulo mide 4 metros más que el doble de su ancho. Si el perímetro es de 56 metros, calcula la longitud de sus lados.",
-            solution: `
-                <div class="space-y-3">
-                    <p><span class="step-pill">Paso 1: Identificar</span> Ancho = $x$, Largo = $2x + 4$.</p>
-                    <p><span class="step-pill">Paso 2: Traducir</span> Perímetro = $2(\\text{Ancho}) + 2(\\text{Largo}) = 56$.</p>
-                    <p><span class="step-pill">Paso 3: Igualar</span> $2(x) + 2(2x + 4) = 56 \\Rightarrow 2x + 4x + 8 = 56 \\Rightarrow 6x = 48 \\Rightarrow x = 8$.</p>
-                    <p><span class="step-pill">Paso 4: Coherencia</span> Ancho = 8 m, Largo = $2(8) + 4 = 20$ m.</p>
-                    <p><span class="step-pill">Paso 5: Comprobar</span> Perímetro: $2(8) + 2(20) = 16 + 40 = 56$ m. ¡Correcto!</p>
-                </div>
-            `
+            problem: "El largo de un rectángulo mide 4 metros más que el doble de su ancho. Si el perímetro es de 56 metros, calcula sus lados.",
+            solution: `<div style="display:flex;flex-direction:column;gap:10px;">
+                <p><span class="step-pill">Paso 1</span> Ancho = $x$, Largo = $2x + 4$.</p>
+                <p><span class="step-pill">Paso 2</span> Perímetro: $2(x) + 2(2x + 4) = 56$.</p>
+                <p><span class="step-pill">Paso 3</span> $6x + 8 = 56 \\Rightarrow x = 8$.</p>
+                <p><span class="step-pill">Paso 4</span> Ancho = 8 m, Largo = 20 m.</p>
+                <p><span class="step-pill">Paso 5</span> $2(8) + 2(20) = 56$ ✓</p>
+            </div>`
         },
         "Avanzado": {
-            problem: "En un triángulo rectángulo, la hipotenusa mide 2 cm más que el cateto mayor, y este a su vez mide 2 cm más que el cateto menor. Determina el área del triángulo.",
-            solution: `
-                <div class="space-y-3">
-                    <p><span class="step-pill">Paso 1: Identificar</span> Cateto menor = $x$, Cateto mayor = $x+2$, Hipotenusa = $x+4$.</p>
-                    <p><span class="step-pill">Paso 2: Traducir</span> Aplicando Teorema de Pitágoras: $x^2 + (x+2)^2 = (x+4)^2$.</p>
-                    <p><span class="step-pill">Paso 3: Igualar</span> $x^2 + x^2 + 4x + 4 = x^2 + 8x + 16 \\Rightarrow x^2 - 4x - 12 = 0$.</p>
-                    <p><span class="step-pill">Paso 4: Coherencia</span> Factorizando: $(x-6)(x+2) = 0 \\Rightarrow x=6$ (el valor de longitud debe ser positivo).</p>
-                    <p><span class="step-pill">Paso 5: Comprobar</span> Catetos: 6 y 8, Hipotenusa: 10 ($6^2 + 8^2 = 100$). Área = $\\frac{6 \\times 8}{2} = 24\\text{ cm}^2$. ¡Correcto!</p>
-                </div>
-            `
+            problem: "En un triángulo rectángulo, la hipotenusa mide 2 cm más que el cateto mayor, y este 2 cm más que el menor. Determina el área.",
+            solution: `<div style="display:flex;flex-direction:column;gap:10px;">
+                <p><span class="step-pill">Paso 1</span> Cat. menor = $x$, mayor = $x+2$, hipotenusa = $x+4$.</p>
+                <p><span class="step-pill">Paso 2</span> Pitágoras: $x^2 + (x+2)^2 = (x+4)^2$.</p>
+                <p><span class="step-pill">Paso 3</span> $x^2 - 4x - 12 = 0 \\Rightarrow (x-6)(x+2)=0 \\Rightarrow x=6$.</p>
+                <p><span class="step-pill">Paso 4</span> Catetos: 6 y 8. Área = $\\frac{6 \\times 8}{2} = 24$ cm².</p>
+                <p><span class="step-pill">Paso 5</span> $6^2 + 8^2 = 100 = 10^2$ ✓</p>
+            </div>`
         }
     }
 };
 
 class AIService {
     static async generateMockProblem(topic, difficulty) {
-        return new Promise((resolve) => {
+        return new Promise(resolve => {
             setTimeout(() => {
-                const topicGroup = MOCK_PROBLEMS[topic] || MOCK_PROBLEMS["Edades"];
-                const item = topicGroup[difficulty] || topicGroup["Básico"];
-                resolve({
-                    problem: item.problem,
-                    solution: item.solution
-                });
+                const group = MOCK_PROBLEMS[topic] || MOCK_PROBLEMS['Edades'];
+                const item = group[difficulty] || group['Básico'];
+                resolve({ problem: item.problem, solution: item.solution });
             }, 800);
         });
     }
 
     static async analyzeMockProblem(text) {
-        return new Promise((resolve) => {
+        return new Promise(resolve => {
             setTimeout(() => {
-                resolve(`
-                    <div class="space-y-3">
-                        <p class="font-semibold text-cyan-400">Análisis Automatizado Local (Failsafe):</p>
-                        <p><span class="step-pill">1. Identificación</span> Hemos analizado tu problema: <em>"${text.substring(0, 50)}..."</em></p>
-                        <p class="mt-2 text-slate-300">Este es un análisis estructurado de respaldo local. Para habilitar traducciones en tiempo real mediante DeepSeek/Gemini, recuerda levantar tus Edge Functions en Supabase.</p>
-                        <div class="bg-slate-950 p-3 rounded font-mono text-[11px] text-cyan-400 border border-slate-800">
-                            Ecuación estimada: $Ax + B = C$
-                        </div>
+                resolve(`<div style="display:flex;flex-direction:column;gap:10px;">
+                    <p style="color:#54b3d6;font-weight:700;">Análisis Estructurado (Modo Offline):</p>
+                    <p><span class="step-pill">1. Identificación</span> Problema analizado: <em>"${text.substring(0, 60)}..."</em></p>
+                    <p style="color:var(--color-text-muted);">Para análisis en tiempo real con DeepSeek/Gemini, despliega las Edge Functions de Supabase con los endpoints <code>generate-challenge</code> y <code>analyze-equation</code>.</p>
+                    <div style="background:#0d0d0d;padding:10px;border-radius:6px;font-family:var(--font-mono);font-size:0.8rem;color:#54b3d6;border:1px solid rgba(255,255,255,0.06);">
+                        Ecuación estimada: $Ax + B = C$
                     </div>
-                `);
+                </div>`);
             }, 1000);
         });
     }
@@ -122,34 +634,27 @@ class AIService {
         let challenge;
         if (SUPABASE_CONFIG.useEdgeFunctions && SUPABASE_CONFIG.url) {
             try {
-                challenge = await this.callSupabaseFunction("generate-challenge", { topic, difficulty });
+                challenge = await this.callSupabaseFunction('generate-challenge', { topic, difficulty });
             } catch (e) {
-                console.warn("Edge Function falló o no existe. Usando generador local de respaldo:", e);
+                console.warn('Edge Function no disponible. Usando generador local:', e);
                 challenge = await this.generateMockProblem(topic, difficulty);
             }
         } else {
             challenge = await this.generateMockProblem(topic, difficulty);
         }
 
-        // Registrar en la tabla exposicion_retos de Supabase si está configurado
-        if (SUPABASE_CONFIG.url && SUPABASE_CONFIG.anonKey) {
+        // Save to Supabase table
+        if (SUPABASE_CONFIG.url && SUPABASE_CONFIG.anonKey && window.supabase) {
             try {
-                const supabaseClient = window.supabase;
-                if (supabaseClient) {
-                    const client = supabaseClient.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
-                    await client.from('exposicion_retos').insert({
-                        topic: topic,
-                        difficulty: difficulty,
-                        problem_text: challenge.problem,
-                        solution_html: challenge.solution
-                    });
-                    console.log("Desafío guardado en la tabla Supabase 'exposicion_retos'");
-                }
-            } catch (e) {
-                console.error("Error al registrar en exposicion_retos:", e);
-            }
+                const client = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+                await client.from('exposicion_retos').insert({
+                    topic, difficulty,
+                    problem_text: challenge.problem,
+                    solution_html: challenge.solution
+                });
+            } catch (e) { console.warn('No se pudo registrar en Supabase:', e); }
         }
-        
+
         return challenge;
     }
 
@@ -157,378 +662,76 @@ class AIService {
         let analysis;
         if (SUPABASE_CONFIG.useEdgeFunctions && SUPABASE_CONFIG.url) {
             try {
-                analysis = await this.callSupabaseFunction("analyze-equation", { text });
+                analysis = await this.callSupabaseFunction('analyze-equation', { text });
             } catch (e) {
-                console.warn("Edge Function de análisis falló o no existe. Usando solucionador local de respaldo:", e);
+                console.warn('Edge Function no disponible. Usando analizador local:', e);
                 analysis = await this.analyzeMockProblem(text);
             }
         } else {
             analysis = await this.analyzeMockProblem(text);
         }
 
-        // Registrar análisis en la tabla exposicion_retos si está configurado
-        if (SUPABASE_CONFIG.url && SUPABASE_CONFIG.anonKey) {
+        if (SUPABASE_CONFIG.url && SUPABASE_CONFIG.anonKey && window.supabase) {
             try {
-                const supabaseClient = window.supabase;
-                if (supabaseClient) {
-                    const client = supabaseClient.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
-                    await client.from('exposicion_retos').insert({
-                        topic: "Análisis de Entrada",
-                        difficulty: "Personalizado",
-                        problem_text: text,
-                        solution_html: analysis
-                    });
-                    console.log("Análisis registrado en la tabla Supabase 'exposicion_retos'");
-                }
-            } catch (e) {
-                console.error("Error al registrar análisis en exposicion_retos:", e);
-            }
+                const client = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+                await client.from('exposicion_retos').insert({
+                    topic: 'Análisis de Entrada',
+                    difficulty: 'Personalizado',
+                    problem_text: text,
+                    solution_html: analysis
+                });
+            } catch (e) { console.warn('No se pudo registrar análisis en Supabase:', e); }
         }
 
         return analysis;
     }
 
     static async callSupabaseFunction(endpoint, payload) {
-        const targetUrl = `${SUPABASE_CONFIG.url}/functions/v1/${endpoint}`;
-        try {
-            const response = await fetch(targetUrl, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${SUPABASE_CONFIG.anonKey}`
-                },
-                body: JSON.stringify(payload)
-            });
-            if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
-            return await response.json();
-        } catch (e) {
-            console.error("Error en Supabase Edge Function:", e);
-            throw new Error("No se pudo conectar con la Edge Function de Supabase. Revisa las credenciales e intenta de nuevo.");
-        }
+        const response = await fetch(`${SUPABASE_CONFIG.url}/functions/v1/${endpoint}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}`
+            },
+            body: JSON.stringify(payload)
+        });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        return response.json();
     }
 }
 
-// --- CONFIGURACIÓN DE CONEXIÓN REMOTA REALTIME (INSPIRADO EN PABLITOEXPO) ---
-class RemoteUplinkService {
-    constructor(presentationController) {
-        this.controller = presentationController;
-        this.channel = null;
-        this.laserEl = document.getElementById('virtual-laser');
-        this.laserActiveTimeout = null;
-        
-        // Coordenadas del láser
-        this.laserX = window.innerWidth / 2;
-        this.laserY = window.innerHeight / 2;
-        
-        this.init();
-    }
-    
-    init() {
-        if (!SUPABASE_CONFIG.url || !SUPABASE_CONFIG.anonKey) {
-            console.log("Supabase no configurado. Iniciando en modo local.");
-            return;
-        }
-        
-        const supabaseClient = window.supabase;
-        if (!supabaseClient) {
-            console.warn("Supabase SDK no cargado en el navegador.");
-            return;
-        }
-        
-        const client = supabaseClient.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
-        this.channel = client.channel('presentation-planteo-ecuaciones');
-        
-        this.channel
-            .on('broadcast', { event: 'navigate' }, (payload) => {
-                if (payload.payload.direction === 'next') {
-                    this.controller.next();
-                } else if (payload.payload.direction === 'prev') {
-                    this.controller.prev();
-                }
-            })
-            .on('broadcast', { event: 'laser-move' }, (payload) => {
-                this.moveLaser(payload.payload.dx, payload.payload.dy);
-            })
-            .on('broadcast', { event: 'remote-scroll' }, (payload) => {
-                if (!document.body.classList.contains('presenter-mode')) {
-                    window.scrollBy({ top: payload.payload.deltaY, behavior: 'auto' });
-                }
-            })
-            .subscribe((status) => {
-                if (status === 'SUBSCRIBED') {
-                    this.controller.showToast("Uplink Remoto Enlazado con Supabase", "success");
-                }
-            });
-    }
-    
-    moveLaser(dx, dy) {
-        if (!this.laserEl) return;
-        
-        this.laserEl.style.opacity = '1';
-        
-        const sensitivity = 2.0;
-        this.laserX += dx * window.innerWidth * sensitivity;
-        this.laserY += dy * window.innerHeight * sensitivity;
-        
-        this.laserX = Math.max(0, Math.min(this.laserX, window.innerWidth));
-        this.laserY = Math.max(0, Math.min(this.laserY, window.innerHeight));
-        
-        this.laserEl.style.left = `${this.laserX}px`;
-        this.laserEl.style.top = `${this.laserY}px`;
-        
-        clearTimeout(this.laserActiveTimeout);
-        this.laserActiveTimeout = setTimeout(() => {
-            this.laserEl.style.opacity = '0';
-        }, 1500);
-    }
+// ── Supabase Realtime (Virtual Laser Pointer) ─────────────────────────────────
+function initRealtimeUplink() {
+    if (!SUPABASE_CONFIG.url || !SUPABASE_CONFIG.anonKey || !window.supabase) return;
+
+    const client = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+    const laser = document.getElementById('virtual-laser');
+    let laserX = window.innerWidth / 2, laserY = window.innerHeight / 2;
+    let hideTimeout;
+
+    client.channel('presentation-planteo-ecuaciones')
+        .on('broadcast', { event: 'laser-move' }, ({ payload }) => {
+            if (!laser) return;
+            laser.style.opacity = '1';
+            laserX = Math.max(0, Math.min(laserX + payload.dx * window.innerWidth * 2, window.innerWidth));
+            laserY = Math.max(0, Math.min(laserY + payload.dy * window.innerHeight * 2, window.innerHeight));
+            laser.style.left = `${laserX}px`;
+            laser.style.top = `${laserY}px`;
+            clearTimeout(hideTimeout);
+            hideTimeout = setTimeout(() => { laser.style.opacity = '0'; }, 1500);
+        })
+        .on('broadcast', { event: 'navigate' }, ({ payload }) => {
+            if (document.getElementById('presenter-overlay').classList.contains('active')) {
+                if (payload.direction === 'next') presenterNext();
+                else presenterPrev();
+            }
+        })
+        .subscribe((status) => {
+            if (status === 'SUBSCRIBED') showToast('🔗 Uplink remoto conectado', 'success');
+        });
 }
 
-// --- LÓGICA DE CONTROL DE LA PRESENTACIÓN ---
-class PresentationController {
-    constructor() {
-        this.slides = document.querySelectorAll('.slide-container');
-        this.currentIndex = 0;
-        this.slideWrapper = document.querySelector('.slide-wrapper');
-        this.toastContainer = document.getElementById('toast-container');
-        
-        this.init();
-    }
-
-    init() {
-        this.updateView();
-        this.setupEventListeners();
-        this.setupAutoScaling();
-        this.setupScrollReveal();
-        
-        // Inicializar Uplink Remoto
-        this.uplink = new RemoteUplinkService(this);
-        
-        // Renderizado inicial de fórmulas KaTeX
-        this.renderMath();
-    }
-
-    setupEventListeners() {
-        // Atajos de Teclado (solo activos en modo presentador)
-        window.addEventListener('keydown', (e) => {
-            if (document.body.classList.contains('presenter-mode')) {
-                if (e.key === 'ArrowRight' || e.key === ' ') {
-                    e.preventDefault();
-                    this.next();
-                } else if (e.key === 'ArrowLeft') {
-                    e.preventDefault();
-                    this.prev();
-                }
-            }
-        });
-
-        // Escuchar redimensionamiento
-        window.addEventListener('resize', () => this.handleScale());
-    }
-
-    setupAutoScaling() {
-        this.handleScale();
-    }
-
-    setupScrollReveal() {
-        // Observer para activar la animación de subida (fade up) al hacer scroll
-        const revealElements = document.querySelectorAll('.reveal');
-        
-        const observerOptions = {
-            root: null,
-            threshold: 0.15,
-            rootMargin: "0px 0px -100px 0px"
-        };
-        
-        const revealObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                }
-            });
-        }, observerOptions);
-        
-        revealElements.forEach(el => revealObserver.observe(el));
-    }
-
-    handleScale() {
-        if (!document.body.classList.contains('presenter-mode') || !this.slideWrapper) {
-            if (this.slideWrapper) this.slideWrapper.style.transform = 'none';
-            return;
-        }
-
-        const baseWidth = 1280;
-        const baseHeight = 700;
-        
-        const scaleX = window.innerWidth / baseWidth;
-        const scaleY = window.innerHeight / baseHeight;
-        
-        const scale = Math.min(scaleX, scaleY) * 0.95; 
-        
-        this.slideWrapper.style.transform = `scale(${scale})`;
-    }
-
-    updateView() {
-        const isPresenter = document.body.classList.contains('presenter-mode');
-        
-        this.slides.forEach((slide, index) => {
-            if (isPresenter) {
-                if (index === this.currentIndex) {
-                    slide.classList.add('active');
-                } else {
-                    slide.classList.remove('active');
-                }
-            } else {
-                slide.classList.add('active');
-            }
-        });
-
-        const indicator = document.getElementById('slide-indicator');
-        if (indicator) {
-            indicator.innerText = `${this.currentIndex + 1} / ${this.slides.length}`;
-        }
-        
-        this.handleScale();
-    }
-
-    next() {
-        if (this.currentIndex < this.slides.length - 1) {
-            this.currentIndex++;
-            this.updateView();
-        } else {
-            this.showToast("Ya estás en la sección final de la clase.", "info");
-        }
-    }
-
-    prev() {
-        if (this.currentIndex > 0) {
-            this.currentIndex--;
-            this.updateView();
-        } else {
-            this.showToast("Estás en la sección de portada.", "info");
-        }
-    }
-
-    setMode(mode) {
-        const header = document.querySelector('header');
-        const pBar = document.getElementById('presenter-bar');
-        
-        if (mode === 'presenter') {
-            document.body.classList.add('presenter-mode');
-            document.body.classList.remove('scroll-mode');
-            if (pBar) pBar.style.display = 'flex';
-            if (header) header.style.display = 'none';
-        } else {
-            document.body.classList.remove('presenter-mode');
-            document.body.classList.add('scroll-mode');
-            if (pBar) pBar.style.display = 'none';
-            if (header) header.style.display = 'flex';
-        }
-        this.currentIndex = 0;
-        this.updateView();
-    }
-
-    renderMath() {
-        if (window.renderMathInElement) {
-            window.renderMathInElement(document.body, {
-                delimiters: [
-                    {left: '$$', right: '$$', display: true},
-                    {left: '$', right: '$', display: false}
-                ],
-                throwOnError: false
-            });
-        }
-    }
-
-    showToast(message, type = 'info') {
-        if (!this.toastContainer) return;
-        
-        const toast = document.createElement('div');
-        toast.className = `px-4 py-3 rounded-lg shadow-lg text-xs font-semibold flex items-center gap-2 border transition-all duration-300 transform translate-y-2 opacity-0`;
-        
-        let icon = '<i class="fa-solid fa-circle-info"></i>';
-        if (type === 'error') {
-            toast.className += ' bg-rose-950/90 border-rose-800 text-rose-200';
-            icon = '<i class="fa-solid fa-triangle-exclamation"></i>';
-        } else if (type === 'warning') {
-            toast.className += ' bg-amber-950/90 border-amber-800 text-amber-200';
-            icon = '<i class="fa-solid fa-circle-exclamation"></i>';
-        } else if (type === 'success') {
-            toast.className += ' bg-emerald-950/90 border-emerald-800 text-emerald-200';
-            icon = '<i class="fa-solid fa-circle-check"></i>';
-        } else {
-            toast.className += ' bg-cyan-950/90 border-cyan-800 text-cyan-200';
-            icon = '<i class="fa-solid fa-sparkles"></i>';
-        }
-
-        toast.innerHTML = `${icon} <span>${message}</span>`;
-        this.toastContainer.appendChild(toast);
-
-        // Forzar reflow para animación
-        setTimeout(() => {
-            toast.classList.remove('translate-y-2', 'opacity-0');
-        }, 10);
-
-        setTimeout(() => {
-            toast.classList.add('opacity-0', 'scale-95');
-            setTimeout(() => toast.remove(), 300);
-        }, 4000);
-    }
-}
-
-// Inicializar la presentación globalmente
-let presentation;
-document.addEventListener('DOMContentLoaded', () => {
-    presentation = new PresentationController();
-    
-    // Configurar botones de modo en el header
-    const btnTogglePresenter = document.getElementById('btn-toggle-presenter');
-    
-    if (btnTogglePresenter) {
-        btnTogglePresenter.addEventListener('click', () => {
-            const isScrollMode = document.body.classList.contains('scroll-mode');
-            if (isScrollMode) {
-                presentation.setMode('presenter');
-            } else {
-                presentation.setMode('scroll');
-            }
-        });
-    }
-    
-    // Listener para volver desde la barra de presentación
-    const pBar = document.getElementById('presenter-bar');
-    if (pBar) {
-        if (!document.getElementById('btn-exit-presenter')) {
-            const backBtn = document.createElement('button');
-            backBtn.id = 'btn-exit-presenter';
-            backBtn.setAttribute('aria-label', 'Volver al modo de lectura web continuo');
-            backBtn.className = 'ml-4 bg-cyan-500 hover:bg-cyan-400 text-slate-950 px-4 py-2.5 rounded-full text-xs font-bold transition-all';
-            backBtn.innerHTML = '<i class="fa-solid fa-house mr-1.5"></i> Volver a Web';
-            backBtn.onclick = () => {
-                presentation.setMode('scroll');
-            };
-            pBar.appendChild(backBtn);
-        }
-    }
-});
-
-// Función expuesta en consola global para exportar las soluciones a PDF
-window.exportSolutionsToPDF = () => {
-    const wasPresenterMode = document.body.classList.contains('presenter-mode');
-    if (wasPresenterMode) {
-        presentation.setMode('scroll');
-    }
-    
-    setTimeout(() => {
-        window.print();
-        if (wasPresenterMode) {
-            presentation.setMode('presenter');
-        }
-    }, 300);
-};
-
-// Puentes de funciones globales para clics en botones HTML
-let lastSolutionHtml = "";
-
+// ── AI Button Handlers ────────────────────────────────────────────────────────
 async function generateAIProblem() {
     const diff = document.getElementById('select-diff').value;
     const topic = document.getElementById('select-topic').value;
@@ -536,31 +739,24 @@ async function generateAIProblem() {
     const output = document.getElementById('ai-problem-output');
     const btnSol = document.getElementById('btn-reveal-solution');
 
-    output.innerHTML = `
-        <div class="flex flex-col items-center justify-center h-full gap-2">
-            <i class="fa-solid fa-spinner animate-spin text-cyan-400 text-2xl"></i>
-            <p class="text-xs text-slate-400">Generando tu desafío matemático...</p>
-        </div>
-    `;
-    btn.disabled = true;
-    btnSol.disabled = true;
+    output.innerHTML = `<div style="display:flex;align-items:center;gap:10px;height:100%;justify-content:center;">
+        <i class="fa-solid fa-spinner fa-spin" style="color:var(--color-accent);font-size:1.5rem;"></i>
+        <span style="color:var(--color-text-muted);">Generando desafío matemático...</span>
+    </div>`;
+    btn.disabled = true; btnSol.disabled = true;
 
     try {
         const challenge = await AIService.generateProblem(topic, diff);
-        output.innerHTML = `
-            <div class="space-y-3 font-sans">
-                <p class="text-xs text-cyan-400 font-semibold uppercase tracking-wider">¡Nuevo Desafío Generado!</p>
-                <p class="text-slate-200 leading-relaxed text-sm">${challenge.problem}</p>
-            </div>
-        `;
+        output.innerHTML = `<div>
+            <p style="color:#46d369;font-weight:700;font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">¡Nuevo Desafío!</p>
+            <p style="color:var(--color-text-secondary);line-height:1.65;">${challenge.problem}</p>
+        </div>`;
         lastSolutionHtml = challenge.solution;
         btnSol.disabled = false;
-        
-        // Re-renderizar KaTeX en el contenedor
-        presentation.renderMath();
+        setTimeout(() => renderAllMath(), 50);
     } catch (e) {
-        presentation.showToast(e.message, 'error');
-        output.innerHTML = `<span class="text-rose-400">Error: ${e.message}</span>`;
+        showToast(e.message, 'error');
+        output.innerHTML = `<span style="color:var(--color-accent);">Error: ${e.message}</span>`;
     } finally {
         btn.disabled = false;
     }
@@ -569,18 +765,12 @@ async function generateAIProblem() {
 function toggleAISolution() {
     if (!lastSolutionHtml) return;
     const output = document.getElementById('ai-problem-output');
-    output.innerHTML += `
-        <div class="mt-4 pt-4 border-t border-slate-800 text-slate-300 animate-fade-in font-sans">
-            <p class="text-xs text-cyan-400 font-semibold uppercase tracking-wider mb-2">Resolución Paso a Paso:</p>
-            <div class="text-xs bg-slate-900/60 p-3 rounded border border-slate-800 space-y-2">
-                ${lastSolutionHtml}
-            </div>
-        </div>
-    `;
+    output.innerHTML += `<div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.08);">
+        <p style="color:#46d369;font-weight:700;font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Resolución Paso a Paso:</p>
+        <div style="font-size:0.82rem;display:flex;flex-direction:column;gap:8px;">${lastSolutionHtml}</div>
+    </div>`;
     document.getElementById('btn-reveal-solution').disabled = true;
-    
-    // Re-renderizar KaTeX en el contenedor
-    presentation.renderMath();
+    setTimeout(() => renderAllMath(), 50);
 }
 
 async function analyzeUserProblem() {
@@ -588,36 +778,49 @@ async function analyzeUserProblem() {
     const btn = document.getElementById('btn-analyze-ai');
     const output = document.getElementById('ai-analysis-output');
 
-    if (!text) {
-        presentation.showToast("Por favor, escribe un problema antes de analizar.", "warning");
-        return;
-    }
+    if (!text) { showToast('Por favor, escribe un problema antes de analizar.', 'warning'); return; }
 
-    output.innerHTML = `
-        <div class="flex flex-col items-center justify-center h-full gap-2">
-            <i class="fa-solid fa-circle-notch animate-spin text-cyan-400 text-2xl"></i>
-            <p class="text-xs text-slate-400">Analizando el texto y mapeando ecuaciones...</p>
-        </div>
-    `;
+    output.innerHTML = `<div style="display:flex;align-items:center;gap:10px;height:100%;justify-content:center;">
+        <i class="fa-solid fa-circle-notch fa-spin" style="color:var(--color-accent);font-size:1.5rem;"></i>
+        <span style="color:var(--color-text-muted);">Analizando y mapeando ecuaciones...</span>
+    </div>`;
     btn.disabled = true;
 
     try {
         const analysis = await AIService.analyzeProblem(text);
-        output.innerHTML = `<div class="space-y-2 font-sans">${analysis}</div>`;
-        
-        // Re-renderizar KaTeX en el contenedor
-        presentation.renderMath();
+        output.innerHTML = `<div style="font-size:0.82rem;">${analysis}</div>`;
+        setTimeout(() => renderAllMath(), 50);
     } catch (e) {
-        presentation.showToast(e.message, 'error');
-        output.innerHTML = `<span class="text-rose-400">Error: ${e.message}</span>`;
+        showToast(e.message, 'error');
+        output.innerHTML = `<span style="color:var(--color-accent);">Error: ${e.message}</span>`;
     } finally {
         btn.disabled = false;
     }
 }
 
-// Expone para compatibilidad con controles del HTML plano si existieran
-window.prevSlide = () => presentation && presentation.prev();
-window.nextSlide = () => presentation && presentation.next();
-window.toggleAISolution = toggleAISolution;
+// ── PDF Export ────────────────────────────────────────────────────────────────
+window.exportSolutionsToPDF = () => {
+    showToast('Preparando exportación a PDF...', 'info');
+    setTimeout(() => window.print(), 400);
+};
+
+// ── Global Bindings ───────────────────────────────────────────────────────────
 window.generateAIProblem = generateAIProblem;
+window.toggleAISolution = toggleAISolution;
 window.analyzeUserProblem = analyzeUserProblem;
+window.selectProfile = selectProfile;
+window.openSlideModal = openSlideModal;
+window.closeSlideModal = closeSlideModal;
+window.startPresenterMode = startPresenterMode;
+window.startPresenterFromSlide = startPresenterFromSlide;
+window.exitPresenterMode = exitPresenterMode;
+window.presenterNext = presenterNext;
+window.presenterPrev = presenterPrev;
+window.slideCarousel = slideCarousel;
+window.showToast = showToast;
+
+// ── Init on DOM Ready ─────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+    initRealtimeUplink();
+    renderAllMath();
+});
