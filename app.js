@@ -5,9 +5,14 @@
 // ── Supabase Configuration ──────────────────────────────────────────────────
 const SUPABASE_CONFIG = {
     url: "https://dyuadrzdrphzywbnxnhz.supabase.co",
+    // Nota: Esta clave anónima es segura para exponer en el frontend gracias a las políticas RLS de Supabase.
     anonKey: "sb_publishable_rCwOvgVa1kGlO5PFAa8tRg_E1KIWKWX",
     useEdgeFunctions: true
 };
+
+const supabaseClient = (typeof window !== 'undefined' && window.supabase && SUPABASE_CONFIG.url) 
+    ? window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey) 
+    : null;
 
 // ── Slide Data (contenido de cada diapositiva para modal y presentador) ─────
 const SLIDES_DATA = {
@@ -392,7 +397,7 @@ function openSlideModal(slideId) {
 }
 
 function closeSlideModal(e) {
-    if (e && e.target !== document.getElementById('slide-modal')) return;
+    if (e && e.target !== e.currentTarget) return;
     const modal = document.getElementById('slide-modal');
     modal.classList.remove('open');
     document.body.style.overflow = '';
@@ -457,12 +462,17 @@ function presenterPrev() {
     }
 }
 
-// Keyboard navigation for presenter mode
+// Global keyboard navigation
 window.addEventListener('keydown', (e) => {
-    if (!document.getElementById('presenter-overlay').classList.contains('active')) return;
-    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); presenterNext(); }
-    else if (e.key === 'ArrowLeft') { e.preventDefault(); presenterPrev(); }
-    else if (e.key === 'Escape') exitPresenterMode();
+    if (document.getElementById('presenter-overlay').classList.contains('active')) {
+        if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); presenterNext(); }
+        else if (e.key === 'ArrowLeft') { e.preventDefault(); presenterPrev(); }
+        else if (e.key === 'Escape') exitPresenterMode();
+    } else if (document.getElementById('qr-modal').classList.contains('open')) {
+        if (e.key === 'Escape') closeQRModal();
+    } else if (document.getElementById('slide-modal').classList.contains('open')) {
+        if (e.key === 'Escape') closeSlideModal();
+    }
 });
 
 // ── Scroll Reveal ─────────────────────────────────────────────────────────────
@@ -570,6 +580,7 @@ const MOCK_PROBLEMS = {
                 <p><span class="step-pill">Paso 1</span> Nieto = $x$, Abuelo = $4x$. Hace 10: $4x-10 = 6(x-10)$.</p>
                 <p><span class="step-pill">Paso 2</span> $4x-10=6x-60 \\Rightarrow 2x=50 \\Rightarrow x=25$. Abuelo=100.</p>
                 <p><span class="step-pill">Paso 3</span> Buscamos $N$: $100+N = 3(25+N) \\Rightarrow N=12.5$ años.</p>
+                <p><span class="step-pill">Paso 4</span> Las edades futuras serán 37.5 y 112.5 años, cantidades coherentes.</p>
                 <p><span class="step-pill">Paso 5</span> En 12.5 años: Nieto=37.5, Abuelo=112.5. $112.5/37.5=3$ ✓</p>
             </div>`
         }
@@ -648,10 +659,9 @@ class AIService {
         }
 
         // Save to Supabase table
-        if (SUPABASE_CONFIG.url && SUPABASE_CONFIG.anonKey && window.supabase) {
+        if (supabaseClient) {
             try {
-                const client = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
-                await client.from('exposicion_retos').insert({
+                await supabaseClient.from('exposicion_retos').insert({
                     topic, difficulty,
                     problem_text: challenge.problem,
                     solution_html: challenge.solution
@@ -675,10 +685,9 @@ class AIService {
             analysis = await this.analyzeMockProblem(text);
         }
 
-        if (SUPABASE_CONFIG.url && SUPABASE_CONFIG.anonKey && window.supabase) {
+        if (supabaseClient) {
             try {
-                const client = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
-                await client.from('exposicion_retos').insert({
+                await supabaseClient.from('exposicion_retos').insert({
                     topic: 'Análisis de Entrada',
                     difficulty: 'Personalizado',
                     problem_text: text,
@@ -706,14 +715,13 @@ class AIService {
 
 // ── Supabase Realtime (Virtual Laser Pointer + Remote Commands) ──────────────────────
 function initRealtimeUplink() {
-    if (!SUPABASE_CONFIG.url || !SUPABASE_CONFIG.anonKey || !window.supabase) return;
+    if (!supabaseClient) return;
 
-    const client = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
     const laser = document.getElementById('virtual-laser');
     let laserX = window.innerWidth / 2, laserY = window.innerHeight / 2;
     let hideTimeout;
 
-    client.channel('presentation-planteo-ecuaciones')
+    supabaseClient.channel('presentation-planteo-ecuaciones')
         .on('broadcast', { event: 'laser-move' }, ({ payload }) => {
             if (!laser) return;
             laser.style.opacity = '1';
@@ -777,10 +785,10 @@ async function generateAIProblem() {
 function toggleAISolution() {
     if (!lastSolutionHtml) return;
     const output = document.getElementById('ai-problem-output');
-    output.innerHTML += `<div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.08);">
+    output.insertAdjacentHTML('beforeend', `<div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.08);">
         <p style="color:#46d369;font-weight:700;font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Resolución Paso a Paso:</p>
         <div style="font-size:0.82rem;display:flex;flex-direction:column;gap:8px;">${lastSolutionHtml}</div>
-    </div>`;
+    </div>`);
     document.getElementById('btn-reveal-solution').disabled = true;
     setTimeout(() => renderAllMath(), 50);
 }
@@ -828,11 +836,7 @@ function closeQRModal() {
     document.body.style.overflow = '';
 }
 
-window.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && document.getElementById('qr-modal').classList.contains('open')) {
-        closeQRModal();
-    }
-});
+
 
 // ── PDF Export ────────────────────────────────────────────────────────────────
 window.exportSolutionsToPDF = () => {
@@ -886,34 +890,18 @@ function stopAllPreviews() {
  * a data-yt-id attribute.
  */
 /**
- * Helper to check if a local video file exists and is not a redirect to index.html (common in SPAs).
- */
-async function checkLocalVideoExists(url) {
-    try {
-        const response = await fetch(url);
-        if (!response.ok) return false;
-        
-        // If content-type is HTML, it's a fallback/redirect page, not a real video
-        const contentType = response.headers.get('content-type') || '';
-        if (contentType.includes('text/html')) {
-            return false;
-        }
-        return true;
-    } catch (e) {
-        // If CORS blocks fetch (e.g. on file:// protocol), return false to fallback to YouTube
-        return false;
-    }
-}
-
-/**
  * Initialises Netflix-style hover preview on every .slide-card that has
  * a data-yt-id attribute.
  */
 function initCardPreviews() {
-    document.querySelectorAll('.slide-card[data-yt-id]').forEach(card => {
+    // Prevent duplicate listeners by keeping track of initialized cards
+    document.querySelectorAll('.slide-card[data-yt-id]').forEach((card, index) => {
+        if (card.dataset.previewInit) return;
+        card.dataset.previewInit = 'true';
+        
         const ytId    = card.dataset.ytId;
         const ytStart = parseInt(card.dataset.ytStart || '0', 10);
-        const cardKey = ytId + '_' + Math.random();
+        const cardKey = ytId + '_' + index;
 
         // ── mouseenter: schedule preview after 600 ms (like Netflix)
         card.addEventListener('mouseenter', () => {
@@ -947,68 +935,36 @@ function initCardPreviews() {
                 thumb.appendChild(container);
                 thumb.appendChild(badge);
 
-                const videoUrl = `assets/videos/${ytId}.mp4`;
+                // Load YouTube iframe directly for preview
+                const src = [
+                    `https://www.youtube.com/embed/${ytId}`,
+                    `?autoplay=1`,
+                    `&mute=1`,
+                    `&controls=0`,
+                    `&modestbranding=1`,
+                    `&rel=0`,
+                    `&fs=0`,
+                    `&iv_load_policy=3`,
+                    `&disablekb=1`,
+                    `&start=${ytStart}`,
+                    `&enablejsapi=0`,
+                    `&playsinline=1`
+                ].join('');
 
-                // Check if local video exists before attempting to load it
-                checkLocalVideoExists(videoUrl).then(exists => {
-                    if (exists) {
-                        // Local video exists! Create video element
-                        const video = document.createElement('video');
-                        video.muted = true;
-                        video.autoplay = true;
-                        video.loop = true;
-                        video.playsInline = true;
-                        video.src = videoUrl;
-                        video.style.width = '100%';
-                        video.style.height = '100%';
-                        video.style.objectFit = 'cover';
-                        video.style.pointerEvents = 'none';
+                const iframe = document.createElement('iframe');
+                iframe.src = src;
+                iframe.title = 'Vista previa de video';
+                iframe.allow = 'autoplay; encrypted-media';
+                iframe.setAttribute('allowfullscreen', '');
 
-                        video.addEventListener('loadedmetadata', () => {
-                            if (ytStart > 0) {
-                                video.currentTime = ytStart;
-                            }
-                        });
+                container.appendChild(iframe);
 
-                        video.addEventListener('canplay', () => {
-                            container.classList.add('visible');
-                            badge.classList.add('visible');
-                        });
-
-                        container.appendChild(video);
-                    } else {
-                        // Local video doesn't exist, load YouTube iframe fallback
-                        const src = [
-                            `https://www.youtube.com/embed/${ytId}`,
-                            `?autoplay=1`,
-                            `&mute=1`,
-                            `&controls=0`,
-                            `&modestbranding=1`,
-                            `&rel=0`,
-                            `&fs=0`,
-                            `&iv_load_policy=3`,
-                            `&disablekb=1`,
-                            `&start=${ytStart}`,
-                            `&enablejsapi=0`,
-                            `&playsinline=1`
-                        ].join('');
-
-                        const iframe = document.createElement('iframe');
-                        iframe.src = src;
-                        iframe.title = 'Vista previa de video';
-                        iframe.allow = 'autoplay; encrypted-media';
-                        iframe.setAttribute('allowfullscreen', '');
-
-                        container.appendChild(iframe);
-
-                        // Fade in YouTube iframe after a short delay
-                        requestAnimationFrame(() => {
-                            requestAnimationFrame(() => {
-                                container.classList.add('visible');
-                                badge.classList.add('visible');
-                            });
-                        });
-                    }
+                // Fade in YouTube iframe after a short delay
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        container.classList.add('visible');
+                        badge.classList.add('visible');
+                    });
                 });
 
                 // Auto-kill after 15 seconds to save resources

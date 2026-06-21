@@ -7,7 +7,7 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 
 const CORS = {
-  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Origin": "https://planteodeecuaciones.sypablitodp.site",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };

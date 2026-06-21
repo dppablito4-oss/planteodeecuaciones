@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Planteo de Ecuaciones — Clase Magistral</title>
     <meta name="description" content="Presentación interactiva de Planteo de Ecuaciones para clase magistral universitaria. Incluye ejemplos, taller con IA y modo presentador.">
+    <meta property="og:title" content="Planteo de Ecuaciones — Clase Magistral">
+    <meta property="og:description" content="Aprende a traducir el lenguaje cotidiano al lenguaje universal de las matemáticas.">
+    <meta property="og:type" content="website">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>">
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -83,7 +87,7 @@
         </div>
     </div>
 
-    <button class="profile-manage" onclick="selectProfile('Invitado', null, '#6d6d6e')">
+    <button class="profile-manage" onclick="showToast('Funcionalidad en desarrollo para la próxima versión.', 'info')">
         Gestionar perfiles
     </button>
 </div>
@@ -533,7 +537,7 @@
         <button class="pbar-btn" onclick="presenterPrev()" aria-label="Diapositiva anterior">
             <i class="fa-solid fa-chevron-left"></i> Anterior
         </button>
-        <span class="pbar-indicator" id="pbar-indicator">1 / 9</span>
+        <span class="pbar-indicator" id="pbar-indicator"></span>
         <button class="pbar-btn" onclick="presenterNext()" aria-label="Diapositiva siguiente">
             Siguiente <i class="fa-solid fa-chevron-right"></i>
         </button>
