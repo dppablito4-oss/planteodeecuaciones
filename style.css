@@ -974,19 +974,18 @@ body {
 .presenter-slide-view {
     flex: 1;
     display: flex;
-    align-items: center;
-    justify-content: center;
     padding: var(--space-16) var(--space-12);
-    overflow: hidden;
+    overflow-y: auto; /* Permite scroll si el contenido es mas grande que la pantalla */
 }
 
 .presenter-slide-inner {
+    margin: auto; /* Centrado inteligente que evita cortes superiores */
     width: 100%;
-    max-width: var(--slide-width);
+    max-width: 1100px; /* Ancho balanceado para presentaciones */
     background: #181818;
     border-radius: 12px;
     border: 1px solid rgba(229, 9, 20, 0.15);
-    padding: var(--space-12) var(--space-16);
+    padding: 60px 80px; /* Mas espacio de respiro interior */
     min-height: 400px;
     box-shadow: 0 30px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(229,9,20,0.1);
 }
@@ -1025,35 +1024,35 @@ body {
 #presenter-overlay .modal-solution-tag { font-size: 1.6rem !important; margin-top: 24px !important; }
 #presenter-overlay .modal-table th, #presenter-overlay .modal-table td { font-size: 1.2rem !important; padding: 16px !important; }
 
-/* Escalar de forma inteligente los estilos inline inyectados en app.js */
+/* Escalar de forma inteligente pero equilibrada los estilos inline */
 #presenter-overlay [style*="font-size:0.7rem"],
-#presenter-overlay [style*="font-size: 0.7rem"] { font-size: 1.4rem !important; }
+#presenter-overlay [style*="font-size: 0.7rem"] { font-size: 1.1rem !important; }
 #presenter-overlay [style*="font-size:0.8rem"],
-#presenter-overlay [style*="font-size: 0.8rem"] { font-size: 1.5rem !important; }
+#presenter-overlay [style*="font-size: 0.8rem"] { font-size: 1.2rem !important; }
 #presenter-overlay [style*="font-size:0.85rem"],
-#presenter-overlay [style*="font-size: 0.85rem"] { font-size: 1.6rem !important; }
+#presenter-overlay [style*="font-size: 0.85rem"] { font-size: 1.3rem !important; }
 #presenter-overlay [style*="font-size:0.9rem"],
-#presenter-overlay [style*="font-size: 0.9rem"] { font-size: 1.7rem !important; }
+#presenter-overlay [style*="font-size: 0.9rem"] { font-size: 1.4rem !important; }
 #presenter-overlay [style*="font-size:1rem"],
-#presenter-overlay [style*="font-size: 1rem"] { font-size: 1.8rem !important; }
+#presenter-overlay [style*="font-size: 1rem"] { font-size: 1.5rem !important; }
 #presenter-overlay [style*="font-size:1.05rem"],
-#presenter-overlay [style*="font-size: 1.05rem"] { font-size: 2rem !important; }
+#presenter-overlay [style*="font-size: 1.05rem"] { font-size: 1.6rem !important; }
 #presenter-overlay [style*="font-size:1.1rem"],
-#presenter-overlay [style*="font-size: 1.1rem"] { font-size: 2.2rem !important; }
+#presenter-overlay [style*="font-size: 1.1rem"] { font-size: 1.7rem !important; }
 #presenter-overlay [style*="font-size:1.2rem"],
-#presenter-overlay [style*="font-size: 1.2rem"] { font-size: 2.4rem !important; }
+#presenter-overlay [style*="font-size: 1.2rem"] { font-size: 1.8rem !important; }
 #presenter-overlay [style*="font-size:1.4rem"],
-#presenter-overlay [style*="font-size: 1.4rem"] { font-size: 2.8rem !important; }
+#presenter-overlay [style*="font-size: 1.4rem"] { font-size: 2rem !important; }
 #presenter-overlay [style*="font-size:1.5rem"],
-#presenter-overlay [style*="font-size: 1.5rem"] { font-size: 3rem !important; }
+#presenter-overlay [style*="font-size: 1.5rem"] { font-size: 2.2rem !important; }
 #presenter-overlay [style*="font-size:2rem"],
-#presenter-overlay [style*="font-size: 2rem"] { font-size: 4rem !important; }
+#presenter-overlay [style*="font-size: 2rem"] { font-size: 2.8rem !important; }
 #presenter-overlay [style*="font-size:2.5rem"],
-#presenter-overlay [style*="font-size: 2.5rem"] { font-size: 5rem !important; }
+#presenter-overlay [style*="font-size: 2.5rem"] { font-size: 3.5rem !important; }
 #presenter-overlay [style*="font-size:3rem"],
-#presenter-overlay [style*="font-size: 3rem"] { font-size: 6rem !important; }
+#presenter-overlay [style*="font-size: 3rem"] { font-size: 4rem !important; }
 #presenter-overlay [style*="font-size:5rem"],
-#presenter-overlay [style*="font-size: 5rem"] { font-size: 8rem !important; }
+#presenter-overlay [style*="font-size: 5rem"] { font-size: 6rem !important; }
 
 /* Separaciones mayores para proyectores */
 #presenter-overlay [style*="margin-bottom:12px"] { margin-bottom: 24px !important; }
