@@ -1734,7 +1734,7 @@ async function _torneoRenderLeaderboard() {
     if (!supabaseClient) return;
     const { data } = await supabaseClient
         .from('participantes')
-        .select('nombre, puntaje')
+        .select('id, nombre, puntaje')
         .order('puntaje', { ascending: false })
         .limit(20);
 

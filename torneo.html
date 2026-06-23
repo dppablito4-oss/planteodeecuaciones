@@ -548,6 +548,7 @@ let editorRotDeg  = 0;      // Rotación acumulada en múltiplos de 90°
 let editorCropMode = false; // ¿Modo recorte activo?
 let editorCropBox  = null;  // { x, y, w, h } en coordenadas del canvas
 let editorDragState = null; // { handle, startX, startY, origBox }
+let editorEventsInitialized = false;
 const HANDLE_HALF  = 14;    // Radio del handle de recorte en px
 
 function editorRenderFrame() {
@@ -638,6 +639,7 @@ function editorTouchToCanvas(e, canvas) {
 }
 
 function editorInitOverlayEvents() {
+    if (editorEventsInitialized) return;
     const ov = document.getElementById('editor-overlay-canvas');
     if (!ov) return;
     // Touch
@@ -648,6 +650,7 @@ function editorInitOverlayEvents() {
     ov.addEventListener('mousedown', editorPointerDown);
     document.addEventListener('mousemove', editorPointerMove);
     document.addEventListener('mouseup',   editorPointerUp);
+    editorEventsInitialized = true;
 }
 
 function editorPointerDown(e) {
