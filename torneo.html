@@ -479,7 +479,12 @@ function aplicarEstado(estado) {
             showScreen('lobby');
             break;
         case 'pregunta':
-            mostrarPregunta(preguntaActualId, estado.tiempo_restante || 60);
+            // Calcular segundos restantes de forma sincronizada usando updated_at
+            const ahora = new Date().getTime();
+            const updatedAt = estado.updated_at ? new Date(estado.updated_at).getTime() : ahora;
+            const segundosTranscurridos = Math.floor((ahora - updatedAt) / 1000);
+            const tiempoRestanteSinc = Math.max(0, (estado.tiempo_restante || 60) - segundosTranscurridos);
+            mostrarPregunta(preguntaActualId, tiempoRestanteSinc);
             break;
         case 'leaderboard':
             clearInterval(timerInterval);
@@ -699,8 +704,8 @@ async function enviarRespuesta() {
 
         if (insertErr) throw insertErr;
 
-        // PASO 4 — Disparar Edge Function (fire-and-forget: el resultado llega por Realtime)
-        fetch(`${EDGE_BASE}/evaluar-matematica`, {
+        // PASO 4 — Disparar Edge Function (esperamos por si hay error en la llamada)
+        const funcRes = await fetch(`${EDGE_BASE}/evaluar-matematica`, {
             method: 'POST',
             headers: {
                 'Content-Type':  'application/json',
@@ -711,7 +716,12 @@ async function enviarRespuesta() {
                 imageUrl:      imageUrl,
                 problemaTexto: pregunta.texto
             })
-        }).catch(console.warn); // No esperamos: el resultado llega por suscripción Realtime
+        });
+
+        if (!funcRes.ok) {
+            const errData = await funcRes.json().catch(() => ({}));
+            throw new Error(errData.error || `Error del servidor de evaluación (${funcRes.status})`);
+        }
 
         // Si en 30 s no llega el evento Realtime, verificar manualmente
         setTimeout(verificarResultadoManual, 30000, respuesta.id);

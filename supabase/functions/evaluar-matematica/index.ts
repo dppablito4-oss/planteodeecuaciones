@@ -96,7 +96,7 @@ Debes responder ESTRICTAMENTE en formato JSON plano con la siguiente estructura,
         }
       ],
       temperature: 0.1,
-      max_tokens: 1024,
+      max_completion_tokens: 1024,
       response_format: { type: "json_object" }
     }
 

@@ -53,22 +53,29 @@ Los 5 pasos de oro son: Identificar, Traducir, Igualar, Coherencia, Comprobar.`;
       throw new Error("No hay API Key configurada. Añade DEEPSEEK_API_KEY o OPENAI_API_KEY en los secretos de Supabase.");
     }
 
+    const requestBody: any = {
+      model,
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user",   content: userPrompt },
+      ],
+      response_format: { type: "json_object" },
+      temperature: 0.8,
+    };
+
+    if (model === "gpt-5.4-mini") {
+      requestBody.max_completion_tokens = 800;
+    } else {
+      requestBody.max_tokens = 800;
+    }
+
     const aiRes = await fetch(apiURL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${apiKey}`,
       },
-      body: JSON.stringify({
-        model,
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user",   content: userPrompt },
-        ],
-        response_format: { type: "json_object" },
-        temperature: 0.8,
-        max_tokens: 800,
-      }),
+      body: JSON.stringify(requestBody),
     });
 
     if (!aiRes.ok) {

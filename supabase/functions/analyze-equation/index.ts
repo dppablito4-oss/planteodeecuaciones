@@ -55,22 +55,29 @@ Usa LaTeX inline con $...$ para las fórmulas. El HTML debe ser semánticamente 
       throw new Error("No hay API Key configurada. Añade DEEPSEEK_API_KEY o OPENAI_API_KEY en los secretos de Supabase.");
     }
 
+    const requestBody: any = {
+      model,
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user",   content: userPrompt },
+      ],
+      response_format: { type: "json_object" },
+      temperature: 0.4,
+    };
+
+    if (model === "gpt-5.4-mini") {
+      requestBody.max_completion_tokens = 900;
+    } else {
+      requestBody.max_tokens = 900;
+    }
+
     const aiRes = await fetch(apiURL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${apiKey}`,
       },
-      body: JSON.stringify({
-        model,
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user",   content: userPrompt },
-        ],
-        response_format: { type: "json_object" },
-        temperature: 0.4,
-        max_tokens: 900,
-      }),
+      body: JSON.stringify(requestBody),
     });
 
     if (!aiRes.ok) {

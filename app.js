@@ -1690,13 +1690,20 @@ async function _torneoRenderPregunta(estado) {
 
     // Timer
     clearInterval(torneoTimerInterval);
-    let t = estado.tiempo_restante || 60;
+    const ahora = new Date().getTime();
+    const updatedAt = estado.updated_at ? new Date(estado.updated_at).getTime() : ahora;
+    const segundosTranscurridos = Math.floor((ahora - updatedAt) / 1000);
+    let t = Math.max(0, (estado.tiempo_restante || 60) - segundosTranscurridos);
+
     const timerEl = document.getElementById('torneo-timer');
     const _tick = () => {
         if (!timerEl) { clearInterval(torneoTimerInterval); return; }
         timerEl.textContent = t;
         timerEl.style.color = t <= 10 ? '#e50914' : '#46d369';
-        if (t <= 0) clearInterval(torneoTimerInterval);
+        if (t <= 0) {
+            clearInterval(torneoTimerInterval);
+            return;
+        }
         t--;
     };
     _tick();
