@@ -1516,4 +1516,278 @@ document.addEventListener('DOMContentLoaded', () => {
     checkAIServiceStatus();
     renderAllMath();
     initCardBackgrounds();
+    initTorneo();
 });
+
+// ═══════════════════════════════════════════════════════════════════════════
+// MÓDULO: TORNEO EN VIVO "MATH-FLIX"
+// ═══════════════════════════════════════════════════════════════════════════
+
+// ── Banco de preguntas del torneo ────────────────────────────────────────────
+const TORNEO_PREGUNTAS = [
+    { id: 1, texto: 'La suma de tres números consecutivos es 72. Halla los números.' },
+    { id: 2, texto: 'El doble de un número aumentado en 5 es igual a 21. Encuentra el número.' },
+    { id: 3, texto: 'La edad de Ana es el triple de la de su hijo. Dentro de 10 años será el doble. ¿Qué edad tiene cada uno?' },
+    { id: 4, texto: 'En un rectángulo el largo es 4 cm mayor que el ancho y su perímetro es 32 cm. Halla sus dimensiones.' },
+    { id: 5, texto: 'Se reparten 50 caramelos entre dos niños de modo que uno recibe 10 más que el otro. ¿Cuántos recibe cada uno?' },
+];
+
+// ── Estado local del torneo ───────────────────────────────────────────────────
+let torneoEstado = { pantalla_actual: 'lobby', pregunta_actual_id: 1, tiempo_restante: 60 };
+let torneoTimerInterval = null;
+let torneoParticipantes = [];
+let torneoRespuestasActuales = 0;
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+function initTorneo() {
+    if (!supabaseClient) return;
+
+    // Suscribirse a cambios en estado_juego (para el overlay de la pantalla grande)
+    supabaseClient
+        .channel('torneo-estado-grande')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'estado_juego' }, ({ new: payload }) => {
+            torneoEstado = payload;
+            if (document.getElementById('tournament-overlay').style.display !== 'none') {
+                _torneoRenderPanel(payload);
+            }
+        })
+        .subscribe();
+
+    // Suscribirse a participantes
+    supabaseClient
+        .channel('torneo-participantes-grande')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'participantes' }, () => {
+            _torneoRecargarParticipantes();
+        })
+        .subscribe();
+
+    // Suscribirse a respuestas (para el contador en tiempo real durante pregunta)
+    supabaseClient
+        .channel('torneo-respuestas-grande')
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'respuestas' }, () => {
+            torneoRespuestasActuales++;
+            _torneoActualizarContadorRespuestas();
+        })
+        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'respuestas', filter: 'procesado=eq.true' }, () => {
+            // Cuando una respuesta queda procesada, refrescar leaderboard si está visible
+            if (torneoEstado.pantalla_actual === 'leaderboard') _torneoRenderLeaderboard();
+        })
+        .subscribe();
+}
+
+// ── Abrir / cerrar overlay ────────────────────────────────────────────────────
+async function openTorneoOverlay() {
+    const overlay = document.getElementById('tournament-overlay');
+    overlay.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+
+    // Generar QR para torneo.html
+    const base      = window.location.origin + window.location.pathname.replace(/[^/]*$/, '');
+    const torneoURL = base + 'torneo.html';
+    document.getElementById('torneo-qr-img').src  = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&color=141414&bgcolor=ffffff&data=${encodeURIComponent(torneoURL)}`;
+    document.getElementById('torneo-qr-url').textContent = torneoURL;
+
+    // Cargar estado actual
+    if (supabaseClient) {
+        const { data } = await supabaseClient.from('estado_juego').select('*').eq('id', 'global').single();
+        if (data) { torneoEstado = data; _torneoRenderPanel(data); }
+        else _torneoRenderPanel(torneoEstado);
+    } else {
+        _torneoRenderPanel(torneoEstado);
+    }
+
+    await _torneoRecargarParticipantes();
+}
+
+function closeTorneoOverlay() {
+    document.getElementById('tournament-overlay').style.display = 'none';
+    document.body.style.overflow = '';
+    clearInterval(torneoTimerInterval);
+}
+
+// ── Render central ────────────────────────────────────────────────────────────
+function _torneoRenderPanel(estado) {
+    ['lobby','pregunta','leaderboard'].forEach(p => {
+        const el = document.getElementById(`torneo-panel-${p}`);
+        if (el) el.style.display = 'none';
+    });
+
+    const panelId = estado.pantalla_actual === 'pregunta' ? 'pregunta' : estado.pantalla_actual;
+    const panel = document.getElementById(`torneo-panel-${panelId}`);
+    if (panel) panel.style.display = 'flex';
+
+    if (estado.pantalla_actual === 'pregunta') {
+        _torneoRenderPregunta(estado);
+    } else if (estado.pantalla_actual === 'leaderboard') {
+        _torneoRenderLeaderboard();
+    }
+}
+
+// ── Panel: Lobby ──────────────────────────────────────────────────────────────
+async function _torneoRecargarParticipantes() {
+    if (!supabaseClient) return;
+    const { data } = await supabaseClient
+        .from('participantes')
+        .select('id, nombre, puntaje')
+        .order('created_at', { ascending: true });
+
+    if (!data) return;
+    torneoParticipantes = data;
+
+    const countEl = document.getElementById('torneo-count');
+    const grid    = document.getElementById('torneo-participantes-grid');
+    if (!countEl || !grid) return;
+
+    countEl.textContent = data.length;
+    grid.innerHTML = data.map(p => `
+        <div style="
+            background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.09);
+            border-radius:10px; padding:8px 14px;
+            font-size:0.8rem; font-weight:600; color:#e5e5e5;
+            display:flex; align-items:center; gap:8px;
+            animation:fadeInCard 0.4s ease;
+        ">
+            <span style="width:28px;height:28px;border-radius:50%;background:rgba(229,9,20,0.15);
+                display:flex;align-items:center;justify-content:center;font-size:0.9rem;">🎓</span>
+            ${p.nombre}
+        </div>`).join('');
+}
+
+// ── Panel: Pregunta ───────────────────────────────────────────────────────────
+async function _torneoRenderPregunta(estado) {
+    const pid = estado.pregunta_actual_id || 1;
+    const pregunta = TORNEO_PREGUNTAS.find(p => p.id === pid) || TORNEO_PREGUNTAS[0];
+
+    document.getElementById('torneo-p-badge').textContent = `Pregunta ${pregunta.id} de ${TORNEO_PREGUNTAS.length}`;
+    document.getElementById('torneo-p-texto').textContent  = pregunta.texto;
+
+    // Contar respuestas de esta pregunta
+    if (supabaseClient) {
+        const { count } = await supabaseClient
+            .from('respuestas')
+            .select('*', { count: 'exact', head: true })
+            .eq('pregunta_id', pid);
+        torneoRespuestasActuales = count || 0;
+    }
+    _torneoActualizarContadorRespuestas();
+
+    // Timer
+    clearInterval(torneoTimerInterval);
+    let t = estado.tiempo_restante || 60;
+    const timerEl = document.getElementById('torneo-timer');
+    const _tick = () => {
+        if (!timerEl) { clearInterval(torneoTimerInterval); return; }
+        timerEl.textContent = t;
+        timerEl.style.color = t <= 10 ? '#e50914' : '#46d369';
+        if (t <= 0) clearInterval(torneoTimerInterval);
+        t--;
+    };
+    _tick();
+    torneoTimerInterval = setInterval(_tick, 1000);
+}
+
+function _torneoActualizarContadorRespuestas() {
+    const el       = document.getElementById('torneo-resp-count');
+    const progBar  = document.getElementById('torneo-prog-bar');
+    const progText = document.getElementById('torneo-prog-text');
+    if (!el) return;
+
+    const total = torneoParticipantes.length || 1;
+    const pct   = Math.min(100, Math.round((torneoRespuestasActuales / total) * 100));
+
+    el.textContent        = torneoRespuestasActuales;
+    if (progText) progText.textContent = `${torneoRespuestasActuales} de ${torneoParticipantes.length} alumnos`;
+    if (progBar)  progBar.style.width  = `${pct}%`;
+}
+
+// ── Panel: Leaderboard ────────────────────────────────────────────────────────
+async function _torneoRenderLeaderboard() {
+    if (!supabaseClient) return;
+    const { data } = await supabaseClient
+        .from('participantes')
+        .select('nombre, puntaje')
+        .order('puntaje', { ascending: false })
+        .limit(20);
+
+    const list = document.getElementById('torneo-leaderboard-list');
+    if (!list || !data) return;
+
+    const medals = ['🥇','🥈','🥉'];
+    list.innerHTML = data.map((p, i) => {
+        const medal   = medals[i] || `#${i + 1}`;
+        const isTop   = i < 3;
+        const accent  = i === 0 ? '#f59e0b' : i === 1 ? '#9ca3af' : i === 2 ? '#b87333' : '#b3b3b3';
+        return `
+        <div style="
+            display:flex; align-items:center; justify-content:space-between;
+            padding:14px 20px;
+            background:${isTop ? `rgba(255,255,255,0.05)` : `rgba(255,255,255,0.02)`};
+            border:1px solid ${isTop ? `rgba(255,255,255,0.12)` : `rgba(255,255,255,0.05)`};
+            border-radius:12px;
+            ${i === 0 ? 'box-shadow:0 0 24px rgba(245,158,11,0.15);' : ''}
+            animation:fadeInCard 0.3s ease ${i * 0.06}s both;
+        ">
+            <div style="display:flex;align-items:center;gap:14px;">
+                <span style="font-size:${isTop ? '1.5rem' : '1rem'};min-width:32px;text-align:center;">${medal}</span>
+                <span style="font-size:${isTop ? '1rem' : '0.88rem'};font-weight:${isTop ? '700' : '500'};color:#fff;">${p.nombre}</span>
+            </div>
+            <span style="font-size:${isTop ? '1.4rem' : '1rem'};font-weight:800;color:${accent};">${p.puntaje}<span style="font-size:0.6rem;color:#6d6d6e;margin-left:2px;">pts</span></span>
+        </div>`;
+    }).join('');
+}
+
+// ── Controles del Profesor ────────────────────────────────────────────────────
+async function torneoSetPantalla(pantalla) {
+    if (!supabaseClient) return showToast('Supabase no conectado', 'error');
+
+    const pregId = torneoEstado.pregunta_actual_id || 1;
+    const { error } = await supabaseClient
+        .from('estado_juego')
+        .update({ pantalla_actual: pantalla, pregunta_actual_id: pregId, tiempo_restante: 60, updated_at: new Date().toISOString() })
+        .eq('id', 'global');
+
+    if (error) return showToast('Error: ' + error.message, 'error');
+
+    torneoEstado.pantalla_actual = pantalla;
+    _torneoRenderPanel(torneoEstado);
+    showToast(`Pantalla cambiada a: ${pantalla}`, 'success');
+}
+
+async function torneoSiguientePregunta() {
+    const nextId = Math.min(TORNEO_PREGUNTAS.length, (torneoEstado.pregunta_actual_id || 1) + 1);
+    if (!supabaseClient) return;
+
+    const { error } = await supabaseClient
+        .from('estado_juego')
+        .update({ pregunta_actual_id: nextId, pantalla_actual: 'pregunta', tiempo_restante: 60, updated_at: new Date().toISOString() })
+        .eq('id', 'global');
+
+    if (error) return showToast('Error: ' + error.message, 'error');
+    torneoEstado.pregunta_actual_id = nextId;
+    torneoEstado.pantalla_actual    = 'pregunta';
+    torneoRespuestasActuales = 0;
+    _torneoRenderPanel(torneoEstado);
+    showToast(`Pregunta ${nextId} lanzada`, 'success');
+}
+
+async function torneoReset() {
+    if (!confirm('¿Resetear el torneo completo? Esto borrará respuestas y puntajes.')) return;
+    if (!supabaseClient) return;
+
+    await supabaseClient.from('respuestas').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+    await supabaseClient.from('participantes').update({ puntaje: 0 }).neq('id', '00000000-0000-0000-0000-000000000000');
+    await supabaseClient.from('estado_juego').update({ pantalla_actual: 'lobby', pregunta_actual_id: 1, tiempo_restante: 60 }).eq('id', 'global');
+
+    torneoEstado = { pantalla_actual: 'lobby', pregunta_actual_id: 1, tiempo_restante: 60 };
+    torneoRespuestasActuales = 0;
+    _torneoRenderPanel(torneoEstado);
+    await _torneoRecargarParticipantes();
+    showToast('Torneo reseteado correctamente', 'info');
+}
+
+// ── Global bindings (torneo) ─────────────────────────────────────────────────
+window.openTorneoOverlay      = openTorneoOverlay;
+window.closeTorneoOverlay     = closeTorneoOverlay;
+window.torneoSetPantalla      = torneoSetPantalla;
+window.torneoSiguientePregunta = torneoSiguientePregunta;
+window.torneoReset            = torneoReset;

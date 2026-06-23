@@ -71,6 +71,7 @@
             <a href="#row-ejemplos">Ejemplos</a>
             <a href="#row-retos">Retos UNI</a>
             <a href="#ai-section">Taller IA</a>
+            <a href="#" onclick="openTorneoOverlay();return false;" style="color:#f59e0b;font-weight:700;">🏆 Torneo</a>
         </nav>
 
         <div class="header-right">
@@ -534,6 +535,94 @@
         </ul>
     </div>
 </div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- TORNEO EN VIVO — OVERLAY PANTALLA GRANDE                                   -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<div id="tournament-overlay" role="dialog" aria-modal="true" aria-label="Torneo en Vivo" style="
+    display:none; position:fixed; inset:0; z-index:900;
+    background:#0a0a0a;
+    flex-direction:column;
+    font-family:'Poppins',sans-serif;
+">
+    <!-- Barra superior del torneo -->
+    <div id="torneo-topbar" style="
+        display:flex; align-items:center; justify-content:space-between;
+        padding:14px 32px; background:rgba(0,0,0,0.6);
+        backdrop-filter:blur(12px); border-bottom:1px solid rgba(255,255,255,0.07);
+    ">
+        <div style="font-size:1.4rem; font-weight:800; color:#e50914;">MATH<span style="color:#fff">-FLIX</span> <span style="font-size:0.75rem;color:#f59e0b;font-weight:700;letter-spacing:2px;">TORNEO EN VIVO</span></div>
+        <div style="display:flex;gap:10px;align-items:center;">
+            <!-- Controles del profesor -->
+            <button onclick="torneoSetPantalla('lobby')"    id="tc-lobby"    style="padding:7px 14px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#fff;border-radius:8px;font-size:0.75rem;font-weight:700;cursor:pointer;">🏠 Lobby</button>
+            <button onclick="torneoSetPantalla('pregunta')" id="tc-pregunta" style="padding:7px 14px;background:rgba(229,9,20,0.15);border:1px solid rgba(229,9,20,0.35);color:#e50914;border-radius:8px;font-size:0.75rem;font-weight:700;cursor:pointer;">▶ Pregunta</button>
+            <button onclick="torneoSetPantalla('leaderboard')" id="tc-lb"   style="padding:7px 14px;background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.3);color:#f59e0b;border-radius:8px;font-size:0.75rem;font-weight:700;cursor:pointer;">🏆 Ranking</button>
+            <button onclick="torneoSiguientePregunta()" style="padding:7px 14px;background:rgba(84,179,214,0.12);border:1px solid rgba(84,179,214,0.3);color:#54b3d6;border-radius:8px;font-size:0.75rem;font-weight:700;cursor:pointer;">⏭ Siguiente</button>
+            <button onclick="torneoReset()" style="padding:7px 14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:#6d6d6e;border-radius:8px;font-size:0.72rem;cursor:pointer;">↺ Reset</button>
+            <button onclick="closeTorneoOverlay()" style="padding:7px 14px;background:transparent;border:1px solid rgba(255,255,255,0.12);color:#b3b3b3;border-radius:8px;font-size:0.75rem;cursor:pointer;"><i class="fa-solid fa-xmark"></i> Cerrar</button>
+        </div>
+    </div>
+
+    <!-- Área de contenido del torneo -->
+    <div id="torneo-content" style="flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+
+        <!-- PANEL LOBBY -->
+        <div id="torneo-panel-lobby" style="display:none;flex-direction:column;align-items:center;gap:32px;padding:40px 32px;text-align:center;width:100%;max-width:1100px;">
+            <div style="font-size:1rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#e50914;">Esperando participantes...</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;width:100%;align-items:start;">
+                <!-- QR -->
+                <div style="display:flex;flex-direction:column;align-items:center;gap:16px;">
+                    <div style="font-size:0.7rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#b3b3b3;">Escanea para unirte</div>
+                    <div id="torneo-qr-wrapper" style="background:#fff;padding:16px;border-radius:12px;box-shadow:0 0 40px rgba(229,9,20,0.2);">
+                        <img id="torneo-qr-img" src="" alt="QR Torneo" width="220" height="220">
+                    </div>
+                    <div id="torneo-qr-url" style="font-size:0.65rem;color:#6d6d6e;word-break:break-all;max-width:260px;"></div>
+                </div>
+                <!-- Lista de participantes -->
+                <div style="display:flex;flex-direction:column;gap:12px;">
+                    <div style="font-size:0.7rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#b3b3b3;">Participantes conectados (<span id="torneo-count">0</span>)</div>
+                    <div id="torneo-participantes-grid" style="display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-start;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PANEL PREGUNTA -->
+        <div id="torneo-panel-pregunta" style="display:none;flex-direction:column;align-items:center;gap:24px;padding:32px;width:100%;max-width:900px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
+                <div id="torneo-p-badge" style="font-size:0.7rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#e50914;background:rgba(229,9,20,0.12);border:1px solid rgba(229,9,20,0.25);padding:6px 14px;border-radius:20px;">Pregunta 1</div>
+                <div style="display:flex;gap:20px;align-items:center;">
+                    <div style="text-align:center;">
+                        <div style="font-size:0.6rem;color:#6d6d6e;text-transform:uppercase;letter-spacing:1px;">Respuestas</div>
+                        <div id="torneo-resp-count" style="font-size:1.4rem;font-weight:800;color:#46d369;">0</div>
+                    </div>
+                    <div id="torneo-timer" style="font-size:3rem;font-weight:800;color:#46d369;font-variant-numeric:tabular-nums;min-width:80px;text-align:center;">60</div>
+                </div>
+            </div>
+            <!-- Enunciado -->
+            <div style="width:100%;background:#1a1a1a;border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:32px;">
+                <div style="font-size:0.65rem;color:#6d6d6e;text-transform:uppercase;letter-spacing:2px;margin-bottom:12px;">Enunciado</div>
+                <div id="torneo-p-texto" style="font-size:1.3rem;color:#e5e5e5;line-height:1.7;font-weight:500;"></div>
+            </div>
+            <!-- Barra de progreso -->
+            <div style="width:100%;">
+                <div style="display:flex;justify-content:space-between;font-size:0.65rem;color:#6d6d6e;margin-bottom:6px;">
+                    <span>Progreso de entregas</span>
+                    <span id="torneo-prog-text">0 de 0 alumnos</span>
+                </div>
+                <div style="width:100%;height:6px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden;">
+                    <div id="torneo-prog-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#e50914,#f59e0b);border-radius:99px;transition:width 0.5s ease;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PANEL LEADERBOARD -->
+        <div id="torneo-panel-leaderboard" style="display:none;flex-direction:column;align-items:center;gap:20px;padding:32px;width:100%;max-width:700px;">
+            <div style="font-size:0.7rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#f59e0b;">🏆 Tabla de Posiciones</div>
+            <div id="torneo-leaderboard-list" style="width:100%;display:flex;flex-direction:column;gap:10px;"></div>
+        </div>
+
+    </div><!-- /torneo-content -->
+</div><!-- /tournament-overlay -->
 
 <!-- GESTIONAR PERFILES MODAL -->
 <div id="profile-manage-modal" role="dialog" aria-modal="true" aria-label="Gestionar Perfiles" onclick="if(event.target===this)closeProfileManageModal()">

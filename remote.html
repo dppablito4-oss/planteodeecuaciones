@@ -324,6 +324,44 @@
     </div>
 </div>
 
+<div class="nav-section" style="margin-top:4px;">
+    <!-- Status: fase actual -->
+    <div id="torneo-fase-banner" style="
+        text-align:center; font-size:0.65rem; font-weight:700;
+        letter-spacing:1.5px; text-transform:uppercase;
+        padding:7px 14px; border-radius:10px;
+        background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08);
+        color:#6d6d6e;
+    ">Torneo: cargando...</div>
+
+    <!-- Título sección torneo -->
+    <div style="font-size:0.6rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#6d6d6e;text-align:center;">
+        🎮 Control del Torneo
+    </div>
+
+    <div class="nav-row">
+        <button class="btn btn-prev" id="btn-t-lobby" onclick="sendTorneoCmd('lobby')" title="Ir al Lobby">
+            <i class="fa-solid fa-house"></i> Lobby
+        </button>
+        <button class="btn btn-next" id="btn-t-pregunta" onclick="sendTorneoCmd('pregunta')" title="Lanzar Pregunta">
+            <i class="fa-solid fa-play"></i> Pregunta
+        </button>
+    </div>
+    <div class="nav-row">
+        <button class="btn btn-start" id="btn-t-lb" onclick="sendTorneoCmd('leaderboard')">
+            <i class="fa-solid fa-trophy"></i> Tabla de Posiciones
+        </button>
+    </div>
+    <div class="nav-row">
+        <button class="btn btn-prev" id="btn-t-next" onclick="sendTorneoCmd('next-question')">
+            <i class="fa-solid fa-forward-step"></i> Sig. Pregunta
+        </button>
+        <button class="btn btn-exit" id="btn-t-reset" onclick="sendTorneoCmd('reset-tournament')" style="color:#e50914;border-color:rgba(229,9,20,0.3);">
+            <i class="fa-solid fa-rotate-left"></i> Reset
+        </button>
+    </div>
+</div>
+
 <footer>ECUACIONES.io · Mando Remoto · Supabase Realtime</footer>
 
 <script>
@@ -463,6 +501,82 @@ function rippleEffect(btn) {
     btn.appendChild(ripple);
     ripple.addEventListener('animationend', () => ripple.remove());
 }
+// ── Tournament Controls ──────────────────────────────────────────────────────
+const TORNEO_PREGUNTAS_REMOTE = [
+    { id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 }
+];
+let _torneoFaseActual   = 'lobby';
+let _torneoPreguntaId   = 1;
+
+async function sendTorneoCmd(cmd) {
+    const banner = document.getElementById('torneo-fase-banner');
+    try {
+        if (cmd === 'lobby' || cmd === 'pregunta' || cmd === 'leaderboard') {
+            await client.from('estado_juego').update({
+                pantalla_actual:    cmd,
+                tiempo_restante:    60,
+                pregunta_actual_id: _torneoPreguntaId,
+                updated_at:         new Date().toISOString()
+            }).eq('id', 'global');
+            _torneoFaseActual = cmd;
+
+        } else if (cmd === 'next-question') {
+            _torneoPreguntaId = Math.min(5, _torneoPreguntaId + 1);
+            await client.from('estado_juego').update({
+                pantalla_actual:    'pregunta',
+                pregunta_actual_id: _torneoPreguntaId,
+                tiempo_restante:    60,
+                updated_at:         new Date().toISOString()
+            }).eq('id', 'global');
+            _torneoFaseActual = 'pregunta';
+
+        } else if (cmd === 'reset-tournament') {
+            if (!confirm('¿Resetear el torneo? Se borrarán respuestas y puntajes.')) return;
+            await client.from('respuestas').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+            await client.from('participantes').update({ puntaje: 0 }).neq('id', '00000000-0000-0000-0000-000000000000');
+            await client.from('estado_juego').update({
+                pantalla_actual: 'lobby', pregunta_actual_id: 1, tiempo_restante: 60
+            }).eq('id', 'global');
+            _torneoPreguntaId = 1;
+            _torneoFaseActual = 'lobby';
+        }
+
+        const btn = event && event.target ? event.target.closest('.btn') : null;
+        if (btn) rippleEffect(btn);
+        _actualizarFaseBanner(_torneoFaseActual, _torneoPreguntaId);
+
+    } catch (err) {
+        if (banner) banner.textContent = '❌ Error: ' + err.message;
+    }
+}
+
+function _actualizarFaseBanner(fase, pregId) {
+    const banner = document.getElementById('torneo-fase-banner');
+    if (!banner) return;
+    const faseMap = { lobby: '🏠 Lobby', pregunta: `▶ Pregunta ${pregId}`, leaderboard: '🏆 Leaderboard' };
+    banner.textContent = 'Torneo: ' + (faseMap[fase] || fase);
+    banner.style.color     = fase === 'pregunta' ? '#e50914' : fase === 'leaderboard' ? '#f59e0b' : '#46d369';
+    banner.style.borderColor = fase === 'pregunta' ? 'rgba(229,9,20,0.3)' : fase === 'leaderboard' ? 'rgba(245,158,11,0.25)' : 'rgba(70,211,105,0.25)';
+}
+
+// Suscribirse a cambios del torneo para reflejar fase actual en el mando
+client.channel('remote-torneo-estado')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'estado_juego' }, ({ new: payload }) => {
+        _torneoFaseActual = payload.pantalla_actual;
+        _torneoPreguntaId = payload.pregunta_actual_id || 1;
+        _actualizarFaseBanner(_torneoFaseActual, _torneoPreguntaId);
+    })
+    .subscribe();
+
+// Cargar estado inicial del torneo
+(async () => {
+    const { data } = await client.from('estado_juego').select('*').eq('id', 'global').single();
+    if (data) {
+        _torneoFaseActual = data.pantalla_actual;
+        _torneoPreguntaId = data.pregunta_actual_id || 1;
+        _actualizarFaseBanner(_torneoFaseActual, _torneoPreguntaId);
+    }
+})();
 </script>
 </body>
 </html>
