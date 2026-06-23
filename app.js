@@ -10,8 +10,8 @@ const SUPABASE_CONFIG = {
     useEdgeFunctions: true
 };
 
-const supabaseClient = (typeof window !== 'undefined' && window.supabase && SUPABASE_CONFIG.url) 
-    ? window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey) 
+const supabaseClient = (typeof window !== 'undefined' && window.supabase && SUPABASE_CONFIG.url)
+    ? window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey)
     : null;
 
 // ── Slide Data (contenido de cada diapositiva para modal y presentador) ─────
@@ -54,10 +54,10 @@ const SLIDES_DATA = {
         content: `
             <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:16px;">
                 ${[
-                    ['🔍','1. Identificar','Aislar y definir claramente las variables o incógnitas del sistema.'],
-                    ['🗣️','2. Traducir','Mapear los conectores lógicos de cantidad a operadores algebraicos.'],
-                    ['⚖️','3. Igualar','Establecer el punto de balance o igualdad de la ecuación.']
-                ].map(([icon,title,desc]) => `
+                ['🔍', '1. Identificar', 'Aislar y definir claramente las variables o incógnitas del sistema.'],
+                ['🗣️', '2. Traducir', 'Mapear los conectores lógicos de cantidad a operadores algebraicos.'],
+                ['⚖️', '3. Igualar', 'Establecer el punto de balance o igualdad de la ecuación.']
+            ].map(([icon, title, desc]) => `
                     <div style="background:rgba(229,9,20,0.05);border:1px solid rgba(229,9,20,0.15);border-radius:10px;padding:20px;text-align:center;">
                         <div style="font-size:2.5rem;margin-bottom:12px;">${icon}</div>
                         <div style="font-weight:700;font-family:var(--font-heading);margin-bottom:8px;color:var(--color-accent);">${title}</div>
@@ -66,9 +66,9 @@ const SLIDES_DATA = {
             </div>
             <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px;">
                 ${[
-                    ['📐','4. Coherencia','Asegurar homogeneidad dimensional de todos los términos (unidades).'],
-                    ['✔️','5. Comprobar','Validar la consistencia lógica del resultado en el contexto original.']
-                ].map(([icon,title,desc]) => `
+                ['📐', '4. Coherencia', 'Asegurar homogeneidad dimensional de todos los términos (unidades).'],
+                ['✔️', '5. Comprobar', 'Validar la consistencia lógica del resultado en el contexto original.']
+            ].map(([icon, title, desc]) => `
                     <div style="background:rgba(229,9,20,0.05);border:1px solid rgba(229,9,20,0.15);border-radius:10px;padding:20px;text-align:center;">
                         <div style="font-size:2.5rem;margin-bottom:12px;">${icon}</div>
                         <div style="font-weight:700;font-family:var(--font-heading);margin-bottom:8px;color:var(--color-accent);">${title}</div>
@@ -109,10 +109,10 @@ const SLIDES_DATA = {
         content: `
             <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;">
                 ${[
-                    ['❌','Olvidar Paréntesis','Al multiplicar el "doble de la suma", el multiplicador afecta a todos los términos dentro.'],
-                    ['⚠️','Mezclar Unidades','No operes minutos con horas o metros con centímetros sin antes hacer la conversión.'],
-                    ['🤔','Resultados Absurdos','Si el cálculo de una edad da fraccionario o negativo, revisa el planteamiento original.']
-                ].map(([icon,title,desc]) => `
+                ['❌', 'Olvidar Paréntesis', 'Al multiplicar el "doble de la suma", el multiplicador afecta a todos los términos dentro.'],
+                ['⚠️', 'Mezclar Unidades', 'No operes minutos con horas o metros con centímetros sin antes hacer la conversión.'],
+                ['🤔', 'Resultados Absurdos', 'Si el cálculo de una edad da fraccionario o negativo, revisa el planteamiento original.']
+            ].map(([icon, title, desc]) => `
                     <div style="background:rgba(229,9,20,0.08);border:1px solid rgba(229,9,20,0.25);border-radius:12px;padding:24px;text-align:center;">
                         <div style="font-size:3rem;margin-bottom:12px;">${icon}</div>
                         <h3 style="font-weight:700;font-family:var(--font-heading);margin-bottom:10px;color:#fff;">${title}</h3>
@@ -129,11 +129,11 @@ const SLIDES_DATA = {
         content: `
             <ul style="list-style:none;display:flex;flex-direction:column;gap:20px;">
                 ${[
-                    'Lee el problema al menos 3 veces antes de estructurar variables.',
-                    'Traduce palabra por palabra metódicamente al lenguaje formal.',
-                    'Conserva el orden en cada una de las operaciones algebraicas.',
-                    'Comprueba siempre el valor obtenido con el enunciado original.'
-                ].map(tip => `
+                'Lee el problema al menos 3 veces antes de estructurar variables.',
+                'Traduce palabra por palabra metódicamente al lenguaje formal.',
+                'Conserva el orden en cada una de las operaciones algebraicas.',
+                'Comprueba siempre el valor obtenido con el enunciado original.'
+            ].map(tip => `
                     <li style="display:flex;align-items:center;gap:16px;font-size:1.05rem;color:var(--color-text-secondary);">
                         <span style="color:#46d369;font-size:1.5rem;flex-shrink:0;">✓</span>
                         ${tip}
@@ -241,14 +241,14 @@ const SLIDES_DATA = {
             <div class="modal-solution-tag"><i class="fa-solid fa-circle-check"></i> Niño A = <strong style="margin:0 4px;">20</strong> · Niño B = <strong style="margin:0 4px;">30</strong> caramelos.</div>`
     },
     'slide-ej6': {
-        title: 'Reto UNI I — Edades en el Tiempo',
+        title: 'Reto UNHEVAL I — Edades en el Tiempo',
         icon: '⭐',
         heroColor: 'linear-gradient(135deg, #1a0030, #0d0020)',
         coverImage: 'assets/math_problem_solving.png',
-        description: 'Problema de preselección UNI con razones temporales. Calcular a+b.',
+        description: 'Problema de preselección UNHEVAL con razones temporales. Calcular a+b.',
         content: `
             <p style="font-size:0.9rem;color:var(--color-text-muted);margin-bottom:16px;border-left:3px solid #a78bfa;padding-left:12px;">
-                <strong>Problema (UNI):</strong> La edad de A hace $a$ años era a la de B como 5:4. Dentro de $b$ años la razón será 7:6. La suma de edades es 46 y la diferencia es 4. Calcule $a+b$.
+                <strong>Problema (UNHEVAL):</strong> La edad de A hace $a$ años era a la de B como 5:4. Dentro de $b$ años la razón será 7:6. La suma de edades es 46 y la diferencia es 4. Calcule $a+b$.
             </p>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
                 <div style="background:rgba(167,139,250,0.05);border:1px solid rgba(167,139,250,0.2);border-radius:10px;padding:16px;">
@@ -266,17 +266,17 @@ const SLIDES_DATA = {
                     </div>
                 </div>
             </div>
-            <div class="modal-solution-tag"><i class="fa-solid fa-circle-check"></i> Resultado: $a + b = 5 + 3 = $ <strong style="margin-left:6px;font-size:1.3rem;color:#46d369;">8</strong></div>`
+            <div class="modal-solution-tag"><i class="fa-solid fa-circle-check"></i> Resultado: $a + b = 5 + b = $ <strong style="margin-left:6px;font-size:1.3rem;color:#46d369;">8</strong></div>`
     },
     'slide-ej7': {
-        title: 'Reto UNI II — Modelado Diofántico',
+        title: 'Reto UNHEVAL II — Modelado Diofántico',
         icon: '⭐⭐',
         heroColor: 'linear-gradient(135deg, #1a0030, #0d0020)',
         coverImage: 'assets/math_logic_concept.png',
         description: 'Ecuación diofántica con restricción de enteros positivos. Cantidad máxima de textos.',
         content: `
             <p style="font-size:0.9rem;color:var(--color-text-muted);margin-bottom:16px;border-left:3px solid #a78bfa;padding-left:12px;">
-                <strong>Problema (UNI):</strong> Textos de Física a $30 y de Química a $20. Gastó $500. Los de Química exceden al doble de Física. Determina la cantidad máxima de textos de Química.
+                <strong>Problema (UNHEVAL):</strong> Textos de Física a $30 y de Química a $20. Gastó $500. Los de Química exceden al doble de Física. Determina la cantidad máxima de textos de Química.
             </p>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
                 <div style="background:rgba(167,139,250,0.05);border:1px solid rgba(167,139,250,0.2);border-radius:10px;padding:16px;">
@@ -312,7 +312,7 @@ const SLIDES_DATA = {
                         <div class="credits-roll">
                             <div class="credit-row"><span class="credit-label">Presentador:</span> <span class="credit-value">Samuel Pablo</span></div>
                             <div class="credit-row"><span class="credit-label">Especialidad:</span> <span class="credit-value">Matemática y Física</span></div>
-                            <div class="credit-row"><span class="credit-label">Universidad:</span> <span class="credit-value">Nacional de Ingeniería (UNI)</span></div>
+                            <div class="credit-row"><span class="credit-label">Universidad:</span> <span class="credit-value">UNHEVAL (Huánuco)</span></div>
                             <div class="credit-row"><span class="credit-label">Plataforma:</span> <span class="credit-value">Math-Flix Presenter 2.0</span></div>
                         </div>
                         <div class="thanks-message">🏆 ¡Muchas gracias por su atención! 🏆</div>
@@ -348,7 +348,7 @@ const SLIDES_DATA = {
                         <div class="rec-mini-card" onclick="exitPresenterMode(); openSlideModal('slide-ej6');">
                             <div class="rec-mini-icon">⭐</div>
                             <div class="rec-mini-info">
-                                <div class="rec-mini-title">Reto UNI I</div>
+                                <div class="rec-mini-title">Reto UNHEVAL I</div>
                                 <div class="rec-mini-genre">Edades en el Tiempo</div>
                             </div>
                         </div>
@@ -375,8 +375,8 @@ let lastExpectedAnswer = '';
 // ── Profiles Management & Selection ──────────────────────────────────────────
 const DEFAULT_PROFILES = [
     { name: 'Samuel Pablo', avatar: '🎓', color: '#e50914' },
-    { name: 'Compañero 1', avatar: '📐', color: '#6366f1' },
-    { name: 'Compañero 2', avatar: '∑', color: '#10b981' }
+    { name: 'James de la Cruz', avatar: '📐', color: '#6366f1' },
+    { name: 'Deyvis', avatar: '∑', color: '#10b981' }
 ];
 
 let currentEditingProfileIndex = null; // null represents adding a new profile
@@ -402,7 +402,7 @@ function renderProfiles() {
     let html = '';
     profiles.forEach((p, idx) => {
         const isFile = p.avatar.includes('/');
-        const avatarHtml = isFile 
+        const avatarHtml = isFile
             ? `<div class="profile-avatar">
                    <img src="${p.avatar}" alt="Avatar de ${p.name}" onerror="this.parentElement.innerHTML='<div style=\'width:100%;height:100%;background:linear-gradient(135deg,${p.color}aa,${p.color});display:flex;align-items:center;justify-content:center;font-size:3rem;\'>🎓</div>'">
                </div>`
@@ -452,7 +452,7 @@ function renderProfileManageList() {
     let html = '';
     profiles.forEach((p, idx) => {
         const isFile = p.avatar.includes('/');
-        const avatarHtml = isFile 
+        const avatarHtml = isFile
             ? `<img src="${p.avatar}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;border-radius:4px;">`
             : p.avatar;
         html += `
@@ -476,7 +476,7 @@ function showAddProfileForm() {
     currentEditingProfileIndex = null;
     document.getElementById('profile-form-title').textContent = 'Añadir Perfil';
     document.getElementById('profile-input-name').value = '';
-    
+
     document.querySelectorAll('#avatar-choices .avatar-choice-item').forEach((el, i) => {
         el.classList.toggle('active', i === 0);
     });
@@ -622,7 +622,7 @@ function openSlideModal(slideId) {
     const modal = document.getElementById('slide-modal');
     const content = document.getElementById('modal-content');
 
-    const bgStyle = data.coverImage 
+    const bgStyle = data.coverImage
         ? `background: linear-gradient(to top, rgba(20,20,20,1) 0%, rgba(20,20,20,0.4) 50%, rgba(20,20,20,0.85) 100%), url('${data.coverImage}');`
         : `background: ${data.heroColor};`;
 
@@ -645,7 +645,7 @@ function openSlideModal(slideId) {
                 </div>
                 <div class="modal-meta">
                     <p><span class="modal-meta-label">Tema: </span><span class="modal-meta-value">Planteo de Ecuaciones</span></p>
-                    <p><span class="modal-meta-label">Nivel: </span><span class="modal-meta-value">Básico–UNI</span></p>
+                    <p><span class="modal-meta-label">Nivel: </span><span class="modal-meta-value">Básico–UNHEVAL</span></p>
                 </div>
             </div>
             <div class="modal-content-area">
@@ -836,10 +836,10 @@ function showToast(message, type = 'info') {
 
     const toast = document.createElement('div');
     const colors = {
-        error:   { bg: 'rgba(229,9,20,0.9)', icon: 'fa-triangle-exclamation' },
+        error: { bg: 'rgba(229,9,20,0.9)', icon: 'fa-triangle-exclamation' },
         warning: { bg: 'rgba(180,130,0,0.9)', icon: 'fa-circle-exclamation' },
         success: { bg: 'rgba(70,211,105,0.15)', icon: 'fa-circle-check' },
-        info:    { bg: 'rgba(40,40,40,0.95)', icon: 'fa-circle-info' }
+        info: { bg: 'rgba(40,40,40,0.95)', icon: 'fa-circle-info' }
     };
     const c = colors[type] || colors.info;
 
@@ -1186,13 +1186,13 @@ function getNumbers(str) {
 function verifyUserAnswer(userText, expectedText) {
     const userNums = getNumbers(userText);
     const expectedNums = getNumbers(expectedText);
-    
+
     if (userNums.length === 0 || expectedNums.length === 0) {
         return userText.toLowerCase().trim() === expectedText.toLowerCase().trim();
     }
-    
+
     if (userNums.length !== expectedNums.length) return false;
-    
+
     return userNums.every((num, idx) => Math.abs(num - expectedNums[idx]) < 0.01);
 }
 
@@ -1200,25 +1200,25 @@ function checkTallerAnswer() {
     const input = document.getElementById('practice-user-answer');
     const feedback = document.getElementById('practice-feedback-msg');
     if (!input || !feedback) return;
-    
+
     const userVal = input.value.trim();
     if (!userVal) {
         showToast('Por favor, escribe una respuesta primero.', 'warning');
         return;
     }
-    
+
     if (!lastExpectedAnswer) {
         showToast('No hay una respuesta esperada registrada para este problema.', 'info');
         return;
     }
-    
+
     const isCorrect = verifyUserAnswer(userVal, lastExpectedAnswer);
-    
+
     feedback.className = 'practice-feedback ' + (isCorrect ? 'success' : 'error');
-    feedback.innerHTML = isCorrect 
+    feedback.innerHTML = isCorrect
         ? `<i class="fa-solid fa-face-grin-stars"></i> <strong>¡Correcto!</strong> La respuesta es ${lastExpectedAnswer}. ¡Excelente trabajo!`
         : `<i class="fa-solid fa-face-frown"></i> <strong>Inténtalo de nuevo.</strong> Sigue intentando y revisa tu planteamiento.`;
-        
+
     if (isCorrect) {
         showToast('¡Respuesta Correcta! 🎉', 'success');
     } else {
@@ -1232,16 +1232,16 @@ function speakText(text) {
         showToast('No hay texto para leer.', 'warning');
         return;
     }
-    
+
     // Verificar soporte de Web Speech API
     if (!window.speechSynthesis || !window.SpeechSynthesisUtterance) {
         showToast('Tu navegador no soporta la reproducción de voz.', 'warning');
         return;
     }
-    
+
     // Cancelar cualquier audio en curso
     window.speechSynthesis.cancel();
-    
+
     // Limpiar LaTeX para lectura natural
     const cleanText = text
         .replace(/\$/g, '')
@@ -1252,23 +1252,23 @@ function speakText(text) {
         .replace(/=/g, ' es igual a ')
         .replace(/\+/g, ' más ')
         .replace(/-/g, ' menos ');
-        
+
     try {
         const utterance = new SpeechSynthesisUtterance(cleanText);
         utterance.lang = 'es-ES';
-        
+
         // Usar la primera voz disponible en español
         const voices = window.speechSynthesis.getVoices();
         const esVoice = voices.find(v => v.lang.startsWith('es'));
         if (esVoice) utterance.voice = esVoice;
-        
+
         utterance.rate = 0.95; // Un poco más despacio para mejor comprensión
-        
+
         utterance.onerror = (e) => {
             console.error('SpeechSynthesis error:', e);
             showToast('Error al reproducir el audio.', 'error');
         };
-        
+
         window.speechSynthesis.speak(utterance);
         showToast('🔊 Reproduciendo enunciado en voz alta...', 'info');
     } catch (e) {
@@ -1280,7 +1280,7 @@ function speakText(text) {
 function checkAIServiceStatus() {
     const badge = document.getElementById('ai-status-badge');
     if (!badge) return;
-    
+
     if (SUPABASE_CONFIG.useEdgeFunctions && SUPABASE_CONFIG.url && SUPABASE_CONFIG.anonKey) {
         // Realizar un preflight ping (OPTIONS) para comprobar si responde el endpoint
         fetch(`${SUPABASE_CONFIG.url}/functions/v1/generate-challenge`, {
@@ -1481,8 +1481,8 @@ function initCardPreviews() {
     document.querySelectorAll('.slide-card[data-yt-id]').forEach((card, index) => {
         if (card.dataset.previewInit) return;
         card.dataset.previewInit = 'true';
-        
-        const ytId    = card.dataset.ytId;
+
+        const ytId = card.dataset.ytId;
         const ytStart = parseInt(card.dataset.ytStart || '0', 10);
         const cardKey = ytId + '_' + index;
 
@@ -1582,16 +1582,16 @@ function _destroyCardPreview(card) {
     if (container) {
         const iframe = container.querySelector('iframe');
         if (iframe) iframe.src = ''; // stops audio immediately
-        
+
         const video = container.querySelector('video');
         if (video) {
             video.pause();
             video.src = '';
             try {
                 video.load();
-            } catch(e) {}
+            } catch (e) { }
         }
-        
+
         container.remove();
     }
     const badge = thumb.querySelector('.card-video-badge');
@@ -1638,7 +1638,7 @@ function initCardBackgrounds() {
         const onclickAttr = card.getAttribute('onclick') || '';
         const match = onclickAttr.match(/openSlideModal\(['"]([^'"]+)['"]\)/);
         if (!match) return;
-        
+
         const slideId = match[1];
         const slideData = SLIDES_DATA[slideId];
         if (!slideData || !slideData.coverImage) return;
@@ -1728,14 +1728,14 @@ async function openTorneoOverlay() {
     document.body.style.overflow = 'hidden';
 
     // Generar QR para torneo.html
-    const base      = window.location.origin + window.location.pathname.replace(/[^/]*$/, '');
+    const base = window.location.origin + window.location.pathname.replace(/[^/]*$/, '');
     const torneoURL = base + 'torneo.html';
-    
+
     // Generar/obtener clave de seguridad del mando
     _remoteKeyActual = await _generarObtenerRemoteKey();
     const remoteURL = base + 'remote.html?key=' + encodeURIComponent(_remoteKeyActual);
 
-    document.getElementById('torneo-qr-img').src  = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&color=141414&bgcolor=ffffff&data=${encodeURIComponent(torneoURL)}`;
+    document.getElementById('torneo-qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&color=141414&bgcolor=ffffff&data=${encodeURIComponent(torneoURL)}`;
     document.getElementById('torneo-qr-url').textContent = torneoURL;
 
     // Si existe un QR para el mando en el overlay, actualizarlo
@@ -1766,7 +1766,7 @@ function closeTorneoOverlay() {
 
 // ── Render central ────────────────────────────────────────────────────────────
 function _torneoRenderPanel(estado) {
-    ['lobby','pregunta','leaderboard'].forEach(p => {
+    ['lobby', 'pregunta', 'leaderboard'].forEach(p => {
         const el = document.getElementById(`torneo-panel-${p}`);
         if (el) el.style.display = 'none';
     });
@@ -1794,12 +1794,12 @@ async function _torneoRecargarParticipantes() {
     torneoParticipantes = data;
 
     const countEl = document.getElementById('torneo-count');
-    const grid    = document.getElementById('torneo-participantes-grid');
+    const grid = document.getElementById('torneo-participantes-grid');
     if (!countEl || !grid) return;
 
     countEl.textContent = data.length;
     grid.innerHTML = data.map(p => `
-        <div onclick="abrirDetalleAlumno('${p.id}','${p.nombre.replace(/'/g,"'")}')"
+        <div onclick="abrirDetalleAlumno('${p.id}','${p.nombre.replace(/'/g, "'")}')"
              style="
             background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.09);
             border-radius:10px; padding:8px 14px;
@@ -1823,7 +1823,7 @@ async function _torneoRenderPregunta(estado) {
     const textoFinal = textoCustom || pregunta.texto;
 
     document.getElementById('torneo-p-badge').textContent = `Pregunta ${pid}`;
-    document.getElementById('torneo-p-texto').textContent  = textoFinal;
+    document.getElementById('torneo-p-texto').textContent = textoFinal;
 
     // Contar SOLO respuestas procesadas (evaluadas por la IA) de esta pregunta
     if (supabaseClient) {
@@ -1859,17 +1859,17 @@ async function _torneoRenderPregunta(estado) {
 }
 
 function _torneoActualizarContadorRespuestas() {
-    const el       = document.getElementById('torneo-resp-count');
-    const progBar  = document.getElementById('torneo-prog-bar');
+    const el = document.getElementById('torneo-resp-count');
+    const progBar = document.getElementById('torneo-prog-bar');
     const progText = document.getElementById('torneo-prog-text');
     if (!el) return;
 
     const total = torneoParticipantes.length || 1;
-    const pct   = Math.min(100, Math.round((torneoRespuestasActuales / total) * 100));
+    const pct = Math.min(100, Math.round((torneoRespuestasActuales / total) * 100));
 
-    el.textContent        = torneoRespuestasActuales;
+    el.textContent = torneoRespuestasActuales;
     if (progText) progText.textContent = `${torneoRespuestasActuales} de ${torneoParticipantes.length} alumnos`;
-    if (progBar)  progBar.style.width  = `${pct}%`;
+    if (progBar) progBar.style.width = `${pct}%`;
 }
 
 // ── Panel: Leaderboard ────────────────────────────────────────────────────────
@@ -1884,13 +1884,13 @@ async function _torneoRenderLeaderboard() {
     const list = document.getElementById('torneo-leaderboard-list');
     if (!list || !data) return;
 
-    const medals = ['🥇','🥈','🥉'];
+    const medals = ['🥇', '🥈', '🥉'];
     list.innerHTML = data.map((p, i) => {
-        const medal   = medals[i] || `#${i + 1}`;
-        const isTop   = i < 3;
-        const accent  = i === 0 ? '#f59e0b' : i === 1 ? '#9ca3af' : i === 2 ? '#b87333' : '#b3b3b3';
+        const medal = medals[i] || `#${i + 1}`;
+        const isTop = i < 3;
+        const accent = i === 0 ? '#f59e0b' : i === 1 ? '#9ca3af' : i === 2 ? '#b87333' : '#b3b3b3';
         return `
-        <div onclick="abrirDetalleAlumno('${p.id || ''}','${(p.nombre || '').replace(/'/g,"'")}')"
+        <div onclick="abrirDetalleAlumno('${p.id || ''}','${(p.nombre || '').replace(/'/g, "'")}')"
              style="
             display:flex; align-items:center; justify-content:space-between;
             padding:14px 20px;
@@ -1938,7 +1938,7 @@ async function torneoSiguientePregunta() {
 
     if (error) return showToast('Error: ' + error.message, 'error');
     torneoEstado.pregunta_actual_id = nextId;
-    torneoEstado.pantalla_actual    = 'pregunta';
+    torneoEstado.pantalla_actual = 'pregunta';
     torneoRespuestasActuales = 0;
     _torneoRenderPanel(torneoEstado);
     showToast(`Pregunta ${nextId} lanzada`, 'success');
@@ -1969,12 +1969,12 @@ async function torneoReset() {
 }
 
 // ── Global bindings (torneo) ─────────────────────────────────────────────────
-window.openTorneoOverlay       = openTorneoOverlay;
-window.closeTorneoOverlay      = closeTorneoOverlay;
-window.torneoSetPantalla       = torneoSetPantalla;
+window.openTorneoOverlay = openTorneoOverlay;
+window.closeTorneoOverlay = closeTorneoOverlay;
+window.torneoSetPantalla = torneoSetPantalla;
 window.torneoSiguientePregunta = torneoSiguientePregunta;
-window.torneoReset             = torneoReset;
-window.abrirDetalleAlumno      = abrirDetalleAlumno;
+window.torneoReset = torneoReset;
+window.abrirDetalleAlumno = abrirDetalleAlumno;
 window.cerrarDetalleAlumnoModal = cerrarDetalleAlumnoModal;
 
 // ── Modal Visor de Soluciones ────────────────────────────────────────────────
@@ -1984,11 +1984,11 @@ async function abrirDetalleAlumno(participanteId, nombre) {
     if (!modal) return;
 
     // Rellenar con datos básicos mientras carga
-    document.getElementById('tdm-nombre').textContent       = nombre || '—';
-    document.getElementById('tdm-puntaje').textContent      = '…';
+    document.getElementById('tdm-nombre').textContent = nombre || '—';
+    document.getElementById('tdm-puntaje').textContent = '…';
     document.getElementById('tdm-transcripcion').textContent = '…';
-    document.getElementById('tdm-feedback').textContent     = '…';
-    document.getElementById('tdm-foto').src                 = '';
+    document.getElementById('tdm-feedback').textContent = '…';
+    document.getElementById('tdm-foto').src = '';
     document.getElementById('tdm-pregunta-label').textContent = '';
     modal.style.display = 'flex';
 
@@ -2012,9 +2012,9 @@ async function abrirDetalleAlumno(participanteId, nombre) {
         .maybeSingle();
 
     if (!data) {
-        document.getElementById('tdm-puntaje').textContent      = '—';
+        document.getElementById('tdm-puntaje').textContent = '—';
         document.getElementById('tdm-transcripcion').textContent = 'Sin respuesta evaluada aún.';
-        document.getElementById('tdm-feedback').textContent     = '—';
+        document.getElementById('tdm-feedback').textContent = '—';
         return;
     }
 
@@ -2022,10 +2022,10 @@ async function abrirDetalleAlumno(participanteId, nombre) {
     _detalleAlumnoActual.respuestaId = data.id;
     _detalleAlumnoActual.puntajeActual = data.puntaje_asignado ?? 0;
 
-    const scoreColors = { 5:'#46d369', 4:'#46d369', 3:'#f59e0b', 2:'#e50914', 1:'#e50914', 0:'#e50914' };
+    const scoreColors = { 5: '#46d369', 4: '#46d369', 3: '#f59e0b', 2: '#e50914', 1: '#e50914', 0: '#e50914' };
     const puntajeEl = document.getElementById('tdm-puntaje');
-    puntajeEl.textContent  = data.puntaje_asignado ?? '—';
-    puntajeEl.style.color  = scoreColors[data.puntaje_asignado] || '#b3b3b3';
+    puntajeEl.textContent = data.puntaje_asignado ?? '—';
+    puntajeEl.style.color = scoreColors[data.puntaje_asignado] || '#b3b3b3';
 
     document.getElementById('tdm-pregunta-label').textContent =
         `Pregunta ${data.pregunta_id} · ${data.puntaje_asignado ?? '?'}/5 puntos`;
@@ -2047,9 +2047,9 @@ function cerrarDetalleAlumnoModal() {
 
 // ── Global bindings extras (nuevas funciones) ──────────────────────────────────
 window.editarPuntajeAlumnoManual = editarPuntajeAlumnoManual;
-window.abrirHistorialRondas      = abrirHistorialRondas;
-window.cerrarHistorialRondas     = cerrarHistorialRondas;
-window.exportarRondaPDF          = exportarRondaPDF;
+window.abrirHistorialRondas = abrirHistorialRondas;
+window.cerrarHistorialRondas = cerrarHistorialRondas;
+window.exportarRondaPDF = exportarRondaPDF;
 
 // ── Seguridad del mando a distancia ─────────────────────────────────────────────
 async function _generarObtenerRemoteKey() {
@@ -2115,7 +2115,7 @@ async function abrirHistorialRondas() {
                 <div style="font-size:0.88rem;font-weight:700;color:#fff;">${r.nombre_ronda}</div>
                 <div style="font-size:0.65rem;color:#6d6d6e;margin-top:2px;">Pregunta ${r.pregunta_id} · ${new Date(r.archivado_at).toLocaleString()}</div>
             </div>
-            <button onclick="exportarRondaPDF('${r.id}','${r.nombre_ronda.replace(/'/g,'').replace(/"/g,'')}')" style="
+            <button onclick="exportarRondaPDF('${r.id}','${r.nombre_ronda.replace(/'/g, '').replace(/"/g, '')}')" style="
                 flex-shrink:0;padding:6px 14px;background:rgba(229,9,20,0.15);border:1px solid rgba(229,9,20,0.3);
                 color:#e50914;border-radius:8px;font-size:0.75rem;font-weight:700;cursor:pointer;">
                 <i class="fa-solid fa-file-pdf"></i> PDF</button>
@@ -2134,10 +2134,10 @@ async function exportarRondaPDF(rondaId, nombreRonda) {
     const win = window.open('', '_blank');
     if (!win) { showToast('Permite ventanas emergentes para exportar PDF', 'error'); return; }
     const rows = (respuestas || []).map((r, i) => `<tr>
-        <td>${i+1}</td><td>${r.nombre_alumno}</td><td>P${r.pregunta_id}</td>
-        <td style="font-weight:800;color:${r.puntaje_asignado>=4?'#16a34a':r.puntaje_asignado>=2?'#d97706':'#dc2626'}">${r.puntaje_asignado??'-'}/5</td>
-        <td>${r.transcripcion_interna||'-'}</td><td>${r.feedback||'-'}</td>
-        ${r.url_foto?`<td><img src="${r.url_foto}" style="max-width:100px;border-radius:6px;"></td>`:'<td>-</td>'}
+        <td>${i + 1}</td><td>${r.nombre_alumno}</td><td>P${r.pregunta_id}</td>
+        <td style="font-weight:800;color:${r.puntaje_asignado >= 4 ? '#16a34a' : r.puntaje_asignado >= 2 ? '#d97706' : '#dc2626'}">${r.puntaje_asignado ?? '-'}/5</td>
+        <td>${r.transcripcion_interna || '-'}</td><td>${r.feedback || '-'}</td>
+        ${r.url_foto ? `<td><img src="${r.url_foto}" style="max-width:100px;border-radius:6px;"></td>` : '<td>-</td>'}
     </tr>`).join('');
     win.document.write(`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Ronda: ${nombreRonda}</title><style>
         body{font-family:'Segoe UI',sans-serif;margin:32px;color:#111}
@@ -2176,7 +2176,7 @@ async function editarPuntajeAlumnoManual() {
     const puntajeEl = document.getElementById('tdm-puntaje');
     if (puntajeEl) {
         puntajeEl.textContent = nuevoPuntaje;
-        const sc = { 5:'#46d369', 4:'#46d369', 3:'#f59e0b', 2:'#e50914', 1:'#e50914', 0:'#e50914' };
+        const sc = { 5: '#46d369', 4: '#46d369', 3: '#f59e0b', 2: '#e50914', 1: '#e50914', 0: '#e50914' };
         puntajeEl.style.color = sc[nuevoPuntaje] || '#b3b3b3';
     }
     const labelEl = document.getElementById('tdm-pregunta-label');

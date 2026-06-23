@@ -41,17 +41,45 @@
 <!-- PANTALLA DE SELECCIÓN DE PERFILES                                         -->
 <!-- ═══════════════════════════════════════════════════════════════════════ -->
 <div id="profile-screen" role="dialog" aria-label="Seleccionar perfil de estudiante">
-    <div class="netflix-logo-top">ECUACIONES<span style="color:#fff">.io</span></div>
+    <!-- Header: Co-branding UNHEVAL + ECUACIONES.io -->
+    <header class="profile-screen-header" style="display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 1200px; margin-bottom: 20px;">
+        <div class="profile-uni-info" style="display: flex; align-items: center; gap: 14px;">
+            <img src="assets/escudo_unheval.png" alt="Escudo UNHEVAL" class="uni-logo-img" style="height: 52px; object-fit: contain; filter: drop-shadow(0 0 8px rgba(255,255,255,0.15));" onerror="this.style.display='none'; document.getElementById('uni-logo-fallback').style.display='flex';">
+            <img src="assets/logo_educacion_myf.png" alt="Logo Educación M&F" class="school-logo-img" style="height: 52px; object-fit: contain; filter: drop-shadow(0 0 8px rgba(255,255,255,0.15));" onerror="this.style.display='none';">
+            <div id="uni-logo-fallback" style="display: none; width: 44px; height: 44px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); border-radius: 50%; align-items: center; justify-content: center; font-size: 1.3rem;">🏛️</div>
+            <div class="profile-uni-text" style="display: flex; flex-direction: column; text-align: left;">
+                <span style="font-family: var(--font-heading); font-size: 0.95rem; font-weight: 800; color: #fff; letter-spacing: 0.5px;">UNHEVAL</span>
+                <span style="font-size: 0.72rem; color: var(--color-text-muted); font-weight: 600;">E.P. de Matemática y Física</span>
+            </div>
+        </div>
+        <div class="netflix-logo-top" style="position: static; font-family: var(--font-heading); font-size: 1.8rem; font-weight: 800; color: var(--color-accent); letter-spacing: -1px; margin: 0;">
+            ECUACIONES<span style="color:#fff">.io</span>
+        </div>
+    </header>
 
-    <h1 class="profile-title">¿Quién está aprendiendo hoy?</h1>
-
-    <div class="profiles-grid" id="profiles-grid-container">
-        <!-- Se genera dinámicamente desde JS -->
+    <!-- Center: Profile Selection -->
+    <div class="profile-screen-center" style="display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; width: 100%;">
+        <h1 class="profile-title" style="margin-bottom: var(--space-8);">¿Quién está aprendiendo hoy?</h1>
+        <div class="profiles-grid" id="profiles-grid-container">
+            <!-- Se genera dinámicamente desde JS -->
+        </div>
+        <button class="profile-manage" onclick="openProfileManageModal()">
+            Gestionar perfiles
+        </button>
     </div>
 
-    <button class="profile-manage" onclick="openProfileManageModal()">
-        Gestionar perfiles
-    </button>
+    <!-- Footer: Academic metadata -->
+    <footer class="profile-screen-footer" style="display: flex; flex-direction: column; align-items: center; gap: 6px; width: 100%; max-width: 1200px; margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: var(--space-4);">
+        <div class="profile-academic-meta" style="display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; justify-content: center;">
+            <span style="font-size: 0.7rem; font-weight: 800; color: var(--color-neon-cyan); border: 1px solid rgba(0, 243, 255, 0.35); background: rgba(0, 243, 255, 0.05); padding: 3px 10px; border-radius: 4px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 0 8px rgba(0, 243, 255, 0.15);">Clase Magistral</span>
+            <span style="font-size: 0.82rem; color: var(--color-text-secondary); font-weight: 700;">Curso: Didáctica de la Matemática</span>
+            <span style="color: rgba(255,255,255,0.15);">|</span>
+            <span style="font-size: 0.82rem; color: var(--color-text-secondary); font-weight: 600;">Profesor: Mg. Samuel Pablo</span>
+            <span style="color: rgba(255,255,255,0.15);">|</span>
+            <span style="font-size: 0.82rem; color: var(--color-text-muted);">Semestre: 2026-I</span>
+        </div>
+        <div style="font-size: 0.65rem; color: var(--color-text-faint); font-family: var(--font-body); letter-spacing: 0.5px;">Universidad Nacional Hermilio Valdizán de Huánuco</div>
+    </footer>
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════════════ -->
@@ -69,7 +97,7 @@
             <a href="#browse-content" class="active">Inicio</a>
             <a href="#row-fundamentos">Fundamentos</a>
             <a href="#row-ejemplos">Ejemplos</a>
-            <a href="#row-retos">Retos UNI</a>
+            <a href="#row-retos">Retos UNHEVAL</a>
             <a href="#ai-section">Taller IA</a>
             <a href="#" onclick="openTorneoOverlay();return false;" style="color:#f59e0b;font-weight:700;">🏆 Torneo</a>
         </nav>
@@ -122,10 +150,10 @@
                 <span class="match">98% relevante</span>
                 <span class="year">2025</span>
                 <span class="rating">PG</span>
-                <span class="duration">7 secciones · Nivel Básico–UNI</span>
+                <span class="duration">7 secciones · Nivel Básico–UNHEVAL</span>
             </div>
             <p class="hero-description">
-                Aprende a traducir el lenguaje cotidiano al lenguaje universal de las matemáticas. Desde fundamentos hasta problemas de preselección UNI, con un taller inteligente impulsado por IA.
+                Aprende a traducir el lenguaje cotidiano al lenguaje universal de las matemáticas. Desde fundamentos hasta problemas de preselección UNHEVAL, con un taller inteligente impulsado por IA.
             </p>
             <div class="hero-actions">
                 <button class="btn-play" onclick="startPresenterMode()" aria-label="Iniciar presentación en pantalla completa">
@@ -354,10 +382,10 @@
             </div>
         </section>
 
-        <!-- ── FILA 3: Retos UNI ─────────────────────────────────────── -->
-        <section id="row-retos" class="netflix-row row-theme-purple reveal" aria-label="Sección Retos de Alto Voltaje UNI">
+        <!-- ── FILA 3: Retos UNHEVAL ─────────────────────────────────────── -->
+        <section id="row-retos" class="netflix-row row-theme-purple reveal" aria-label="Sección Retos de Alto Voltaje UNHEVAL">
             <div class="netflix-row-header">
-                <h2 class="netflix-row-title"><i class="fa-solid fa-star" style="color:#a78bfa;margin-right:8px;"></i>Retos de Alto Voltaje · Nivel UNI</h2>
+                <h2 class="netflix-row-title"><i class="fa-solid fa-star" style="color:#a78bfa;margin-right:8px;"></i>Retos de Alto Voltaje · Nivel UNHEVAL</h2>
                 <span class="netflix-row-see-all">Ver retos</span>
             </div>
             <div class="carousel-wrapper">
@@ -367,27 +395,27 @@
                         <div class="slide-card-thumb">
                             <div class="slide-card-thumb-inner">
                                 <div class="slide-card-icon" style="color:#a78bfa;">⭐</div>
-                                <div class="slide-card-label">Reto UNI I<br>Edades en el Tiempo</div>
+                                <div class="slide-card-label">Reto UNHEVAL I<br>Edades en el Tiempo</div>
                                 <div class="slide-card-math">(A-a)/(B-a) = 5/4</div>
                             </div>
                         </div>
                         <div class="slide-card-info">
                             <div class="slide-card-actions"><button class="card-btn play" onclick="event.stopPropagation();openSlideModal('slide-ej6')"><i class="fa-solid fa-play"></i></button><button class="card-btn"><i class="fa-solid fa-ellipsis"></i></button></div>
-                            <div class="slide-card-info-title">Reto UNI I: Edades en el Tiempo</div>
-                            <div class="slide-card-info-tags"><span class="card-tag" style="color:#e50914;font-weight:700;">Avanzado</span><span class="card-tag">UNI</span></div>
+                            <div class="slide-card-info-title">Reto UNHEVAL I: Edades en el Tiempo</div>
+                            <div class="slide-card-info-tags"><span class="card-tag" style="color:#e50914;font-weight:700;">Avanzado</span><span class="card-tag">UNHEVAL</span></div>
                         </div>
                     </div>
                     <div class="slide-card" onclick="openSlideModal('slide-ej7')" data-yt-id="F71H4y2t5aY" data-yt-start="240">
                         <div class="slide-card-thumb">
                             <div class="slide-card-thumb-inner">
                                 <div class="slide-card-icon" style="color:#a78bfa;">⭐⭐</div>
-                                <div class="slide-card-label">Reto UNI II<br>Modelado Diofántico</div>
+                                <div class="slide-card-label">Reto UNHEVAL II<br>Modelado Diofántico</div>
                                 <div class="slide-card-math">3x + 2y = 50, y > 2x</div>
                             </div>
                         </div>
                         <div class="slide-card-info">
                             <div class="slide-card-actions"><button class="card-btn play" onclick="event.stopPropagation();openSlideModal('slide-ej7')"><i class="fa-solid fa-play"></i></button><button class="card-btn"><i class="fa-solid fa-ellipsis"></i></button></div>
-                            <div class="slide-card-info-title">Reto UNI II: Modelado Diofántico</div>
+                            <div class="slide-card-info-title">Reto UNHEVAL II: Modelado Diofántico</div>
                             <div class="slide-card-info-tags"><span class="card-tag" style="color:#e50914;font-weight:700;">Avanzado</span><span class="card-tag">Diofántico</span></div>
                         </div>
                     </div>
