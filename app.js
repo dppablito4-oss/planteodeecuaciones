@@ -613,17 +613,19 @@ function closeSlideModal(e) {
 function startPresenterMode() {
     stopAllPreviews();
     presenterIndex = 0;
-    renderPresenterSlide();
+    _presenterRenderAll();
     document.getElementById('presenter-overlay').classList.add('active');
     document.body.style.overflow = 'hidden';
+    requestAnimationFrame(() => _presenterScrollTo(presenterIndex));
 }
 
 function startPresenterFromSlide(slideId) {
     const idx = PRESENTER_SLIDES.indexOf(slideId);
     presenterIndex = idx >= 0 ? idx : 0;
-    renderPresenterSlide();
+    _presenterRenderAll();
     document.getElementById('presenter-overlay').classList.add('active');
     document.body.style.overflow = 'hidden';
+    requestAnimationFrame(() => _presenterScrollTo(presenterIndex));
 }
 
 function exitPresenterMode() {
@@ -631,29 +633,50 @@ function exitPresenterMode() {
     document.body.style.overflow = '';
 }
 
-function renderPresenterSlide() {
-    const slideId = PRESENTER_SLIDES[presenterIndex];
-    const data = SLIDES_DATA[slideId];
-    if (!data) return;
+/** Build all slides as stacked cards inside the scroll container */
+function _presenterRenderAll() {
+    const view = document.getElementById('presenter-slide-view');
+    if (!view) return;
 
-    const container = document.getElementById('presenter-slide-content');
-    const indicator = document.getElementById('pbar-indicator');
+    view.innerHTML = PRESENTER_SLIDES.map((slideId, i) => {
+        const data = SLIDES_DATA[slideId];
+        if (!data) return '';
+        return `<div class="presenter-slide-card${i === presenterIndex ? ' ps-active' : ''}" id="ps-card-${i}" data-ps-index="${i}">
+            <div class="ps-badge"><i class="fa-solid fa-bookmark"></i> ${i + 1} / ${PRESENTER_SLIDES.length}</div>
+            <h2 style="font-family:var(--font-heading);font-size:1.8rem;font-weight:800;margin-bottom:16px;display:flex;align-items:center;gap:12px;padding-bottom:12px;border-bottom:2px solid var(--color-accent);">
+                <span>${data.icon}</span> ${data.title}
+            </h2>
+            <p style="font-size:1rem;color:var(--color-text-muted);margin-bottom:24px;">${data.description}</p>
+            <div style="font-size:1.05rem;line-height:1.8;">${data.content}</div>
+        </div>`;
+    }).join('');
 
-    container.innerHTML = `
-        <h2 style="font-family:var(--font-heading);font-size:1.8rem;font-weight:800;margin-bottom:20px;display:flex;align-items:center;gap:12px;padding-bottom:12px;border-bottom:2px solid var(--color-accent);">
-            <span>${data.icon}</span> ${data.title}
-        </h2>
-        <p style="font-size:1rem;color:var(--color-text-muted);margin-bottom:24px;">${data.description}</p>
-        <div style="font-size:1.05rem;line-height:1.8;">${data.content}</div>`;
-
-    indicator.textContent = `${presenterIndex + 1} / ${PRESENTER_SLIDES.length}`;
+    _presenterUpdateIndicator();
     setTimeout(() => renderAllMath(), 50);
+}
+
+/** Scroll to a card and mark it active */
+function _presenterScrollTo(idx) {
+    const view = document.getElementById('presenter-slide-view');
+    if (!view) return;
+    // Update active class
+    view.querySelectorAll('.presenter-slide-card').forEach((el, i) => {
+        el.classList.toggle('ps-active', i === idx);
+    });
+    const card = document.getElementById(`ps-card-${idx}`);
+    if (card) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    _presenterUpdateIndicator();
+}
+
+function _presenterUpdateIndicator() {
+    const el = document.getElementById('pbar-indicator');
+    if (el) el.textContent = `${presenterIndex + 1} / ${PRESENTER_SLIDES.length}`;
 }
 
 function presenterNext() {
     if (presenterIndex < PRESENTER_SLIDES.length - 1) {
         presenterIndex++;
-        renderPresenterSlide();
+        _presenterScrollTo(presenterIndex);
     } else {
         showToast('Llegaste a la última diapositiva.', 'info');
     }
@@ -662,11 +685,12 @@ function presenterNext() {
 function presenterPrev() {
     if (presenterIndex > 0) {
         presenterIndex--;
-        renderPresenterSlide();
+        _presenterScrollTo(presenterIndex);
     } else {
         showToast('Estás en la primera diapositiva.', 'info');
     }
 }
+
 
 // Global keyboard navigation
 window.addEventListener('keydown', (e) => {

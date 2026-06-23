@@ -498,10 +498,8 @@
 <!-- MODO PRESENTADOR FULLSCREEN                                                -->
 <!-- ═══════════════════════════════════════════════════════════════════════ -->
 <div id="presenter-overlay" role="dialog" aria-modal="true" aria-label="Modo presentación">
-    <div class="presenter-slide-view">
-        <div class="presenter-slide-inner" id="presenter-slide-content">
-            <!-- Contenido de diapositiva activa inyectado por JS -->
-        </div>
+    <div class="presenter-slide-view" id="presenter-slide-view">
+        <!-- Todas las diapositivas se renderizan aquí en orden vertical por JS -->
     </div>
     <div class="presenter-bar" role="toolbar" aria-label="Controles de la presentación">
         <button class="pbar-btn exit" onclick="exitPresenterMode()" aria-label="Salir del modo presentación">
