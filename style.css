@@ -2148,3 +2148,79 @@ textarea:focus-visible {
         gap: 24px !important;
     }
 }
+
+/* ══════════════════════════════════════════════════════════════════════════ */
+/* CUSTOM SIGNATURE FOOTER (ESTILO CREADOR)                                   */
+/* ══════════════════════════════════════════════════════════════════════════ */
+.custom-signature-footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: var(--space-8) var(--space-4);
+    width: 100%;
+    margin-top: var(--space-8);
+    font-family: var(--font-body), sans-serif;
+}
+
+.custom-signature-footer .icon-box {
+    border: 1px solid rgba(245, 158, 11, 0.35);
+    padding: 10px;
+    border-radius: 8px;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto var(--space-4) auto;
+    background: rgba(245, 158, 11, 0.05);
+    box-shadow: 0 0 12px rgba(245, 158, 11, 0.15);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
+}
+
+.custom-signature-footer .icon-box:hover {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.35);
+}
+
+.custom-signature-footer .main-text {
+    font-family: var(--font-heading), sans-serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #9ca3af;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin: 0;
+}
+
+.custom-signature-footer .main-text .heart {
+    display: inline-block;
+    color: #f97316;
+    animation: heartBeat 1.4s infinite ease-in-out;
+}
+
+.custom-signature-footer .main-text .creator-name {
+    color: #f59e0b;
+    font-weight: 800;
+    text-shadow: 0 0 8px rgba(245, 158, 11, 0.2);
+}
+
+.custom-signature-footer .sub-text {
+    font-size: 0.62rem;
+    color: #4b5563;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin: 8px 0 0 0;
+}
+
+@keyframes heartBeat {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+}

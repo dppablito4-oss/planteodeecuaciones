@@ -383,6 +383,83 @@
             transition: transform 0.1s, opacity 0.2s;
         }
         .btn-run:active { transform: scale(0.97); }
+
+        /* ══════════════════════════════════════════════════════════════════════════ */
+        /* CUSTOM SIGNATURE FOOTER (ESTILO CREADOR)                                   */
+        /* ══════════════════════════════════════════════════════════════════════════ */
+        .custom-signature-footer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 24px 16px;
+            width: 100%;
+            margin-top: 32px;
+            font-family: 'Poppins', sans-serif;
+            border-top: 1px solid rgba(255,255,255,0.03);
+        }
+
+        .custom-signature-footer .icon-box {
+            border: 1px solid rgba(245, 158, 11, 0.35);
+            padding: 10px;
+            border-radius: 8px;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px auto;
+            background: rgba(245, 158, 11, 0.05);
+            box-shadow: 0 0 12px rgba(245, 158, 11, 0.15);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
+        }
+
+        .custom-signature-footer .icon-box:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.35);
+        }
+
+        .custom-signature-footer .main-text {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: #9ca3af;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin: 0;
+            line-height: 1.4;
+        }
+
+        .custom-signature-footer .main-text .heart {
+            display: inline-block;
+            color: #f97316;
+            animation: heartBeat 1.4s infinite ease-in-out;
+        }
+
+        .custom-signature-footer .main-text .creator-name {
+            color: #f59e0b;
+            font-weight: 800;
+            text-shadow: 0 0 8px rgba(245, 158, 11, 0.2);
+        }
+
+        .custom-signature-footer .sub-text {
+            font-size: 0.6rem;
+            color: #4b5563;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin: 8px 0 0 0;
+        }
+
+        @keyframes heartBeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
     </style>
 </head>
 <body>
@@ -543,7 +620,20 @@
     </div>
 </div><!-- /tab-alumnos -->
 
-<footer>ECUACIONES.io · Mando Remoto · Supabase Realtime</footer>
+<div class="custom-signature-footer">
+    <div class="icon-box">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 3C12 7.5 16.5 12 21 12C16.5 12 12 16.5 12 21C12 16.5 7.5 12 3 12C7.5 12 12 7.5 12 3Z" fill="#f59e0b"/>
+            <circle cx="7" cy="17" r="1.5" fill="#f59e0b" opacity="0.8"/>
+        </svg>
+    </div>
+    <p class="main-text">
+        Sistema creado con <span class="heart">🧡</span> por <span class="creator-name">Samuel Pablo Claudio</span>
+    </p>
+    <p class="sub-text">
+        &copy; 2026 PABLITO_DP &mdash; Acceso Clasificado
+    </p>
+</div>
 
 <script>
 // ── Config ──────────────────────────────────────────────────────────────────
