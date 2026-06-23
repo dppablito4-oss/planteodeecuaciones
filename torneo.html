@@ -1045,6 +1045,10 @@ function setStep(id, state) {
 
 async function enviarRespuesta() {
     if (!archivoSeleccionado || !alumnoId) return;
+    if (tiempoExpirado) {
+        alert('Lo sentimos, tu tiempo ha expirado.');
+        return;
+    }
 
     let respuestaIdInsertado = null; // Track insertion so we can rollback on AI error
     const btnEnviar   = document.getElementById('btn-enviar');

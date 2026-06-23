@@ -1849,7 +1849,8 @@ async function torneoReset() {
 
     // Archivar ronda antes de borrar (si se ingresó nombre)
     if (nombreRonda.trim()) {
-        await archivarRondaActual(nombreRonda.trim());
+        const success = await archivarRondaActual(nombreRonda.trim());
+        if (!success) return; // Detener reset si archivar falló
     }
 
     await supabaseClient.from('respuestas').delete().neq('id', '00000000-0000-0000-0000-000000000000');
@@ -1887,6 +1888,15 @@ async function abrirDetalleAlumno(participanteId, nombre) {
     document.getElementById('tdm-pregunta-label').textContent = '';
     modal.style.display = 'flex';
 
+    // Inicializar _detalleAlumnoActual
+    const part = torneoParticipantes.find(p => p.id === participanteId);
+    _detalleAlumnoActual = {
+        id: participanteId,
+        nombre: nombre,
+        puntajeActual: part ? (part.puntaje || 0) : 0,
+        respuestaId: null
+    };
+
     // Consultar última respuesta procesada del alumno
     const { data } = await supabaseClient
         .from('respuestas')
@@ -1903,6 +1913,10 @@ async function abrirDetalleAlumno(participanteId, nombre) {
         document.getElementById('tdm-feedback').textContent     = '—';
         return;
     }
+
+    // Actualizar con la respuesta cargada
+    _detalleAlumnoActual.respuestaId = data.id;
+    _detalleAlumnoActual.puntajeActual = data.puntaje_asignado ?? 0;
 
     const scoreColors = { 5:'#46d369', 4:'#46d369', 3:'#f59e0b', 2:'#e50914', 1:'#e50914', 0:'#e50914' };
     const puntajeEl = document.getElementById('tdm-puntaje');
@@ -1947,11 +1961,14 @@ async function _generarObtenerRemoteKey() {
 
 // ── Archivar ronda actual en Supabase ────────────────────────────────────────────
 async function archivarRondaActual(nombreRonda) {
-    if (!supabaseClient) return;
+    if (!supabaseClient) return false;
     const pregId = torneoEstado.pregunta_actual_id || 1;
     const { data: ronda, error } = await supabaseClient
         .from('historial_rondas').insert({ nombre_ronda: nombreRonda, pregunta_id: pregId }).select().single();
-    if (error || !ronda) { showToast('Error archivando ronda: ' + (error?.message || ''), 'error'); return; }
+    if (error || !ronda) {
+        showToast('Error archivando ronda: ' + (error?.message || ''), 'error');
+        return false;
+    }
 
     const { data: respuestas } = await supabaseClient.from('respuestas')
         .select('*, participantes(nombre, puntaje)').eq('procesado', true);
@@ -1962,8 +1979,15 @@ async function archivarRondaActual(nombreRonda) {
             pregunta_id: r.pregunta_id, puntaje_asignado: r.puntaje_asignado,
             feedback: r.feedback, transcripcion_interna: r.transcripcion_interna, url_foto: r.url_foto
         }));
-        await supabaseClient.from('historial_respuestas').insert(histRows);
+        const { error: histErr } = await supabaseClient.from('historial_respuestas').insert(histRows);
+        if (histErr) {
+            showToast('Error insertando respuestas en el historial: ' + histErr.message, 'error');
+            // Intentar borrar la ronda vacía para no dejar basura
+            await supabaseClient.from('historial_rondas').delete().eq('id', ronda.id);
+            return false;
+        }
     }
+    return true;
 }
 
 // ── Modal: Historial de Rondas ───────────────────────────────────────────────────

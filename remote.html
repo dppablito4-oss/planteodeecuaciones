@@ -560,13 +560,12 @@ const channel = client.channel(CHANNEL_NAME);
 (async () => {
     const params = new URLSearchParams(window.location.search);
     const keyParam = params.get('key');
-    if (!keyParam) return; // Sin key = acceso de prueba local, permitir
     const { data } = await client.from('estado_juego').select('remote_key').eq('id', 'global').single();
     if (data?.remote_key && data.remote_key !== keyParam) {
         document.body.innerHTML = `
             <div style="min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;
                         background:#0f0f0f;color:#fff;font-family:Poppins,sans-serif;padding:32px;text-align:center;">
-                <div style="font-size:3rem;margin-bottom:16px;">&#x1F512;</div>
+                <div style="font-size:3rem;margin-bottom:16px;">🔐</div>
                 <h1 style="font-size:1.4rem;font-weight:800;color:#e50914;margin-bottom:8px;">Acceso Denegado</h1>
                 <p style="color:#6d6d6e;font-size:0.88rem;max-width:280px;">Este enlace no es válido o ha caducado. Pide al profesor que genere un nuevo código QR.</p>
             </div>`;
@@ -856,17 +855,26 @@ async function sendTorneoCmd(cmd) {
             // Archivar si se dio nombre
             if (nombreRonda.trim()) {
                 const pregId = _torneoPreguntaId || 1;
-                const { data: ronda } = await client.from('historial_rondas')
+                const { data: ronda, error: rondaErr } = await client.from('historial_rondas')
                     .insert({ nombre_ronda: nombreRonda.trim(), pregunta_id: pregId }).select().single();
-                if (ronda) {
-                    const { data: resp } = await client.from('respuestas')
-                        .select('*, participantes(nombre)').eq('procesado', true);
-                    if (resp?.length) {
-                        await client.from('historial_respuestas').insert(resp.map(r => ({
-                            ronda_id: ronda.id, nombre_alumno: r.participantes?.nombre || 'Desconocido',
-                            pregunta_id: r.pregunta_id, puntaje_asignado: r.puntaje_asignado,
-                            feedback: r.feedback, transcripcion_interna: r.transcripcion_interna, url_foto: r.url_foto
-                        })));
+                if (rondaErr || !ronda) {
+                    alert('Error al crear la ronda en el historial: ' + (rondaErr?.message || 'No se pudo crear la ronda.'));
+                    return;
+                }
+                const { data: resp } = await client.from('respuestas')
+                    .select('*, participantes(nombre)').eq('procesado', true);
+                if (resp?.length) {
+                    const histRows = resp.map(r => ({
+                        ronda_id: ronda.id, nombre_alumno: r.participantes?.nombre || 'Desconocido',
+                        pregunta_id: r.pregunta_id, puntaje_asignado: r.puntaje_asignado,
+                        feedback: r.feedback, transcripcion_interna: r.transcripcion_interna, url_foto: r.url_foto
+                    }));
+                    const { error: histErr } = await client.from('historial_respuestas').insert(histRows);
+                    if (histErr) {
+                        alert('Error al archivar respuestas: ' + histErr.message);
+                        // Borrar la ronda vacía para no dejar basura
+                        await client.from('historial_rondas').delete().eq('id', ronda.id);
+                        return;
                     }
                 }
             }
@@ -954,11 +962,37 @@ async function remoteRecargarAlumnos() {
 }
 
 async function remoteEditarPuntaje(id, nombre, puntajeActual) {
-    const input = prompt(`Editar puntaje de ${nombre}\n(0 a 999)`, puntajeActual);
-    if (input === null) return;
-    const nuevo = parseInt(input);
-    if (isNaN(nuevo) || nuevo < 0) { alert('Valor inválido'); return; }
-    await client.from('participantes').update({ puntaje: nuevo }).eq('id', id);
+    // Buscar la última respuesta del alumno para la pregunta actual
+    const { data: resp } = await client.from('respuestas')
+        .select('id, puntaje_asignado')
+        .eq('participante_id', id)
+        .eq('pregunta_id', _torneoPreguntaId)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+    if (resp) {
+        // Si hay respuesta para la pregunta actual, editamos la nota de esta pregunta (0 a 5 pts)
+        const input = prompt(`Editar calificación de Pregunta ${_torneoPreguntaId} para ${nombre}\n(0 a 5 puntos)`, resp.puntaje_asignado ?? 0);
+        if (input === null) return;
+        const nuevoNota = parseInt(input);
+        if (isNaN(nuevoNota) || nuevoNota < 0 || nuevoNota > 5) { alert('El puntaje de la respuesta debe ser entre 0 y 5.'); return; }
+        const diff = nuevoNota - (resp.puntaje_asignado ?? 0);
+        
+        // Actualizar respuesta
+        await client.from('respuestas').update({ puntaje_asignado: nuevoNota }).eq('id', resp.id);
+        // Actualizar puntaje total acumulado (sumar diff)
+        if (diff !== 0) {
+            await client.rpc('sumar_puntaje_alumno', { alumno_id: id, puntos: diff });
+        }
+    } else {
+        // Si no hay respuesta, editamos el puntaje acumulado directamente
+        const input = prompt(`Editar puntaje acumulado de ${nombre}\n(0 a 999)`, puntajeActual);
+        if (input === null) return;
+        const nuevoAcumulado = parseInt(input);
+        if (isNaN(nuevoAcumulado) || nuevoAcumulado < 0) { alert('Valor acumulado inválido.'); return; }
+        await client.from('participantes').update({ puntaje: nuevoAcumulado }).eq('id', id);
+    }
     await remoteRecargarAlumnos();
 }
 
