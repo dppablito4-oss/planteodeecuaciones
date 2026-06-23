@@ -46,7 +46,7 @@ Los 5 pasos de oro son: Identificar, Traducir, Igualar, Coherencia, Comprobar.`;
     if (!apiKey) {
       apiKey = Deno.env.get("OPENAI_API_KEY");
       apiURL = "https://api.openai.com/v1/chat/completions";
-      model  = "gpt-5.4-mini";
+      model  = "gpt-4o-mini";
     }
 
     if (!apiKey) {
@@ -63,7 +63,7 @@ Los 5 pasos de oro son: Identificar, Traducir, Igualar, Coherencia, Comprobar.`;
       temperature: 0.8,
     };
 
-    if (model === "gpt-5.4-mini") {
+    if (model === "gpt-4o-mini") {
       requestBody.max_completion_tokens = 800;
     } else {
       requestBody.max_tokens = 800;

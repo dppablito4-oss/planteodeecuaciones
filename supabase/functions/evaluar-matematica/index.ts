@@ -1,11 +1,12 @@
 // ═══════════════════════════════════════════════════════════════════════════
 // Edge Function: evaluar-matematica
-// Evalúa con OpenAI gpt-5.4-mini la foto de un procedimiento matemático
+// Evalúa con OpenAI gpt-4o-mini la foto de un procedimiento matemático
 // Requiere: OPENAI_API_KEY, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
 // ═══════════════════════════════════════════════════════════════════════════
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
+import { encode } from "https://deno.land/std@0.177.0/encoding/base64.ts"
 
 // Headers para evitar problemas de CORS desde el celular de los alumnos
 const corsHeaders = {
@@ -43,7 +44,7 @@ serve(async (req) => {
       throw new Error(`No se pudo descargar la imagen: ${imageResponse.status}`)
     }
     const imageBuffer = await imageResponse.arrayBuffer()
-    const base64Image = btoa(String.fromCharCode(...new Uint8Array(imageBuffer)))
+    const base64Image = encode(new Uint8Array(imageBuffer))
 
     // Detectar MIME type desde el Content-Type de la respuesta o asumir JPEG
     const contentType = imageResponse.headers.get('content-type') || 'image/jpeg'
@@ -67,9 +68,9 @@ Debes responder ESTRICTAMENTE en formato JSON plano con la siguiente estructura,
   "feedback": "[Explicación corta de 1 oración en español sobre el acierto o error]"
 }`;
 
-    // 4. Configurar el Payload para OpenAI gpt-5.4-mini (Multimodal)
+    // 4. Configurar el Payload para OpenAI gpt-4o-mini (Multimodal)
     const payload = {
-      model: "gpt-5.4-mini",
+      model: "gpt-4o-mini",
       messages: [
         {
           role: "system",

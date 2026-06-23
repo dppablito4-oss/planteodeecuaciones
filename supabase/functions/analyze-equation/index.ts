@@ -48,7 +48,7 @@ Usa LaTeX inline con $...$ para las fórmulas. El HTML debe ser semánticamente 
     if (!apiKey) {
       apiKey = Deno.env.get("OPENAI_API_KEY");
       apiURL = "https://api.openai.com/v1/chat/completions";
-      model  = "gpt-5.4-mini";
+      model  = "gpt-4o-mini";
     }
 
     if (!apiKey) {
@@ -65,7 +65,7 @@ Usa LaTeX inline con $...$ para las fórmulas. El HTML debe ser semánticamente 
       temperature: 0.4,
     };
 
-    if (model === "gpt-5.4-mini") {
+    if (model === "gpt-4o-mini") {
       requestBody.max_completion_tokens = 900;
     } else {
       requestBody.max_tokens = 900;

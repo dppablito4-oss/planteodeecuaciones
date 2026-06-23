@@ -161,6 +161,10 @@ DROP POLICY IF EXISTS "Inserción pública anónima de exámenes" ON storage.obj
 CREATE POLICY "Inserción pública anónima de exámenes"
     ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'examenes');
 
+DROP POLICY IF EXISTS "Actualización pública anónima de exámenes" ON storage.objects;
+CREATE POLICY "Actualización pública anónima de exámenes"
+    ON storage.objects FOR UPDATE USING (bucket_id = 'examenes') WITH CHECK (bucket_id = 'examenes');
+
 -- ──────────────────────────────────────────────────────────────────────────────
 -- VERIFICACIÓN:
 -- SELECT * FROM public.estado_juego;

@@ -1141,6 +1141,12 @@ function speakText(text) {
         return;
     }
     
+    // Verificar soporte de Web Speech API
+    if (!window.speechSynthesis || !window.SpeechSynthesisUtterance) {
+        showToast('Tu navegador no soporta la reproducción de voz.', 'warning');
+        return;
+    }
+    
     // Cancelar cualquier audio en curso
     window.speechSynthesis.cancel();
     
@@ -1155,23 +1161,28 @@ function speakText(text) {
         .replace(/\+/g, ' más ')
         .replace(/-/g, ' menos ');
         
-    const utterance = new SpeechSynthesisUtterance(cleanText);
-    utterance.lang = 'es-ES';
-    
-    // Usar la primera voz disponible en español
-    const voices = window.speechSynthesis.getVoices();
-    const esVoice = voices.find(v => v.lang.startsWith('es'));
-    if (esVoice) utterance.voice = esVoice;
-    
-    utterance.rate = 0.95; // Un poco más despacio para mejor comprensión
-    
-    utterance.onerror = (e) => {
-        console.error('SpeechSynthesis error:', e);
-        showToast('Error al reproducir el audio.', 'error');
-    };
-    
-    window.speechSynthesis.speak(utterance);
-    showToast('🔊 Reproduciendo enunciado en voz alta...', 'info');
+    try {
+        const utterance = new SpeechSynthesisUtterance(cleanText);
+        utterance.lang = 'es-ES';
+        
+        // Usar la primera voz disponible en español
+        const voices = window.speechSynthesis.getVoices();
+        const esVoice = voices.find(v => v.lang.startsWith('es'));
+        if (esVoice) utterance.voice = esVoice;
+        
+        utterance.rate = 0.95; // Un poco más despacio para mejor comprensión
+        
+        utterance.onerror = (e) => {
+            console.error('SpeechSynthesis error:', e);
+            showToast('Error al reproducir el audio.', 'error');
+        };
+        
+        window.speechSynthesis.speak(utterance);
+        showToast('🔊 Reproduciendo enunciado en voz alta...', 'info');
+    } catch (e) {
+        console.error('SpeechSynthesis creation error:', e);
+        showToast('Error al inicializar el lector de voz.', 'error');
+    }
 }
 
 function checkAIServiceStatus() {
@@ -1298,9 +1309,10 @@ async function analyzeUserProblem() {
 }
 
 // ── QR Modal ──────────────────────────────────────────────────────────────────
-function openQRModal() {
+async function openQRModal() {
     const base = window.location.origin + window.location.pathname.replace(/[^\/]*$/, '');
-    const remoteURL = base + 'remote.html';
+    const key = await _generarObtenerRemoteKey();
+    const remoteURL = base + 'remote.html?key=' + encodeURIComponent(key);
     const encoded = encodeURIComponent(remoteURL);
     const qrAPI = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&color=141414&bgcolor=ffffff&data=${encoded}`;
 
