@@ -145,6 +145,19 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
+-- 7. Crear bucket de almacenamiento para exámenes (fotos) y configurar políticas públicas
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('examenes', 'examenes', true)
+ON CONFLICT (id) DO NOTHING;
+
+DROP POLICY IF EXISTS "Acceso público de lectura a exámenes" ON storage.objects;
+CREATE POLICY "Acceso público de lectura a exámenes"
+    ON storage.objects FOR SELECT USING (bucket_id = 'examenes');
+
+DROP POLICY IF EXISTS "Inserción pública anónima de exámenes" ON storage.objects;
+CREATE POLICY "Inserción pública anónima de exámenes"
+    ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'examenes');
+
 -- ──────────────────────────────────────────────────────────────────────────────
 -- VERIFICACIÓN:
 -- SELECT * FROM public.estado_juego;
