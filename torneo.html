@@ -373,72 +373,66 @@
             align-items: center;
             justify-content: center;
             text-align: center;
-            padding: 24px 16px;
+            padding: 16px;
             width: 100%;
-            margin-top: 32px;
+            margin-top: 24px;
             font-family: 'Poppins', sans-serif;
             border-top: 1px solid rgba(255,255,255,0.03);
+            opacity: 0.28;
+            transition: opacity 0.35s ease;
+        }
+
+        .custom-signature-footer:hover {
+            opacity: 0.75;
         }
 
         .custom-signature-footer .icon-box {
-            border: 1px solid rgba(245, 158, 11, 0.35);
-            padding: 10px;
-            border-radius: 8px;
-            width: 44px;
-            height: 44px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 16px auto;
-            background: rgba(245, 158, 11, 0.05);
-            box-shadow: 0 0 12px rgba(245, 158, 11, 0.15);
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
+            width: auto;
+            height: auto;
+            border: none;
+            background: none;
+            padding: 0;
+            box-shadow: none;
+            margin: 0 auto 6px auto;
+            transition: transform 0.3s ease;
         }
 
-        .custom-signature-footer .icon-box:hover {
-            transform: scale(1.1) rotate(5deg);
-            box-shadow: 0 0 20px rgba(245, 158, 11, 0.35);
+        .custom-signature-footer:hover .icon-box {
+            transform: scale(1.08) rotate(4deg);
         }
 
         .custom-signature-footer .main-text {
-            font-size: 0.78rem;
-            font-weight: 700;
-            color: #9ca3af;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
+            font-size: 0.68rem;
+            font-weight: 500;
+            color: #88888f;
+            letter-spacing: 0.5px;
+            text-transform: none;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
+            gap: 4px;
             flex-wrap: wrap;
             margin: 0;
             line-height: 1.4;
         }
 
         .custom-signature-footer .main-text .heart {
-            display: inline-block;
-            color: #f97316;
-            animation: heartBeat 1.4s infinite ease-in-out;
+            color: #ef4444; /* simple subtle red */
         }
 
         .custom-signature-footer .main-text .creator-name {
-            color: #f59e0b;
-            font-weight: 800;
-            text-shadow: 0 0 8px rgba(245, 158, 11, 0.2);
+            color: #c27803; /* muted warm gold/brown */
+            font-weight: 600;
+            text-shadow: none;
         }
 
         .custom-signature-footer .sub-text {
-            font-size: 0.6rem;
+            font-size: 0.56rem;
             color: #4b5563;
-            font-weight: 700;
-            letter-spacing: 3px;
+            font-weight: 500;
+            letter-spacing: 1.5px;
             text-transform: uppercase;
-            margin: 8px 0 0 0;
-        }
-
-        @keyframes heartBeat {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.2); }
+            margin: 4px 0 0 0;
         }
     </style>
 </head>
