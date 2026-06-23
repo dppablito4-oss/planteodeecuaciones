@@ -297,6 +297,64 @@ const SLIDES_DATA = {
                 </div>
             </div>
             <div class="modal-solution-tag"><i class="fa-solid fa-circle-check"></i> Máximo de textos de Química: <strong style="margin-left:6px;font-size:1.3rem;color:#46d369;">22</strong></div>`
+    },
+    'slide-fin': {
+        title: 'Clase Completada',
+        icon: '🎬',
+        heroColor: 'linear-gradient(135deg, #09090b, #111115)',
+        description: 'Has completado la Clase Magistral de Planteo de Ecuaciones.',
+        content: `
+            <div class="netflix-ending-container">
+                <div class="netflix-ending-left">
+                    <div class="netflix-credits-box">
+                        <h3 class="credits-logo">ECUACIONES<span>.io</span></h3>
+                        <p class="credits-title">Clase Magistral de Planteo de Ecuaciones</p>
+                        <div class="credits-roll">
+                            <div class="credit-row"><span class="credit-label">Presentador:</span> <span class="credit-value">Samuel Pablo</span></div>
+                            <div class="credit-row"><span class="credit-label">Especialidad:</span> <span class="credit-value">Matemática y Física</span></div>
+                            <div class="credit-row"><span class="credit-label">Universidad:</span> <span class="credit-value">Nacional de Ingeniería (UNI)</span></div>
+                            <div class="credit-row"><span class="credit-label">Plataforma:</span> <span class="credit-value">Math-Flix Presenter 2.0</span></div>
+                        </div>
+                        <div class="thanks-message">🏆 ¡Muchas gracias por su atención! 🏆</div>
+                    </div>
+                </div>
+                <div class="netflix-ending-right">
+                    <div class="netflix-next-card">
+                        <div class="next-banner">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> RECOMENDADO A CONTINUACIÓN
+                        </div>
+                        <div class="next-card-content">
+                            <div class="next-title">Taller Inteligente con IA</div>
+                            <p class="next-desc">Traduce problemas reales y obtén resoluciones automáticas explicadas con los 5 Pasos de Oro en tiempo real.</p>
+                            <div class="countdown-row">
+                                <button class="btn-netflix-red btn-next-act" onclick="exitPresenterMode(); window.location.hash='#ai-section'; document.getElementById('ai-section').scrollIntoView({behavior:'smooth'});" style="padding:10px 20px; font-weight:700;">
+                                    Ir al Taller ahora <span class="countdown-sec" id="ending-countdown">10</span>
+                                </button>
+                                <button class="btn-netflix-grey btn-next-act" onclick="exitPresenterMode(); window.location.hash='#row-fundamentos'; document.getElementById('row-fundamentos').scrollIntoView({behavior:'smooth'});" style="padding:10px 20px;">
+                                    Volver al catálogo
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="other-recs-title">Otros recomendados en esta categoría:</div>
+                    <div class="other-recs-grid">
+                        <div class="rec-mini-card" onclick="exitPresenterMode(); openTorneoOverlay();">
+                            <div class="rec-mini-icon">🏆</div>
+                            <div class="rec-mini-info">
+                                <div class="rec-mini-title">Torneo en Vivo</div>
+                                <div class="rec-mini-genre">Competencia Math-Flix</div>
+                            </div>
+                        </div>
+                        <div class="rec-mini-card" onclick="exitPresenterMode(); openSlideModal('slide-ej6');">
+                            <div class="rec-mini-icon">⭐</div>
+                            <div class="rec-mini-info">
+                                <div class="rec-mini-title">Reto UNI I</div>
+                                <div class="rec-mini-genre">Edades en el Tiempo</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>`
     }
 };
 
@@ -304,7 +362,7 @@ const SLIDES_DATA = {
 const PRESENTER_SLIDES = [
     'slide-planteo', 'slide-pasos', 'slide-diccionario',
     'slide-ej1', 'slide-ej2', 'slide-ej3', 'slide-ej4', 'slide-ej5',
-    'slide-ej6', 'slide-ej7', 'slide-errores', 'slide-resumen'
+    'slide-ej6', 'slide-ej7', 'slide-errores', 'slide-resumen', 'slide-fin'
 ];
 
 // ── State ────────────────────────────────────────────────────────────────────
@@ -628,9 +686,36 @@ function startPresenterFromSlide(slideId) {
     requestAnimationFrame(() => _presenterScrollTo(presenterIndex));
 }
 
+let endingTimer = null;
+function startEndingCountdown() {
+    stopEndingCountdown();
+    let sec = 10;
+    const el = document.getElementById('ending-countdown');
+    if (el) el.textContent = sec;
+    endingTimer = setInterval(() => {
+        sec--;
+        const el2 = document.getElementById('ending-countdown');
+        if (el2) el2.textContent = sec;
+        if (sec <= 0) {
+            stopEndingCountdown();
+            exitPresenterMode();
+            const aiSec = document.getElementById('ai-section');
+            if (aiSec) aiSec.scrollIntoView({ behavior: 'smooth' });
+            window.location.hash = '#ai-section';
+        }
+    }, 1000);
+}
+function stopEndingCountdown() {
+    if (endingTimer) {
+        clearInterval(endingTimer);
+        endingTimer = null;
+    }
+}
+
 function exitPresenterMode() {
     document.getElementById('presenter-overlay').classList.remove('active');
     document.body.style.overflow = '';
+    stopEndingCountdown();
 }
 
 /** Build all slides as stacked cards inside the scroll container */
@@ -666,6 +751,13 @@ function _presenterScrollTo(idx) {
     const card = document.getElementById(`ps-card-${idx}`);
     if (card) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
     _presenterUpdateIndicator();
+
+    // Check if it's the final slide (Netflix credits/recommendations)
+    if (PRESENTER_SLIDES[idx] === 'slide-fin') {
+        startEndingCountdown();
+    } else {
+        stopEndingCountdown();
+    }
 }
 
 function _presenterUpdateIndicator() {
