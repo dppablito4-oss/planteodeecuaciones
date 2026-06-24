@@ -481,6 +481,9 @@
     <button class="tab-btn" id="tab-btn-alumnos" onclick="switchTab('alumnos')">
         &#x1F393; Alumnos
     </button>
+    <button class="tab-btn" id="tab-btn-admin" onclick="switchTab('admin')">
+        ⚙️ Admin
+    </button>
 </div>
 
 <!-- ── TAB 1: DIAPOSITIVAS ─────────────────────────────────────────────── -->
@@ -618,6 +621,61 @@
         </div>
     </div>
 </div><!-- /tab-alumnos -->
+
+<!-- ── TAB 4: ADMIN ───────────────────────────────────────────────────── -->
+<div class="tab-content" id="tab-admin">
+    <div class="nav-section" style="padding-top:14px; gap:16px;">
+        <div class="torneo-section-title">⚙️ Panel de Administración</div>
+        
+        <!-- Tarjeta de Gestión de Base de Datos -->
+        <div style="background:var(--card); border:1px solid var(--border); border-radius:14px; padding:16px; display:flex; flex-direction:column; gap:12px;">
+            <h4 style="font-size:0.75rem; font-weight:700; text-transform:uppercase; color:rgba(255,255,255,0.4); border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:6px; display:flex; align-items:center; gap:6px;">
+                <i class="fa-solid fa-database" style="color:var(--muted); font-size: 0.8rem;"></i> Limpieza del Torneo
+            </h4>
+            
+            <div style="display:flex; flex-direction:column; gap:8px;">
+                <button class="btn btn-exit" onclick="adminLimpiarRespuestas()" style="grid-column:auto; padding:11px; font-size:0.78rem; text-align:left; justify-content:flex-start; color:#fff; border-color:rgba(255,255,255,0.08); background:rgba(255,255,255,0.02);">
+                    <i class="fa-solid fa-file-pen" style="color:#f59e0b; width:16px; margin-right:4px;"></i> Vaciar Respuestas
+                </button>
+                <button class="btn btn-exit" onclick="adminEliminarParticipantes()" style="grid-column:auto; padding:11px; font-size:0.78rem; text-align:left; justify-content:flex-start; color:#fff; border-color:rgba(255,255,255,0.08); background:rgba(255,255,255,0.02);">
+                    <i class="fa-solid fa-users-slash" style="color:#ef4444; width:16px; margin-right:4px;"></i> Eliminar Participantes
+                </button>
+                <button class="btn btn-exit" onclick="adminBorrarHistorial()" style="grid-column:auto; padding:11px; font-size:0.78rem; text-align:left; justify-content:flex-start; color:#fff; border-color:rgba(255,255,255,0.08); background:rgba(255,255,255,0.02);">
+                    <i class="fa-solid fa-clock-rotate-left" style="color:#54b3d6; width:16px; margin-right:4px;"></i> Borrar Historial de Rondas
+                </button>
+            </div>
+        </div>
+
+        <!-- Tarjeta de Almacenamiento y Retos -->
+        <div style="background:var(--card); border:1px solid var(--border); border-radius:14px; padding:16px; display:flex; flex-direction:column; gap:12px;">
+            <h4 style="font-size:0.75rem; font-weight:700; text-transform:uppercase; color:rgba(255,255,255,0.4); border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:6px; display:flex; align-items:center; gap:6px;">
+                <i class="fa-solid fa-cloud" style="color:var(--muted); font-size: 0.8rem;"></i> Storage &amp; Retos
+            </h4>
+            
+            <div style="display:flex; flex-direction:column; gap:8px;">
+                <button class="btn btn-exit" onclick="adminLimpiarFotosStorage()" style="grid-column:auto; padding:11px; font-size:0.78rem; text-align:left; justify-content:flex-start; color:#fff; border-color:rgba(255,255,255,0.08); background:rgba(255,255,255,0.02);">
+                    <i class="fa-solid fa-images" style="color:#10b981; width:16px; margin-right:4px;"></i> Limpiar Fotos Guardadas
+                </button>
+                <button class="btn btn-exit" onclick="adminLimpiarRetosIA()" style="grid-column:auto; padding:11px; font-size:0.78rem; text-align:left; justify-content:flex-start; color:#fff; border-color:rgba(255,255,255,0.08); background:rgba(255,255,255,0.02);">
+                    <i class="fa-solid fa-robot" style="color:#a855f7; width:16px; margin-right:4px;"></i> Limpiar Retos IA
+                </button>
+            </div>
+        </div>
+
+        <!-- Tarjeta de Pánico / Resets -->
+        <div style="background:rgba(229,9,20,0.03); border:1px solid rgba(229,9,20,0.2); border-radius:14px; padding:16px; display:flex; flex-direction:column; gap:12px;">
+            <h4 style="font-size:0.75rem; font-weight:700; text-transform:uppercase; color:#ef4444; border-bottom:1px solid rgba(229,9,20,0.1); padding-bottom:6px; display:flex; align-items:center; gap:6px;">
+                <i class="fa-solid fa-triangle-exclamation" style="color:#ef4444; font-size: 0.8rem;"></i> Acciones Críticas
+            </h4>
+            <p style="font-size:0.68rem; color:var(--muted); line-height:1.4;">
+                El Super Reset borrará todas las respuestas, participantes, historiales, retos de IA, fotos subidas y reiniciará el juego al lobby.
+            </p>
+            <button class="btn" onclick="adminSuperReset()" style="background:#e50914; color:#fff; font-size:0.82rem; font-weight:800;">
+                <i class="fa-solid fa-bomb" style="margin-right:6px;"></i> SUPER RESET TOTAL
+            </button>
+        </div>
+    </div>
+</div><!-- /tab-admin -->
 
 <div class="custom-signature-footer">
     <div class="icon-box">
@@ -1091,6 +1149,125 @@ client.channel('remote-alumnos-puntajes')
         remoteRecargarAlumnos();
     })
     .subscribe();
+
+// ── Funciones de Administración ──────────────────────────────────────────────
+async function adminLimpiarRespuestas() {
+    if (!confirm('¿Seguro que deseas eliminar TODAS las respuestas registradas? El puntaje de los alumnos no cambiará.')) return;
+    try {
+        const { error } = await client.from('respuestas').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+        if (error) throw error;
+        alert('✅ Todas las respuestas han sido eliminadas.');
+    } catch (err) {
+        alert('❌ Error al eliminar respuestas: ' + err.message);
+    }
+}
+
+async function adminEliminarParticipantes() {
+    if (!confirm('¿Seguro que deseas eliminar a TODOS los participantes? Esto también eliminará sus respuestas y tendrán que volver a escanear el QR.')) return;
+    try {
+        const { error } = await client.from('participantes').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+        if (error) throw error;
+        alert('✅ Todos los participantes han sido eliminados.');
+        await remoteRecargarAlumnos();
+    } catch (err) {
+        alert('❌ Error al eliminar participantes: ' + err.message);
+    }
+}
+
+async function adminBorrarHistorial() {
+    if (!confirm('¿Seguro que deseas vaciar el historial de rondas y sus respuestas archivadas? Esto es permanente.')) return;
+    try {
+        const { error } = await client.from('historial_rondas').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+        if (error) throw error;
+        alert('✅ Historial de rondas vaciado.');
+    } catch (err) {
+        alert('❌ Error al borrar el historial: ' + err.message);
+    }
+}
+
+async function adminLimpiarFotosStorage() {
+    if (!confirm('¿Seguro que deseas eliminar todas las fotos de exámenes guardadas en el Storage?')) return;
+    try {
+        const { data: files, error: listErr } = await client.storage.from('examenes').list();
+        if (listErr) throw listErr;
+        if (!files || files.length === 0) {
+            alert('ℹ️ No hay fotos guardadas en el Storage.');
+            return;
+        }
+        
+        const fileNames = files.map(f => f.name).filter(name => name !== '.emptyFolderPlaceholder');
+        if (fileNames.length === 0) {
+            alert('ℹ️ No hay fotos para borrar.');
+            return;
+        }
+
+        const { error: deleteErr } = await client.storage.from('examenes').remove(fileNames);
+        if (deleteErr) throw deleteErr;
+        alert(`✅ Se eliminaron ${fileNames.length} fotos del Storage.`);
+    } catch (err) {
+        alert('❌ Error al limpiar fotos del Storage: ' + err.message);
+    }
+}
+
+async function adminLimpiarRetosIA() {
+    if (!confirm('¿Seguro que deseas vaciar todos los retos generados por IA en la pantalla de exposición?')) return;
+    try {
+        const { error } = await client.from('exposicion_retos').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+        if (error) throw error;
+        alert('✅ Retos de exposición eliminados.');
+    } catch (err) {
+        alert('❌ Error al borrar retos IA: ' + err.message);
+    }
+}
+
+async function adminSuperReset() {
+    const input = prompt('Para confirmar el RESET COMPLETO de la presentación y torneo, escribe "RESET" (en mayúsculas):');
+    if (input !== 'RESET') {
+        alert('Confirmación incorrecta. No se ha realizado ninguna acción.');
+        return;
+    }
+    
+    try {
+        // 1. Borrar todas las respuestas
+        await client.from('respuestas').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+        
+        // 2. Borrar participantes
+        await client.from('participantes').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+        
+        // 3. Borrar historial
+        await client.from('historial_rondas').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+        
+        // 4. Borrar retos IA
+        await client.from('exposicion_retos').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+        
+        // 5. Reiniciar estado del juego
+        await client.from('estado_juego').update({
+            pantalla_actual: 'lobby',
+            pregunta_actual_id: 1,
+            tiempo_restante: 60,
+            pregunta_custom_texto: null
+        }).eq('id', 'global');
+        
+        // 6. Limpiar fotos de storage
+        const { data: files } = await client.storage.from('examenes').list();
+        if (files && files.length > 0) {
+            const fileNames = files.map(f => f.name).filter(name => name !== '.emptyFolderPlaceholder');
+            if (fileNames.length > 0) {
+                await client.storage.from('examenes').remove(fileNames);
+            }
+        }
+        
+        alert('⚡ RESET COMPLETO COMPLETADO CON ÉXITO. La base de datos y la presentación están limpias y en su estado inicial.');
+        
+        // Actualizar UI del mando
+        _torneoPreguntaId = 1;
+        _torneoFaseActual = 'lobby';
+        _actualizarFaseBanner(_torneoFaseActual, _torneoPreguntaId);
+        await remoteRecargarAlumnos();
+    } catch (err) {
+        alert('❌ Error durante el Super Reset: ' + err.message);
+    }
+}
 </script>
 </body>
 </html>

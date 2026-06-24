@@ -381,17 +381,70 @@ const DEFAULT_PROFILES = [
 
 let currentEditingProfileIndex = null; // null represents adding a new profile
 
-function getProfiles() {
-    let profiles = localStorage.getItem('ecuaciones_profiles');
-    if (!profiles) {
-        profiles = JSON.stringify(DEFAULT_PROFILES);
-        localStorage.setItem('ecuaciones_profiles', profiles);
+let localProfilesCache = [];
+
+async function initProfiles() {
+    if (!supabaseClient) {
+        // Fallback to localStorage if Supabase is offline
+        let profiles = localStorage.getItem('ecuaciones_profiles');
+        if (!profiles) {
+            profiles = JSON.stringify(DEFAULT_PROFILES);
+            localStorage.setItem('ecuaciones_profiles', profiles);
+        }
+        localProfilesCache = JSON.parse(profiles);
+        renderProfiles();
+        return;
     }
-    return JSON.parse(profiles);
+
+    try {
+        // Load from Supabase
+        const { data, error } = await supabaseClient.from('perfiles').select('*').order('id', { ascending: true });
+        if (error) throw error;
+
+        if (!data || data.length === 0) {
+            // Seed Supabase with DEFAULT_PROFILES
+            const { data: seeded, error: seedErr } = await supabaseClient.from('perfiles').insert(DEFAULT_PROFILES).select();
+            if (seedErr) throw seedErr;
+            localProfilesCache = seeded;
+        } else {
+            localProfilesCache = data;
+        }
+    } catch (err) {
+        console.error("Error loading profiles from Supabase:", err);
+        // Fallback to localStorage
+        let profiles = localStorage.getItem('ecuaciones_profiles');
+        localProfilesCache = profiles ? JSON.parse(profiles) : DEFAULT_PROFILES;
+    }
+
+    renderProfiles();
+
+    // Subscribe to Realtime changes on perfiles table
+    supabaseClient.channel('realtime-perfiles')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'perfiles' }, async () => {
+            try {
+                // Reload all profiles from Supabase to keep sync and order
+                const { data: updatedData } = await supabaseClient.from('perfiles').select('*').order('id', { ascending: true });
+                if (updatedData) {
+                    localProfilesCache = updatedData;
+                    renderProfiles();
+                    if (document.getElementById('profile-manage-modal')?.classList.contains('open')) {
+                        renderProfileManageList();
+                    }
+                }
+            } catch (err) {
+                console.error("Error reloading profiles on realtime event:", err);
+            }
+        })
+        .subscribe();
+}
+
+function getProfiles() {
+    return localProfilesCache.length > 0 ? localProfilesCache : DEFAULT_PROFILES;
 }
 
 function saveProfiles(profiles) {
-    localStorage.setItem('ecuaciones_profiles', JSON.stringify(profiles));
+    // Deprecado: ahora se guarda en Supabase de forma asíncrona directamente en el formulario
+    localProfilesCache = profiles;
 }
 
 function renderProfiles() {
@@ -519,7 +572,7 @@ function selectColorChoice(el) {
     el.classList.add('active');
 }
 
-function saveProfileForm() {
+async function saveProfileForm() {
     const name = document.getElementById('profile-input-name').value.trim();
     if (!name) {
         showToast('Por favor, ingresa un nombre para el perfil.', 'warning');
@@ -534,27 +587,62 @@ function saveProfileForm() {
 
     const profiles = getProfiles();
 
-    if (currentEditingProfileIndex === null) {
-        profiles.push({ name, avatar, color });
-        showToast(`Perfil "${name}" creado exitosamente.`, 'success');
-    } else {
-        profiles[currentEditingProfileIndex] = { name, avatar, color };
-        showToast(`Perfil "${name}" actualizado.`, 'success');
+    try {
+        if (currentEditingProfileIndex === null) {
+            if (supabaseClient) {
+                const { data, error } = await supabaseClient.from('perfiles').insert({ name, avatar, color }).select();
+                if (error) throw error;
+                if (data && data[0]) {
+                    localProfilesCache.push(data[0]);
+                }
+            } else {
+                profiles.push({ name, avatar, color });
+                saveProfiles(profiles);
+            }
+            showToast(`Perfil "${name}" creado exitosamente.`, 'success');
+        } else {
+            const profileToEdit = profiles[currentEditingProfileIndex];
+            if (supabaseClient && profileToEdit.id) {
+                const { error } = await supabaseClient.from('perfiles').update({ name, avatar, color }).eq('id', profileToEdit.id);
+                if (error) throw error;
+                localProfilesCache[currentEditingProfileIndex] = { ...profileToEdit, name, avatar, color };
+            } else {
+                profiles[currentEditingProfileIndex] = { name, avatar, color };
+                saveProfiles(profiles);
+            }
+            showToast(`Perfil "${name}" actualizado.`, 'success');
+        }
+    } catch (err) {
+        console.error("Error saving profile to Supabase:", err);
+        showToast("Error al guardar perfil: " + err.message, "error");
+        return;
     }
 
-    saveProfiles(profiles);
     renderProfileManageList();
     cancelProfileForm();
 }
 
-function deleteProfile(idx) {
+async function deleteProfile(idx) {
     const profiles = getProfiles();
-    const name = profiles[idx].name;
+    const profileToDelete = profiles[idx];
+    const name = profileToDelete.name;
     if (confirm(`¿Estás seguro de que deseas eliminar el perfil de "${name}"?`)) {
-        profiles.splice(idx, 1);
-        saveProfiles(profiles);
+        try {
+            if (supabaseClient && profileToDelete.id) {
+                const { error } = await supabaseClient.from('perfiles').delete().eq('id', profileToDelete.id);
+                if (error) throw error;
+                localProfilesCache.splice(idx, 1);
+            } else {
+                profiles.splice(idx, 1);
+                saveProfiles(profiles);
+            }
+            showToast(`Perfil "${name}" eliminado.`, 'info');
+        } catch (err) {
+            console.error("Error deleting profile from Supabase:", err);
+            showToast("Error al eliminar perfil: " + err.message, "error");
+            return;
+        }
         renderProfileManageList();
-        showToast(`Perfil "${name}" eliminado.`, 'info');
     }
 }
 
@@ -1657,7 +1745,7 @@ function initCardBackgrounds() {
 // ── Init on DOM Ready ─────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
     initRealtimeUplink();
-    renderProfiles();
+    initProfiles();
     checkAIServiceStatus();
     renderAllMath();
     initCardBackgrounds();
