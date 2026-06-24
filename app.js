@@ -310,7 +310,7 @@ const SLIDES_DATA = {
                         <h3 class="credits-logo">ECUACIONES<span>.io</span></h3>
                         <p class="credits-title">Clase Magistral de Planteo de Ecuaciones</p>
                         <div class="credits-roll">
-                            <div class="credit-row"><span class="credit-label">Presentador:</span> <span class="credit-value">Samuel Pablo</span></div>
+                            <div class="credit-row"><span class="credit-label">Presentador:</span> <span class="credit-value">Joel Cipriano Tarazona Bardales</span></div>
                             <div class="credit-row"><span class="credit-label">Especialidad:</span> <span class="credit-value">Matemática y Física</span></div>
                             <div class="credit-row"><span class="credit-label">Universidad:</span> <span class="credit-value">UNHEVAL (Huánuco)</span></div>
                             <div class="credit-row"><span class="credit-label">Plataforma:</span> <span class="credit-value">Math-Flix Presenter 2.0</span></div>
@@ -374,7 +374,7 @@ let lastExpectedAnswer = '';
 
 // ── Profiles Management & Selection ──────────────────────────────────────────
 const DEFAULT_PROFILES = [
-    { name: 'Samuel Pablo', avatar: '🎓', color: '#e50914' },
+    { name: 'Joel Cipriano', avatar: '🎓', color: '#e50914' },
     { name: 'James de la Cruz', avatar: '📐', color: '#6366f1' },
     { name: 'Deyvis', avatar: '∑', color: '#10b981' }
 ];

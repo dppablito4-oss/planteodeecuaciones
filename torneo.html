@@ -439,6 +439,101 @@
             text-transform: uppercase;
             margin: 2px 0 0 0;
         }
+
+        /* Modal de confirmación de ronda */
+        .custom-confirm-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 20px;
+        }
+
+        .custom-confirm-box {
+            background: #181818;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 32px 24px;
+            max-width: 420px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 20px rgba(229,9,20,0.1);
+            animation: modalScaleUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes modalScaleUp {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .confirm-icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        .custom-confirm-box h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 12px;
+        }
+
+        .custom-confirm-box p {
+            font-size: 0.9rem;
+            color: #b3b3b3;
+            line-height: 1.5;
+            margin-bottom: 24px;
+        }
+
+        .confirm-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .confirm-btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .confirm-btn:active {
+            transform: scale(0.98);
+        }
+
+        .confirm-btn.yes-btn {
+            background: #e50914;
+            color: #fff;
+        }
+
+        .confirm-btn.yes-btn:hover {
+            background: #f40a16;
+        }
+
+        .confirm-btn.no-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #fff;
+        }
+
+        .confirm-btn.no-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
     </style>
 </head>
 <body>
@@ -482,8 +577,7 @@
         <div class="lobby-title">¡Estás registrado!</div>
         <div class="lobby-name" id="lobby-nombre"></div>
         <div class="lobby-sub">
-            El profesor iniciará el torneo en breve.<br>
-            Mantén esta pantalla abierta y en silencio.
+            Esperando que comience la ronda...
         </div>
         <div class="waiting-dots">
             <span></span><span></span><span></span>
@@ -578,7 +672,7 @@
     <!-- ══════════════════════════════════════════════════════════════ -->
     <section id="screen-leaderboard" class="screen">
         <div class="lb-title">🏆 Tabla de Posiciones</div>
-        <div class="lb-sub">Mira la pantalla del profesor para ver el ranking</div>
+        <div class="lb-sub">Mira la pantalla principal para ver el ranking</div>
         <div class="my-score-card">
             <div class="my-score-label">Tu puntaje total</div>
             <div class="my-score-num" id="lb-mi-puntaje">—</div>
@@ -591,6 +685,23 @@
 
 </main>
 
+<!-- Modal Confirmación de Nueva Ronda -->
+<div id="round-confirm-modal" class="custom-confirm-overlay" style="display: none;">
+    <div class="custom-confirm-box">
+        <div class="confirm-icon">🎮</div>
+        <h3>¿Participar en la nueva ronda?</h3>
+        <p>Se ha iniciado una nueva ronda del torneo en vivo. ¿Deseas unirte como <span id="confirm-student-name" style="color: #e50914; font-weight: 700;"></span>?</p>
+        <div class="confirm-actions">
+            <button class="confirm-btn yes-btn" onclick="acceptRound()">
+                <i class="fa-solid fa-check"></i> Sí, participar
+            </button>
+            <button class="confirm-btn no-btn" onclick="rejectRound()">
+                <i class="fa-solid fa-user-pen"></i> No, cambiar nombre
+            </button>
+        </div>
+    </div>
+</div>
+
 <div class="custom-signature-footer">
     <div class="icon-box">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -599,7 +710,7 @@
         </svg>
     </div>
     <p class="main-text">
-        Sistema creado con <span class="heart">🧡</span> por <span class="creator-name">Samuel Pablo Claudio</span>
+        Sistema creado con <span class="heart">🧡</span> por <span class="creator-name">Pablito_DP y su grupo</span>
     </p>
     <p class="sub-text">
         &copy; 2026 PABLITO_DP &mdash; Acceso Clasificado
@@ -895,10 +1006,21 @@ function aplicarEstado(estado) {
     preguntaActualId = estado.pregunta_actual_id || 1;
 
     switch (estado.pantalla_actual) {
-        case 'lobby':
+        case 'lobby': {
             clearInterval(timerInterval);
-            showScreen('lobby');
+            
+            const lastAceptadoTimestamp = localStorage.getItem('torneo_ronda_timestamp') || '';
+            const currentLobbyTimestamp = estado.updated_at || '';
+            
+            if (lastAceptadoTimestamp !== currentLobbyTimestamp) {
+                document.getElementById('confirm-student-name').textContent = alumnoNom;
+                document.getElementById('round-confirm-modal').style.display = 'flex';
+                window.pendingLobbyTimestamp = currentLobbyTimestamp;
+            } else {
+                showScreen('lobby');
+            }
             break;
+        }
         case 'pregunta': {
             // Calcular segundos restantes de forma sincronizada usando updated_at
             const ahora = new Date().getTime();
@@ -968,6 +1090,15 @@ async function handleLogin(e) {
 
         localStorage.setItem('torneo_alumno_id',  alumnoId);
         localStorage.setItem('torneo_alumno_nom', alumnoNom);
+
+        try {
+            const { data: est } = await sbClient.from('estado_juego').select('updated_at').eq('id', 'global').single();
+            if (est && est.updated_at) {
+                localStorage.setItem('torneo_ronda_timestamp', est.updated_at);
+            }
+        } catch (e) {
+            console.error('Error al guardar timestamp de ronda:', e);
+        }
 
         document.getElementById('lobby-nombre').textContent = `Hola, ${alumnoNom} 👋`;
         document.getElementById('lb-mi-nombre').textContent  = alumnoNom;
@@ -1269,6 +1400,43 @@ async function actualizarMiPuntaje() {
         .eq('id', alumnoId)
         .single();
     if (data) document.getElementById('lb-mi-puntaje').textContent = data.puntaje;
+}
+
+let pendingLobbyTimestamp = '';
+
+function acceptRound() {
+    const timestamp = window.pendingLobbyTimestamp || '';
+    localStorage.setItem('torneo_ronda_timestamp', timestamp);
+    document.getElementById('round-confirm-modal').style.display = 'none';
+    showScreen('lobby');
+}
+
+async function rejectRound() {
+    document.getElementById('round-confirm-modal').style.display = 'none';
+    
+    if (alumnoId) {
+        try {
+            await sbClient.from('participantes').delete().eq('id', alumnoId);
+        } catch (e) {
+            console.error('Error al remover participante:', e);
+        }
+    }
+    
+    localStorage.removeItem('torneo_alumno_id');
+    localStorage.removeItem('torneo_alumno_nom');
+    localStorage.removeItem('torneo_ronda_timestamp');
+    
+    alumnoId = null;
+    alumnoNom = null;
+    
+    document.getElementById('input-nombre').value = '';
+    const btn = document.getElementById('btn-unirse');
+    if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Unirme al Torneo';
+    }
+    
+    showScreen('screen-login');
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────
