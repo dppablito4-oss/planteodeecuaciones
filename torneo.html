@@ -1110,6 +1110,7 @@ async function handleLogin(e) {
         document.getElementById('lb-mi-nombre').textContent  = alumnoNom;
 
         suscribirMisRespuestas();
+        suscribirMiParticipante();
         await cargarEstadoInicial();
 
         // Si no hay estado que cambie la pantalla, quedarse en lobby
@@ -1176,6 +1177,34 @@ async function obtenerRespuestaActual(pregId) {
             .maybeSingle();
         return data;
     } catch { return null; }
+}
+
+// ── Suscripción a MI participante (para salir si el admin nos borra) ─────────
+function suscribirMiParticipante() {
+    if (!alumnoId) return;
+    const channelName = `torneo-mi-participante-${alumnoId}`;
+    
+    // Desuscribir canal previo si existe para evitar duplicados
+    sbClient.channel(channelName).unsubscribe().catch(() => {});
+    
+    sbClient
+        .channel(channelName)
+        .on('postgres_changes', {
+            event: 'DELETE',
+            schema: 'public',
+            table: 'participantes',
+            filter: `id=eq.${alumnoId}`
+        }, () => {
+            // El administrador nos eliminó, limpiar estado y redirigir
+            localStorage.removeItem('torneo_alumno_id');
+            localStorage.removeItem('torneo_alumno_nom');
+            localStorage.removeItem('torneo_ronda_timestamp');
+            alumnoId = null;
+            alumnoNom = null;
+            showScreen('login');
+            alert('Has sido retirado del torneo o se ha reiniciado la ronda.');
+        })
+        .subscribe();
 }
 
 async function verificarYaEntrego(pregId) {
@@ -1692,10 +1721,37 @@ async function actualizarMiPuntaje() {
 
 let pendingLobbyTimestamp = '';
 
-function acceptRound() {
+async function acceptRound() {
     const timestamp = window.pendingLobbyTimestamp || '';
     localStorage.setItem('torneo_ronda_timestamp', timestamp);
     document.getElementById('round-confirm-modal').style.display = 'none';
+
+    // Verificar si el participante existe en la base de datos, si no, volver a crearlo
+    if (alumnoId && alumnoNom) {
+        try {
+            const { data, error } = await sbClient
+                .from('participantes')
+                .select('id')
+                .eq('id', alumnoId)
+                .maybeSingle();
+                
+            if (!data) {
+                // No existe (fue eliminado por el admin), lo re-insertamos
+                const { error: insertErr } = await sbClient
+                    .from('participantes')
+                    .insert({ id: alumnoId, nombre: alumnoNom, puntaje: 0 });
+                if (insertErr) throw insertErr;
+            }
+            // Reactivar suscripciones
+            suscribirMiParticipante();
+            suscribirMisRespuestas();
+        } catch (e) {
+            console.error('Error al re-unirse al torneo:', e);
+            rejectRound();
+            return;
+        }
+    }
+
     showScreen('lobby');
 }
 
@@ -1733,9 +1789,31 @@ async function rejectRound() {
 
     // Si ya estaba registrado (recarga)
     if (alumnoId && alumnoNom) {
+        // Verificar si el alumno aún existe en la base de datos (por si hubo reset general)
+        try {
+            const { data, error } = await sbClient
+                .from('participantes')
+                .select('id')
+                .eq('id', alumnoId)
+                .maybeSingle();
+            if (!data) {
+                // No existe, limpiar sesión local y mandar a login
+                localStorage.removeItem('torneo_alumno_id');
+                localStorage.removeItem('torneo_alumno_nom');
+                localStorage.removeItem('torneo_ronda_timestamp');
+                alumnoId = null;
+                alumnoNom = null;
+                showScreen('login');
+                return;
+            }
+        } catch (e) {
+            console.error('Error al validar participante en init:', e);
+        }
+
         document.getElementById('lobby-nombre').textContent = `Hola, ${alumnoNom} 👋`;
         document.getElementById('lb-mi-nombre').textContent  = alumnoNom;
         suscribirMisRespuestas();
+        suscribirMiParticipante();
         await cargarEstadoInicial();
         const activa = document.querySelector('.screen.active');
         if (!activa || activa.id === 'screen-login') showScreen('lobby');
