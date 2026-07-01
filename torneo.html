@@ -1,0 +1,1747 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Torneo Math-Flix — Estudiante</title>
+    <meta name="description" content="Interfaz del torneo en vivo para estudiantes. Envía tu solución y recibe calificación instantánea por IA.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏆</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --red:    #e50914;
+            --green:  #46d369;
+            --blue:   #54b3d6;
+            --gold:   #f59e0b;
+            --bg:     #0f0f0f;
+            --card:   #1a1a1a;
+            --card2:  #222;
+            --border: rgba(255,255,255,0.09);
+            --text:   #ffffff;
+            --muted:  #b3b3b3;
+            --faint:  #6d6d6e;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Poppins', sans-serif;
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* ── Header ──────────────────────────────────────────────── */
+        header {
+            padding: 16px 20px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border);
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(12px);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .logo { font-size: 1.1rem; font-weight: 800; color: var(--red); letter-spacing: -0.5px; }
+        .logo span { color: #fff; }
+        #conn-dot {
+            width: 9px; height: 9px; border-radius: 50%;
+            background: #444; transition: background 0.4s;
+            box-shadow: 0 0 0 3px rgba(255,255,255,0.05);
+        }
+        #conn-dot.ok  { background: var(--green); box-shadow: 0 0 8px rgba(70,211,105,0.45); }
+        #conn-dot.err { background: var(--red);   box-shadow: 0 0 8px rgba(229,9,20,0.45); }
+        @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.35;} }
+        #conn-dot.connecting { background: var(--gold); animation: pulse 1.2s ease-in-out infinite; }
+
+        /* ── Main screens ─────────────────────────────────────────── */
+        main { flex: 1; display: flex; flex-direction: column; }
+
+        .screen {
+            display: none;
+            flex: 1;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 28px 20px;
+            gap: 20px;
+            text-align: center;
+            animation: fadeIn 0.4s ease;
+        }
+        .screen.active { display: flex; }
+        @keyframes fadeIn { from{ opacity:0; transform:translateY(10px); } to{ opacity:1; transform:none; } }
+
+        /* ── Login Screen ─────────────────────────────────────────── */
+        .login-logo {
+            font-size: 3.5rem;
+            margin-bottom: 4px;
+            filter: drop-shadow(0 0 20px rgba(229,9,20,0.4));
+        }
+        .login-title {
+            font-size: 1.6rem; font-weight: 800;
+            line-height: 1.2; margin-bottom: 4px;
+        }
+        .login-title span { color: var(--red); }
+        .login-sub { font-size: 0.8rem; color: var(--muted); }
+
+        .login-form {
+            width: 100%; max-width: 340px;
+            display: flex; flex-direction: column; gap: 14px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px 20px;
+        }
+        .input-label {
+            font-size: 0.65rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 1.5px;
+            color: var(--muted); text-align: left; display: block;
+        }
+        .text-input {
+            width: 100%; padding: 12px 14px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text); font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem; font-weight: 600;
+            outline: none; transition: border-color 0.2s;
+        }
+        .text-input:focus { border-color: rgba(229,9,20,0.5); }
+        .text-input::placeholder { color: var(--faint); font-weight: 400; }
+
+        .btn-primary {
+            width: 100%; padding: 14px;
+            background: var(--red); border: none; border-radius: 10px;
+            color: #fff; font-family: 'Poppins', sans-serif;
+            font-size: 0.95rem; font-weight: 700;
+            cursor: pointer; transition: transform 0.1s, opacity 0.2s;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .btn-primary:active { transform: scale(0.97); }
+        .btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }
+
+        /* ── Lobby Screen ─────────────────────────────────────────── */
+        .lobby-icon { font-size: 4rem; animation: float 3s ease-in-out infinite; }
+        @keyframes float { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-10px);} }
+
+        .lobby-title { font-size: 1.4rem; font-weight: 800; }
+        .lobby-name  { font-size: 1rem; color: var(--green); font-weight: 700; }
+        .lobby-sub   { font-size: 0.8rem; color: var(--muted); line-height: 1.6; }
+
+        .waiting-dots span {
+            display: inline-block; width: 8px; height: 8px;
+            border-radius: 50%; background: var(--red);
+            margin: 0 3px; animation: dot 1.4s ease-in-out infinite;
+        }
+        .waiting-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .waiting-dots span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes dot { 0%,80%,100%{opacity:0.2; transform:scale(0.8);} 40%{opacity:1; transform:scale(1);} }
+
+        /* ── Pregunta Screen ──────────────────────────────────────── */
+        .pregunta-header {
+            width: 100%; max-width: 420px;
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 12px;
+        }
+        .pregunta-badge {
+            font-size: 0.65rem; font-weight: 700; letter-spacing: 1.5px;
+            text-transform: uppercase; color: var(--red);
+            background: rgba(229,9,20,0.12); border: 1px solid rgba(229,9,20,0.25);
+            padding: 4px 10px; border-radius: 20px;
+        }
+        #timer-display {
+            font-size: 1.4rem; font-weight: 800;
+            color: var(--green); font-variant-numeric: tabular-nums;
+            transition: color 0.3s;
+        }
+        #timer-display.urgent { color: var(--red); animation: pulse 0.8s ease-in-out infinite; }
+
+        .pregunta-box {
+            width: 100%; max-width: 420px;
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 14px; padding: 20px;
+            text-align: left;
+        }
+        .pregunta-num { font-size: 0.65rem; color: var(--faint); font-weight: 700; text-transform: uppercase; margin-bottom: 8px; }
+        .pregunta-texto { font-size: 0.92rem; color: var(--text); line-height: 1.7; font-weight: 500; }
+
+        /* ── Camera / Upload ──────────────────────────────────────── */
+        .upload-zone {
+            width: 100%; max-width: 420px;
+            border: 2px dashed rgba(255,255,255,0.15);
+            border-radius: 14px; padding: 24px 16px;
+            display: flex; flex-direction: column;
+            align-items: center; gap: 12px;
+            cursor: pointer; transition: border-color 0.2s, background 0.2s;
+            background: rgba(255,255,255,0.02);
+            position: relative;
+        }
+        .upload-zone:hover, .upload-zone.has-file {
+            border-color: rgba(229,9,20,0.4);
+            background: rgba(229,9,20,0.04);
+        }
+        .upload-zone input[type=file] {
+            position: absolute; inset: 0; opacity: 0; cursor: pointer;
+        }
+        .upload-icon { font-size: 2.2rem; color: var(--faint); }
+        .upload-label { font-size: 0.82rem; color: var(--muted); font-weight: 600; }
+        .upload-hint  { font-size: 0.68rem; color: var(--faint); }
+
+        #preview-img {
+            width: 100%; max-width: 420px;
+            border-radius: 12px; border: 1px solid var(--border);
+            display: none; object-fit: cover; max-height: 260px;
+        }
+
+        .btn-enviar {
+            width: 100%; max-width: 420px;
+            padding: 15px; background: var(--red); border: none;
+            border-radius: 12px; color: #fff;
+            font-family: 'Poppins', sans-serif; font-size: 1rem; font-weight: 700;
+            cursor: pointer; transition: transform 0.1s, opacity 0.2s;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+        .btn-enviar:active { transform: scale(0.97); }
+        .btn-enviar:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        /* ── Estado de envío ──────────────────────────────────────── */
+        .status-card {
+            width: 100%; max-width: 420px;
+            background: var(--card2); border: 1px solid var(--border);
+            border-radius: 14px; padding: 20px;
+            display: flex; flex-direction: column; gap: 12px;
+        }
+        .status-step {
+            display: flex; align-items: center; gap: 12px;
+            font-size: 0.82rem; color: var(--muted);
+        }
+        .status-step .step-icon {
+            width: 28px; height: 28px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.85rem; flex-shrink: 0;
+            background: rgba(255,255,255,0.06); color: var(--faint);
+        }
+        .status-step.done .step-icon { background: rgba(70,211,105,0.15); color: var(--green); }
+        .status-step.active .step-icon { background: rgba(229,9,20,0.15); color: var(--red); }
+        .status-step.done span  { color: var(--text); }
+        .status-step.active span { color: var(--text); }
+
+        /* ── Resultado ────────────────────────────────────────────── */
+        .resultado-card {
+            width: 100%; max-width: 420px;
+            border-radius: 16px; padding: 24px 20px;
+            display: flex; flex-direction: column; gap: 14px; align-items: center;
+        }
+        .resultado-card.score-5 { background: linear-gradient(135deg,rgba(70,211,105,0.12),rgba(70,211,105,0.04)); border: 1px solid rgba(70,211,105,0.3); }
+        .resultado-card.score-4 { background: linear-gradient(135deg,rgba(70,211,105,0.08),rgba(70,211,105,0.02)); border: 1px solid rgba(70,211,105,0.2); }
+        .resultado-card.score-3 { background: linear-gradient(135deg,rgba(245,158,11,0.10),rgba(245,158,11,0.02)); border: 1px solid rgba(245,158,11,0.25); }
+        .resultado-card.score-2 { background: linear-gradient(135deg,rgba(229,9,20,0.08),rgba(229,9,20,0.02)); border: 1px solid rgba(229,9,20,0.2); }
+        .resultado-card.score-1,
+        .resultado-card.score-0 { background: linear-gradient(135deg,rgba(229,9,20,0.12),rgba(229,9,20,0.04)); border: 1px solid rgba(229,9,20,0.3); }
+
+        .score-num {
+            font-size: 5rem; font-weight: 800; line-height: 1;
+        }
+        .score-5 .score-num, .score-4 .score-num { color: var(--green); }
+        .score-3 .score-num { color: var(--gold); }
+        .score-2 .score-num, .score-1 .score-num, .score-0 .score-num { color: var(--red); }
+
+        .score-of { font-size: 0.75rem; color: var(--faint); }
+        .score-feedback { font-size: 0.88rem; color: var(--muted); line-height: 1.6; }
+
+        /* ── Leaderboard screen ───────────────────────────────────── */
+        .lb-title { font-size: 1.3rem; font-weight: 800; }
+        .lb-sub   { font-size: 0.8rem; color: var(--muted); }
+
+        .my-score-card {
+            width: 100%; max-width: 340px;
+            background: linear-gradient(135deg,rgba(229,9,20,0.12),rgba(229,9,20,0.04));
+            border: 1px solid rgba(229,9,20,0.25); border-radius: 16px;
+            padding: 20px; text-align: center;
+        }
+        .my-score-label { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; color: var(--red); letter-spacing: 1.5px; }
+        .my-score-num   { font-size: 4rem; font-weight: 800; color: #fff; }
+        .my-score-name  { font-size: 0.8rem; color: var(--muted); }
+
+        .lb-cta {
+            font-size: 0.85rem; color: var(--muted); line-height: 1.7;
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 12px; padding: 16px 20px; width: 100%; max-width: 340px;
+        }
+
+        /* ── Footer ───────────────────────────────────────────────── */
+        footer {
+            text-align: center; padding: 14px;
+            font-size: 0.58rem; color: rgba(255,255,255,0.12);
+            letter-spacing: 1px; text-transform: uppercase;
+            border-top: 1px solid var(--border);
+        }
+
+        /* ── Ya Entregaste / Tiempo Expirado ──────────────────────── */
+        .blocked-notice {
+            width: 100%; max-width: 420px;
+            background: rgba(229,9,20,0.08);
+            border: 1px solid rgba(229,9,20,0.25);
+            border-radius: 16px; padding: 28px 20px;
+            display: flex; flex-direction: column;
+            align-items: center; gap: 14px;
+            animation: fadeIn 0.4s ease;
+        }
+        .blocked-notice .blocked-icon { font-size: 3rem; }
+        .blocked-notice .blocked-title {
+            font-size: 1rem; font-weight: 700; color: var(--red);
+        }
+        .blocked-notice .blocked-sub {
+            font-size: 0.8rem; color: var(--muted); line-height: 1.6;
+        }
+        .expired-notice {
+            width: 100%; max-width: 420px;
+            background: rgba(109,109,110,0.10);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px; padding: 28px 20px;
+            display: flex; flex-direction: column;
+            align-items: center; gap: 14px;
+            animation: fadeIn 0.4s ease;
+        }
+        .expired-notice .exp-icon { font-size: 3rem; }
+        .expired-notice .exp-title {
+            font-size: 1rem; font-weight: 700; color: var(--muted);
+        }
+        .expired-notice .exp-sub {
+            font-size: 0.8rem; color: var(--faint); line-height: 1.6;
+        }
+
+        /* ── Editor de Imagen Canvas ──────────────────────────────── */
+        .editor-wrap {
+            width: 100%; max-width: 420px;
+            background: var(--card2); border: 1px solid var(--border);
+            border-radius: 14px; overflow: hidden;
+            position: relative; display: none;
+        }
+        .editor-canvas-container {
+            position: relative; width: 100%;
+            touch-action: none; user-select: none;
+        }
+        #editor-base-canvas {
+            display: block; width: 100%; height: auto;
+            max-height: 300px; object-fit: contain;
+        }
+        #editor-overlay-canvas {
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%;
+            touch-action: none;
+        }
+        .editor-toolbar {
+            display: flex; align-items: center;
+            justify-content: space-between;
+            gap: 8px; padding: 10px 12px;
+            border-top: 1px solid var(--border);
+            background: rgba(0,0,0,0.3);
+        }
+        .editor-btn {
+            flex: 1; padding: 9px 6px;
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 8px; color: #fff;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.72rem; font-weight: 600;
+            cursor: pointer; transition: background 0.15s;
+            display: flex; align-items: center;
+            justify-content: center; gap: 5px;
+        }
+        .editor-btn:active { background: rgba(255,255,255,0.14); }
+        .editor-btn.confirm {
+            background: rgba(229,9,20,0.2);
+            border-color: rgba(229,9,20,0.4);
+            color: var(--red);
+        }
+        .editor-btn.confirm:active { background: rgba(229,9,20,0.3); }
+
+        /* ══════════════════════════════════════════════════════════════════════════ */
+        /* CUSTOM SIGNATURE FOOTER (ESTILO CREADOR)                                   */
+        /* ══════════════════════════════════════════════════════════════════════════ */
+        .custom-signature-footer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 8px;
+            width: 100%;
+            margin-top: 16px;
+            font-family: 'Poppins', sans-serif;
+            border-top: 1px solid rgba(255,255,255,0.03);
+            opacity: 0.25;
+            transition: opacity 0.35s ease;
+        }
+
+        .custom-signature-footer:hover {
+            opacity: 0.7;
+        }
+
+        .custom-signature-footer .icon-box {
+            width: auto;
+            height: auto;
+            border: none;
+            background: none;
+            padding: 0;
+            box-shadow: none;
+            margin: 0 auto 3px auto;
+            transition: transform 0.3s ease;
+        }
+
+        .custom-signature-footer .icon-box svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .custom-signature-footer:hover .icon-box {
+            transform: scale(1.06) rotate(3deg);
+        }
+
+        .custom-signature-footer .main-text {
+            font-size: 0.58rem;
+            font-weight: 500;
+            color: #77777a;
+            letter-spacing: 0.3px;
+            text-transform: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            flex-wrap: wrap;
+            margin: 0;
+            line-height: 1.4;
+        }
+
+        .custom-signature-footer .main-text .heart {
+            color: #ef4444;
+        }
+
+        .custom-signature-footer .main-text .creator-name {
+            color: #c27803;
+            font-weight: 600;
+            text-shadow: none;
+        }
+
+        .custom-signature-footer .sub-text {
+            font-size: 0.48rem;
+            color: #4b5563;
+            font-weight: 500;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin: 2px 0 0 0;
+        }
+
+        /* Modal de confirmación de ronda */
+        .custom-confirm-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 20px;
+        }
+
+        .custom-confirm-box {
+            background: #181818;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 32px 24px;
+            max-width: 420px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 20px rgba(229,9,20,0.1);
+            animation: modalScaleUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes modalScaleUp {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .confirm-icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        .custom-confirm-box h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 12px;
+        }
+
+        .custom-confirm-box p {
+            font-size: 0.9rem;
+            color: #b3b3b3;
+            line-height: 1.5;
+            margin-bottom: 24px;
+        }
+
+        .confirm-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .confirm-btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .confirm-btn:active {
+            transform: scale(0.98);
+        }
+
+        .confirm-btn.yes-btn {
+            background: #e50914;
+            color: #fff;
+        }
+
+        .confirm-btn.yes-btn:hover {
+            background: #f40a16;
+        }
+
+        .confirm-btn.no-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #fff;
+        }
+
+        .confirm-btn.no-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo">MATH<span>-FLIX</span></div>
+    <div id="conn-dot" class="connecting" title="Estado de conexión"></div>
+</header>
+
+<main>
+
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <!-- PANTALLA 1: LOGIN                                              -->
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <section id="screen-login" class="screen active">
+        <div class="login-logo">🏆</div>
+        <div>
+            <div class="login-title">Torneo <span>Math-Flix</span></div>
+            <div class="login-sub">Ingresa tu nombre para participar en el torneo</div>
+        </div>
+
+        <form class="login-form" onsubmit="handleLogin(event)">
+            <label class="input-label" for="input-nombre">Tu nombre</label>
+            <input
+                type="text" id="input-nombre" class="text-input"
+                placeholder="Ej: María García"
+                autocomplete="off" autocorrect="off"
+                maxlength="40" required
+            >
+            <button type="submit" class="btn-primary" id="btn-unirse">
+                <i class="fa-solid fa-right-to-bracket"></i> Unirme al Torneo
+            </button>
+        </form>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <!-- PANTALLA 2: LOBBY                                              -->
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <section id="screen-lobby" class="screen">
+        <div class="lobby-icon">⏳</div>
+        <div class="lobby-title">¡Estás registrado!</div>
+        <div class="lobby-name" id="lobby-nombre"></div>
+        <div class="lobby-sub">
+            Esperando que comience la ronda...
+        </div>
+        <div class="waiting-dots">
+            <span></span><span></span><span></span>
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <!-- PANTALLA 3: PREGUNTA                                           -->
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <section id="screen-pregunta" class="screen">
+        <div class="pregunta-header">
+            <div class="pregunta-badge" id="pregunta-badge">Pregunta 1</div>
+            <div id="timer-display">60</div>
+        </div>
+
+        <div class="pregunta-box" id="pregunta-box">
+            <div class="pregunta-num" id="pregunta-num">PROBLEMA</div>
+            <div class="pregunta-texto" id="pregunta-texto">Cargando enunciado...</div>
+        </div>
+
+        <!-- Bloqueo: ya entregó para esta pregunta -->
+        <div class="blocked-notice" id="blocked-notice" style="display:none;">
+            <div class="blocked-icon">✅</div>
+            <div class="blocked-title">¡Solución enviada!</div>
+            <div class="blocked-sub">Ya enviaste tu respuesta para esta pregunta.<br>Espera los resultados o la siguiente pregunta.</div>
+        </div>
+
+        <!-- Bloqueo: tiempo expirado -->
+        <div class="expired-notice" id="expired-notice" style="display:none;">
+            <div class="exp-icon">⏰</div>
+            <div class="exp-title">Tiempo expirado</div>
+            <div class="exp-sub">Lo sentimos, el tiempo para subir tu solución a esta pregunta ha terminado. Espera la siguiente pregunta.</div>
+        </div>
+
+        <!-- Upload zone (solo visible si no bloqueado) -->
+        <div class="upload-zone" id="upload-zone" onclick="triggerFileInput()">
+            <input type="file" id="foto-input" accept="image/*" capture="environment"
+                   onchange="handleFotoSeleccionada(event)" style="display:none;">
+            <div class="upload-icon"><i class="fa-solid fa-camera"></i></div>
+            <div class="upload-label">Toca aquí para tomar/subir tu foto</div>
+            <div class="upload-hint">Asegúrate que el procedimiento sea legible</div>
+        </div>
+
+        <!-- Editor de imagen: rotar + recortar -->
+        <div class="editor-wrap" id="editor-wrap">
+            <div class="editor-canvas-container" id="editor-canvas-container">
+                <canvas id="editor-base-canvas"></canvas>
+                <canvas id="editor-overlay-canvas"></canvas>
+            </div>
+            <div class="editor-toolbar">
+                <button class="editor-btn" onclick="editorRotar()">
+                    <i class="fa-solid fa-rotate-right"></i> Rotar
+                </button>
+                <button class="editor-btn" id="btn-toggle-crop" onclick="editorToggleCrop()">
+                    <i class="fa-solid fa-crop-simple"></i> Recortar
+                </button>
+                <button class="editor-btn confirm" onclick="editorConfirmar()">
+                    <i class="fa-solid fa-check"></i> Confirmar
+                </button>
+            </div>
+        </div>
+
+        <div class="status-card" id="status-card" style="display:none;">
+            <div class="status-step" id="step-comprimiendo">
+                <div class="step-icon"><i class="fa-solid fa-compress"></i></div>
+                <span>Comprimiendo imagen...</span>
+            </div>
+            <div class="status-step" id="step-subiendo">
+                <div class="step-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+                <span>Subiendo al servidor...</span>
+            </div>
+            <div class="status-step" id="step-evaluando">
+                <div class="step-icon"><i class="fa-solid fa-brain"></i></div>
+                <span>Profesor IA evaluando tu solución...</span>
+            </div>
+        </div>
+
+        <button class="btn-enviar" id="btn-enviar" onclick="enviarRespuesta()" disabled>
+            <i class="fa-solid fa-paper-plane"></i> Enviar Solución
+        </button>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <!-- PANTALLA 4: RESULTADO                                          -->
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <section id="screen-resultado" class="screen">
+        <div id="resultado-card-container"></div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <!-- PANTALLA 5: LEADERBOARD                                        -->
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <section id="screen-leaderboard" class="screen">
+        <div class="lb-title">🏆 Tabla de Posiciones</div>
+        <div class="lb-sub">Mira la pantalla principal para ver el ranking</div>
+        <div class="my-score-card">
+            <div class="my-score-label">Tu puntaje total</div>
+            <div class="my-score-num" id="lb-mi-puntaje">—</div>
+            <div class="my-score-name" id="lb-mi-nombre"></div>
+        </div>
+        <div class="lb-cta">
+            📺 Mira la <strong>pantalla principal</strong> para ver el ranking completo en tiempo real.
+        </div>
+    </section>
+
+</main>
+
+<!-- Modal Confirmación de Nueva Ronda -->
+<div id="round-confirm-modal" class="custom-confirm-overlay" style="display: none;">
+    <div class="custom-confirm-box">
+        <div class="confirm-icon">🎮</div>
+        <h3>¿Participar en la nueva ronda?</h3>
+        <p>Se ha iniciado una nueva ronda del torneo en vivo. ¿Deseas unirte como <span id="confirm-student-name" style="color: #e50914; font-weight: 700;"></span>?</p>
+        <div class="confirm-actions">
+            <button class="confirm-btn yes-btn" onclick="acceptRound()">
+                <i class="fa-solid fa-check"></i> Sí, participar
+            </button>
+            <button class="confirm-btn no-btn" onclick="rejectRound()">
+                <i class="fa-solid fa-user-pen"></i> No, cambiar nombre
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="custom-signature-footer">
+    <div class="icon-box">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 3C12 7.5 16.5 12 21 12C16.5 12 12 16.5 12 21C12 16.5 7.5 12 3 12C7.5 12 12 7.5 12 3Z" fill="#f59e0b"/>
+            <circle cx="7" cy="17" r="1.5" fill="#f59e0b" opacity="0.8"/>
+        </svg>
+    </div>
+    <p class="main-text">
+        Sistema creado con <span class="heart">🧡</span> por <span class="creator-name">Pablito_DP y su grupo</span>
+    </p>
+    <p class="sub-text">
+        &copy; 2026 PABLITO_DP &mdash; Acceso Clasificado
+    </p>
+</div>
+
+<script>
+// ── Supabase Config ──────────────────────────────────────────────────────────
+const SUPABASE_URL  = 'https://dyuadrzdrphzywbnxnhz.supabase.co';
+const SUPABASE_KEY  = 'sb_publishable_rCwOvgVa1kGlO5PFAa8tRg_E1KIWKWX';
+const EDGE_BASE     = `${SUPABASE_URL}/functions/v1`;
+
+const sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ── Estado local ─────────────────────────────────────────────────────────────
+let alumnoId   = localStorage.getItem('torneo_alumno_id')   || null;
+let alumnoNom  = localStorage.getItem('torneo_alumno_nom')  || null;
+let archivoSeleccionado = null;  // Blob o File a enviar (puede ser el editado por canvas)
+let timerInterval = null;
+let preguntaActualId = 1;
+let tiempoExpirado   = false;
+
+// Variables globales para la descarga de PDF
+let ultimoPuntaje = 0;
+let ultimoFeedback = '';
+let ultimaFotoUrl = '';
+let ultimaPreguntaTexto = '';
+
+// Banco de preguntas sincronizado con app.js
+const PREGUNTAS_TORNEO = [
+    { id: 1, texto: 'Resolver: La suma de tres números consecutivos es 72. Halla los números.' },
+    { id: 2, texto: 'Resolver: El doble de un número aumentado en 5 es igual a 21. Encuentra el número.' },
+    { id: 3, texto: 'Resolver: La edad de Ana es el triple de la de su hijo. Dentro de 10 años será el doble. ¿Qué edad tiene cada uno?' },
+    { id: 4, texto: 'Resolver: En un rectángulo el largo es 4 cm mayor que el ancho y su perímetro es 32 cm. Halla sus dimensiones.' },
+    { id: 5, texto: 'Resolver: Se reparten 50 caramelos entre dos niños de modo que uno recibe 10 más que el otro. ¿Cuántos recibe cada uno?' },
+];
+
+// ── Editor de imagen (Canvas): estado ────────────────────────────────────────
+let editorImg     = null;   // HTMLImageElement cargado originalmente
+let editorRotDeg  = 0;      // Rotación acumulada en múltiplos de 90°
+let editorCropMode = false; // ¿Modo recorte activo?
+let editorCropBox  = null;  // { x, y, w, h } en coordenadas del canvas
+let editorDragState = null; // { handle, startX, startY, origBox }
+let editorEventsInitialized = false;
+const HANDLE_HALF  = 14;    // Radio del handle de recorte en px
+
+function editorRenderFrame() {
+    const baseCanvas = document.getElementById('editor-base-canvas');
+    const ov         = document.getElementById('editor-overlay-canvas');
+    if (!editorImg || !baseCanvas) return;
+
+    // Calcular dimensiones para la rotación
+    const rad   = (editorRotDeg % 360) * Math.PI / 180;
+    const sin   = Math.abs(Math.sin(rad));
+    const cos   = Math.abs(Math.cos(rad));
+    const nW    = Math.round(editorImg.naturalWidth * cos + editorImg.naturalHeight * sin);
+    const nH    = Math.round(editorImg.naturalWidth * sin + editorImg.naturalHeight * cos);
+
+    baseCanvas.width  = nW;
+    baseCanvas.height = nH;
+    ov.width  = nW;
+    ov.height = nH;
+
+    const ctx = baseCanvas.getContext('2d');
+    ctx.clearRect(0, 0, nW, nH);
+    ctx.save();
+    ctx.translate(nW / 2, nH / 2);
+    ctx.rotate(rad);
+    ctx.drawImage(editorImg, -editorImg.naturalWidth / 2, -editorImg.naturalHeight / 2);
+    ctx.restore();
+
+    editorRenderOverlay();
+}
+
+function editorRenderOverlay() {
+    const ov  = document.getElementById('editor-overlay-canvas');
+    if (!ov) return;
+    const ctx = ov.getContext('2d');
+    ctx.clearRect(0, 0, ov.width, ov.height);
+    if (!editorCropMode || !editorCropBox) return;
+
+    const { x, y, w, h } = editorCropBox;
+    // Oscurecer fuera del recorte
+    ctx.fillStyle = 'rgba(0,0,0,0.5)';
+    ctx.fillRect(0, 0, ov.width, ov.height);
+    ctx.clearRect(x, y, w, h);
+
+    // Borde del recorte
+    ctx.strokeStyle = '#e50914';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(x, y, w, h);
+
+    // Dibuja los 4 handles de esquina + 4 de borde
+    const handles = editorGetHandlePositions();
+    handles.forEach(pt => {
+        ctx.beginPath();
+        ctx.arc(pt.x, pt.y, HANDLE_HALF, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(229,9,20,0.85)';
+        ctx.fill();
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+    });
+}
+
+function editorGetHandlePositions() {
+    if (!editorCropBox) return [];
+    const { x, y, w, h } = editorCropBox;
+    const cx = x + w / 2, cy = y + h / 2;
+    return [
+        { id: 'tl', x, y },            { id: 'tc', x: cx, y },      { id: 'tr', x: x + w, y },
+        { id: 'ml', x, y: cy },                                       { id: 'mr', x: x + w, y: cy },
+        { id: 'bl', x, y: y + h },     { id: 'bc', x: cx, y: y + h },{ id: 'br', x: x + w, y: y + h }
+    ];
+}
+
+function editorHitHandle(px, py) {
+    return editorGetHandlePositions().find(h =>
+        Math.hypot(h.x - px, h.y - py) <= HANDLE_HALF + 4
+    );
+}
+
+function editorTouchToCanvas(e, canvas) {
+    const rect  = canvas.getBoundingClientRect();
+    const touch = (e.touches || [e])[0];
+    const scaleX = canvas.width  / rect.width;
+    const scaleY = canvas.height / rect.height;
+    return {
+        x: (touch.clientX - rect.left) * scaleX,
+        y: (touch.clientY - rect.top)  * scaleY
+    };
+}
+
+function editorInitOverlayEvents() {
+    if (editorEventsInitialized) return;
+    const ov = document.getElementById('editor-overlay-canvas');
+    if (!ov) return;
+    // Touch
+    ov.addEventListener('touchstart', editorPointerDown, { passive: false });
+    ov.addEventListener('touchmove',  editorPointerMove, { passive: false });
+    ov.addEventListener('touchend',   editorPointerUp,   { passive: false });
+    // Mouse (para pruebas en escritorio)
+    ov.addEventListener('mousedown', editorPointerDown);
+    document.addEventListener('mousemove', editorPointerMove);
+    document.addEventListener('mouseup',   editorPointerUp);
+    editorEventsInitialized = true;
+}
+
+function editorPointerDown(e) {
+    if (!editorCropMode) return;
+    e.preventDefault();
+    const ov = document.getElementById('editor-overlay-canvas');
+    const pt = editorTouchToCanvas(e, ov);
+    const hit = editorHitHandle(pt.x, pt.y);
+    if (hit) {
+        editorDragState = { handle: hit.id, startX: pt.x, startY: pt.y, origBox: { ...editorCropBox } };
+    }
+}
+
+function editorPointerMove(e) {
+    if (!editorDragState || !editorCropMode) return;
+    e.preventDefault && e.preventDefault();
+    const ov = document.getElementById('editor-overlay-canvas');
+    const pt = editorTouchToCanvas(e, ov);
+    const dx = pt.x - editorDragState.startX;
+    const dy = pt.y - editorDragState.startY;
+    const ob = editorDragState.origBox;
+    const MIN = 30;
+    let { x, y, w, h } = ob;
+    const id = editorDragState.handle;
+    if (id.includes('l')) { x = Math.min(ob.x + dx, ob.x + ob.w - MIN); w = ob.w - (x - ob.x); }
+    if (id.includes('r')) { w = Math.max(MIN, ob.w + dx); }
+    if (id.includes('t')) { y = Math.min(ob.y + dy, ob.y + ob.h - MIN); h = ob.h - (y - ob.y); }
+    if (id.includes('b')) { h = Math.max(MIN, ob.h + dy); }
+    // Clamp
+    x = Math.max(0, x); y = Math.max(0, y);
+    w = Math.min(ov.width  - x, w);
+    h = Math.min(ov.height - y, h);
+    editorCropBox = { x, y, w, h };
+    editorRenderOverlay();
+}
+
+function editorPointerUp(e) {
+    editorDragState = null;
+}
+
+function editorRotar() {
+    editorRotDeg = (editorRotDeg + 90) % 360;
+    // Resetear recorte al rotar
+    editorCropBox = null;
+    editorCropMode = false;
+    document.getElementById('btn-toggle-crop').style.background = '';
+    editorRenderFrame();
+    // Resetear cropBox a tamaño completo si crop activo
+    const ov = document.getElementById('editor-overlay-canvas');
+    editorCropBox = { x: ov.width * 0.08, y: ov.height * 0.08, w: ov.width * 0.84, h: ov.height * 0.84 };
+}
+
+function editorToggleCrop() {
+    editorCropMode = !editorCropMode;
+    const btn = document.getElementById('btn-toggle-crop');
+    if (editorCropMode) {
+        btn.style.background = 'rgba(229,9,20,0.2)';
+        const ov = document.getElementById('editor-overlay-canvas');
+        if (!editorCropBox) {
+            editorCropBox = { x: ov.width * 0.08, y: ov.height * 0.08, w: ov.width * 0.84, h: ov.height * 0.84 };
+        }
+    } else {
+        btn.style.background = '';
+    }
+    editorRenderOverlay();
+}
+
+function editorConfirmar() {
+    const baseCanvas = document.getElementById('editor-base-canvas');
+    let srcCanvas = baseCanvas;
+
+    // Si hay recorte activo, aplicarlo
+    if (editorCropMode && editorCropBox) {
+        const { x, y, w, h } = editorCropBox;
+        const cropped = document.createElement('canvas');
+        cropped.width  = Math.round(w);
+        cropped.height = Math.round(h);
+        cropped.getContext('2d').drawImage(baseCanvas, Math.round(x), Math.round(y), Math.round(w), Math.round(h), 0, 0, Math.round(w), Math.round(h));
+        srcCanvas = cropped;
+    }
+
+    // Convertir a blob JPEG
+    srcCanvas.toBlob(blob => {
+        archivoSeleccionado = blob;
+        // Mostrar preview de lo editado
+        const url = URL.createObjectURL(blob);
+        // No hay preview-img separado; el editor ya es el preview
+        document.getElementById('btn-enviar').disabled = false;
+    }, 'image/jpeg', 0.88);
+}
+
+function editorMostrar(src) {
+    editorImg = new Image();
+    editorImg.onload = () => {
+        document.getElementById('upload-zone').style.display   = 'none';
+        document.getElementById('editor-wrap').style.display   = 'block';
+        document.getElementById('btn-enviar').disabled = true;
+        editorRotDeg  = 0;
+        editorCropMode = false;
+        editorCropBox  = null;
+        editorDragState = null;
+        editorRenderFrame();
+        editorInitOverlayEvents();
+        // Pre-setear cropBox
+        const ov = document.getElementById('editor-overlay-canvas');
+        editorCropBox = { x: ov.width * 0.08, y: ov.height * 0.08, w: ov.width * 0.84, h: ov.height * 0.84 };
+    };
+    editorImg.src = src;
+}
+
+// ── Helpers de pantalla ───────────────────────────────────────────────────────
+function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    const sc = document.getElementById(`screen-${id}`);
+    if (sc) sc.classList.add('active');
+}
+
+// ── Conexión Supabase ─────────────────────────────────────────────────────────
+const dot = document.getElementById('conn-dot');
+
+function setConn(state) {
+    dot.className = state; // 'ok' | 'err' | 'connecting'
+}
+
+// ── Suscripción al estado del juego ──────────────────────────────────────────
+function suscribirEstadoJuego() {
+    sbClient
+        .channel('torneo-estado-alumno')
+        .on('postgres_changes', {
+            event:  '*',
+            schema: 'public',
+            table:  'estado_juego'
+        }, ({ new: payload }) => {
+            aplicarEstado(payload);
+        })
+        .subscribe(status => {
+            if (status === 'SUBSCRIBED') setConn('ok');
+            else setConn('connecting');
+        });
+}
+
+async function cargarEstadoInicial() {
+    const { data } = await sbClient
+        .from('estado_juego')
+        .select('*')
+        .eq('id', 'global')
+        .single();
+    if (data) aplicarEstado(data);
+}
+
+function aplicarEstado(estado) {
+    if (!alumnoId) return; // Aún en login
+    preguntaActualId = estado.pregunta_actual_id || 1;
+
+    switch (estado.pantalla_actual) {
+        case 'lobby': {
+            clearInterval(timerInterval);
+            
+            const lastAceptadoTimestamp = localStorage.getItem('torneo_ronda_timestamp') || '';
+            const currentLobbyTimestamp = estado.updated_at || '';
+            
+            if (lastAceptadoTimestamp !== currentLobbyTimestamp) {
+                document.getElementById('confirm-student-name').textContent = alumnoNom;
+                document.getElementById('round-confirm-modal').style.display = 'flex';
+                window.pendingLobbyTimestamp = currentLobbyTimestamp;
+            } else {
+                showScreen('lobby');
+            }
+            break;
+        }
+        case 'pregunta': {
+            // Calcular segundos restantes de forma sincronizada usando updated_at
+            const ahora = new Date().getTime();
+            const updatedAt = estado.updated_at ? new Date(estado.updated_at).getTime() : ahora;
+            const segundosTranscurridos = Math.floor((ahora - updatedAt) / 1000);
+            const tiempoRestanteSinc = Math.max(0, (estado.tiempo_restante || 60) - segundosTranscurridos);
+            mostrarPregunta(preguntaActualId, tiempoRestanteSinc, estado.pregunta_custom_texto || null);
+            break;
+        }
+        case 'leaderboard':
+            clearInterval(timerInterval);
+            actualizarMiPuntaje();
+            showScreen('leaderboard');
+            break;
+    }
+}
+
+// ── Suscripción a MIS respuestas (para mostrar resultado cuando OpenAI termina) ─
+function suscribirMisRespuestas() {
+    sbClient
+        .channel(`torneo-respuestas-${alumnoId}`)
+        .on('postgres_changes', {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'respuestas',
+            filter: `participante_id=eq.${alumnoId}`
+        }, ({ new: resp }) => {
+            if (resp.procesado) {
+                mostrarResultado(resp.puntaje_asignado, resp.feedback);
+            }
+        })
+        .subscribe();
+}
+
+// ── Login ─────────────────────────────────────────────────────────────────────
+async function handleLogin(e) {
+    e.preventDefault();
+    const nombre = document.getElementById('input-nombre').value.trim();
+    if (!nombre) return;
+
+    const btn = document.getElementById('btn-unirse');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Uniendo...';
+
+    try {
+        // Buscar si ya existe con ese nombre (por si recarga la página)
+        const { data: existe } = await sbClient
+            .from('participantes')
+            .select('id, nombre, puntaje')
+            .eq('nombre', nombre)
+            .single();
+
+        if (existe) {
+            alumnoId  = existe.id;
+            alumnoNom = existe.nombre;
+        } else {
+            const { data, error } = await sbClient
+                .from('participantes')
+                .insert({ nombre })
+                .select()
+                .single();
+
+            if (error) throw error;
+            alumnoId  = data.id;
+            alumnoNom = data.nombre;
+        }
+
+        localStorage.setItem('torneo_alumno_id',  alumnoId);
+        localStorage.setItem('torneo_alumno_nom', alumnoNom);
+
+        try {
+            const { data: est } = await sbClient.from('estado_juego').select('updated_at').eq('id', 'global').single();
+            if (est && est.updated_at) {
+                localStorage.setItem('torneo_ronda_timestamp', est.updated_at);
+            }
+        } catch (e) {
+            console.error('Error al guardar timestamp de ronda:', e);
+        }
+
+        document.getElementById('lobby-nombre').textContent = `Hola, ${alumnoNom} 👋`;
+        document.getElementById('lb-mi-nombre').textContent  = alumnoNom;
+
+        suscribirMisRespuestas();
+        await cargarEstadoInicial();
+
+        // Si no hay estado que cambie la pantalla, quedarse en lobby
+        const pantalla = document.querySelector('.screen.active');
+        if (!pantalla || pantalla.id === 'screen-login') showScreen('lobby');
+
+    } catch (err) {
+        alert('Error al unirte: ' + err.message);
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Unirme al Torneo';
+    }
+}
+
+// ── Pregunta & Timer ──────────────────────────────────────────────────────────
+async function mostrarPregunta(id, tiempoInicial, preguntaCustomTexto) {
+    preguntaActualId = id;
+    tiempoExpirado = false;
+
+    // Texto: usar custom si existe, sino el banco estático
+    const pregunta = PREGUNTAS_TORNEO.find(p => p.id === id) || PREGUNTAS_TORNEO[0];
+    const texto = preguntaCustomTexto || pregunta.texto;
+    ultimaPreguntaTexto = texto;
+
+    document.getElementById('pregunta-badge').textContent = `Pregunta ${id}`;
+    document.getElementById('pregunta-num').textContent   = `PROBLEMA ${id}`;
+    document.getElementById('pregunta-texto').textContent  = texto;
+
+    // Reset UI
+    archivoSeleccionado = null;
+    document.getElementById('editor-wrap').style.display    = 'none';
+    document.getElementById('blocked-notice').style.display = 'none';
+    document.getElementById('expired-notice').style.display = 'none';
+    document.getElementById('status-card').style.display    = 'none';
+    document.getElementById('foto-input').value = '';
+    document.getElementById('btn-enviar').disabled = true;
+    editorImg = null; editorRotDeg = 0; editorCropMode = false; editorCropBox = null;
+
+    // Verificar si ya entregó respuesta para esta pregunta
+    const respuestaExistente = await obtenerRespuestaActual(preguntaActualId);
+    if (respuestaExistente) {
+        if (respuestaExistente.procesado) {
+            ultimaFotoUrl = respuestaExistente.url_foto;
+            mostrarResultado(respuestaExistente.puntaje_asignado, respuestaExistente.feedback);
+            return;
+        }
+        document.getElementById('upload-zone').style.display = 'none';
+        document.getElementById('blocked-notice').style.display = 'flex';
+    } else {
+        document.getElementById('upload-zone').style.display = 'flex';
+    }
+
+    showScreen('pregunta');
+    iniciarTimer(tiempoInicial);
+}
+
+async function obtenerRespuestaActual(pregId) {
+    if (!alumnoId) return null;
+    try {
+        const { data } = await sbClient
+            .from('respuestas')
+            .select('*')
+            .eq('participante_id', alumnoId)
+            .eq('pregunta_id', pregId)
+            .maybeSingle();
+        return data;
+    } catch { return null; }
+}
+
+async function verificarYaEntrego(pregId) {
+    const res = await obtenerRespuestaActual(pregId);
+    return !!res;
+}
+
+function iniciarTimer(segundos) {
+    clearInterval(timerInterval);
+    let t = Math.max(0, segundos);
+    const el = document.getElementById('timer-display');
+    const actualizar = () => {
+        el.textContent = t;
+        el.classList.toggle('urgent', t <= 10);
+        if (t <= 0) {
+            clearInterval(timerInterval);
+            bloquearPorTiempo();
+            return;
+        }
+        t--;
+    };
+    actualizar();
+    timerInterval = setInterval(actualizar, 1000);
+}
+
+function bloquearPorTiempo() {
+    if (tiempoExpirado) return;
+    tiempoExpirado = true;
+    // Solo bloquear si el alumno no envió ya y no está en proceso de envío
+    const statusCard = document.getElementById('status-card');
+    if (statusCard.style.display !== 'none') return; // En proceso de envío, no interrumpir
+    document.getElementById('upload-zone').style.display   = 'none';
+    document.getElementById('editor-wrap').style.display   = 'none';
+    document.getElementById('blocked-notice').style.display = 'none';
+    document.getElementById('expired-notice').style.display = 'flex';
+    document.getElementById('btn-enviar').disabled = true;
+}
+
+// ── Foto ──────────────────────────────────────────────────────────────────────
+function triggerFileInput() {
+    if (tiempoExpirado) return;
+    document.getElementById('foto-input').click();
+}
+
+function handleFotoSeleccionada(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Cargar en el editor de canvas
+    const reader = new FileReader();
+    reader.onload = ev => {
+        editorMostrar(ev.target.result);
+    };
+    reader.readAsDataURL(file);
+}
+
+// ── Comprimir imagen con Canvas ───────────────────────────────────────────────
+// Acepta File, Blob, o HTMLCanvasElement
+function compressImage(source, maxWidth = 1024) {
+    return new Promise(resolve => {
+        // Si ya es un Blob/File editado por el editor, redimensionar directamente
+        if (source instanceof Blob) {
+            const img = new Image();
+            const url = URL.createObjectURL(source);
+            img.onload = () => {
+                URL.revokeObjectURL(url);
+                const canvas = document.createElement('canvas');
+                const scale  = Math.min(1, maxWidth / img.width);
+                canvas.width  = img.width  * scale;
+                canvas.height = img.height * scale;
+                canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+                canvas.toBlob(blob => resolve(blob), 'image/jpeg', 0.80);
+            };
+            img.src = url;
+        } else {
+            // Fallback File → dataURL
+            const reader = new FileReader();
+            reader.readAsDataURL(source);
+            reader.onload = ev => {
+                const img = new Image();
+                img.src = ev.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const scale  = Math.min(1, maxWidth / img.width);
+                    canvas.width  = img.width  * scale;
+                    canvas.height = img.height * scale;
+                    canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+                    canvas.toBlob(blob => resolve(blob), 'image/jpeg', 0.80);
+                };
+            };
+        }
+    });
+}
+
+// ── Enviar Respuesta ──────────────────────────────────────────────────────────
+function setStep(id, state) {
+    const el = document.getElementById(id);
+    el.className = `status-step ${state}`;
+    const icon = el.querySelector('.step-icon i');
+    if (state === 'done')   icon.className = 'fa-solid fa-circle-check';
+    if (state === 'active') icon.className = 'fa-solid fa-spinner fa-spin';
+    if (state === '')       icon.className = el.dataset.icon || 'fa-solid fa-circle';
+}
+
+async function enviarRespuesta() {
+    if (!archivoSeleccionado || !alumnoId) return;
+    if (tiempoExpirado) {
+        alert('Lo sentimos, tu tiempo ha expirado.');
+        return;
+    }
+
+    let respuestaIdInsertado = null; // Track insertion so we can rollback on AI error
+    const btnEnviar   = document.getElementById('btn-enviar');
+    const uploadZone  = document.getElementById('upload-zone');
+    const statusCard  = document.getElementById('status-card');
+
+    btnEnviar.disabled = true;
+    uploadZone.style.display = 'none';
+    statusCard.style.display = 'flex';
+
+    setStep('step-comprimiendo', 'active');
+    setStep('step-subiendo',     '');
+    setStep('step-evaluando',    '');
+
+    try {
+        // PASO 1 — Comprimir
+        const blob = await compressImage(archivoSeleccionado, 1024);
+        setStep('step-comprimiendo', 'done');
+        setStep('step-subiendo',     'active');
+
+        // PASO 2 — Subir a Storage
+        const fileName = `${alumnoId}_p${preguntaActualId}_${Date.now()}.jpg`;
+        const { error: storageErr } = await sbClient.storage
+            .from('examenes')
+            .upload(fileName, blob, { contentType: 'image/jpeg', upsert: true });
+
+        if (storageErr) throw storageErr;
+
+        const imageUrl = sbClient.storage
+            .from('examenes')
+            .getPublicUrl(fileName).data.publicUrl;
+        ultimaFotoUrl = imageUrl;
+
+        setStep('step-subiendo', 'done');
+        setStep('step-evaluando', 'active');
+
+        // PASO 3 — Insertar en tabla respuestas
+        const pregunta = PREGUNTAS_TORNEO.find(p => p.id === preguntaActualId) || PREGUNTAS_TORNEO[0];
+        const { data: respuesta, error: insertErr } = await sbClient
+            .from('respuestas')
+            .insert({
+                participante_id: alumnoId,
+                pregunta_id:     preguntaActualId,
+                url_foto:        imageUrl
+            })
+            .select()
+            .single();
+
+        if (insertErr) throw insertErr;
+        respuestaIdInsertado = respuesta.id; // Track so we can delete if AI fails
+
+        // PASO 4 — Disparar Edge Function (esperamos por si hay error en la llamada)
+        const funcRes = await fetch(`${EDGE_BASE}/evaluar-matematica`, {
+            method: 'POST',
+            headers: {
+                'Content-Type':  'application/json',
+                'Authorization': `Bearer ${SUPABASE_KEY}`
+            },
+            body: JSON.stringify({
+                respuestaId:   respuesta.id,
+                imageUrl:      imageUrl,
+                problemaTexto: pregunta.texto
+            })
+        });
+
+        if (!funcRes.ok) {
+            const errData = await funcRes.json().catch(() => ({}));
+            throw new Error(errData.error || `Error del servidor de evaluación (${funcRes.status})`);
+        }
+
+        // Si en 30 s no llega el evento Realtime, verificar manualmente
+        setTimeout(verificarResultadoManual, 30000, respuesta.id);
+
+    } catch (err) {
+        // Si ya insertamos una respuesta pero la IA falló, eliminarla para desbloquear al alumno
+        if (respuestaIdInsertado) {
+            await sbClient.from('respuestas').delete().eq('id', respuestaIdInsertado).catch(() => {});
+            respuestaIdInsertado = null;
+        }
+        alert('Error al enviar: ' + err.message + '\n\nPuedes volver a intentarlo.');
+        btnEnviar.disabled = false;
+        uploadZone.style.display = 'flex';
+        statusCard.style.display = 'none';
+    }
+}
+
+// Fallback: consultar directamente si el evento Realtime no llega
+async function verificarResultadoManual(respuestaId) {
+    const { data } = await sbClient
+        .from('respuestas')
+        .select('*')
+        .eq('id', respuestaId)
+        .eq('procesado', true)
+        .single();
+    if (data) mostrarResultado(data.puntaje_asignado, data.feedback);
+}
+
+// ── Mostrar Resultado ──────────────────────────────────────────────────────────
+function mostrarResultado(puntaje, feedback) {
+    setStep('step-evaluando', 'done');
+    clearInterval(timerInterval);
+
+    ultimoPuntaje = puntaje;
+    ultimoFeedback = feedback;
+
+    const emojis  = ['😢','😟','😐','🙂','😊','🌟'];
+    const textos   = ['Sigue practicando','Casi ahí','Procedimiento incompleto','Buen intento','¡Muy bien!','¡Perfecto!'];
+    const scoreClass = `score-${Math.max(0, Math.min(5, puntaje))}`;
+    const emoji = emojis[puntaje] || emojis[0];
+
+    const container = document.getElementById('resultado-card-container');
+    container.innerHTML = `
+        <div class="resultado-card ${scoreClass}">
+            <div style="font-size:3.5rem;">${emoji}</div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+                <div class="score-num">${puntaje}</div>
+                <div class="score-of">de 5 puntos</div>
+            </div>
+            <div style="font-weight:700;font-size:1rem;">${textos[puntaje] || ''}</div>
+            <div class="score-feedback">${feedback || 'Resultado recibido.'}</div>
+        </div>
+        <button class="btn-primary" onclick="descargarMiParticipacionPDF()" style="margin-top: 16px; background: #222; border: 1px solid var(--border); width: 100%; max-width: 420px;">
+            <i class="fa-solid fa-file-pdf"></i> Descargar Mi Participación (PDF)
+        </button>`;
+
+    showScreen('resultado');
+    actualizarMiPuntaje();
+}
+
+function descargarMiParticipacionPDF() {
+    if (!alumnoNom || !ultimaPreguntaTexto) {
+        alert("No hay datos suficientes para generar el reporte.");
+        return;
+    }
+
+    const win = window.open('', '_blank');
+    if (!win) {
+        alert('Por favor, permite las ventanas emergentes para descargar tu PDF.');
+        return;
+    }
+
+    const logoUrl = new URL('assets/logo_educacion_myf.png', window.location.href).href;
+
+    const html = `
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Reporte de Participación - ${alumnoNom}</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 40px;
+            color: #1a1a1a;
+            background-color: #ffffff;
+            line-height: 1.6;
+        }
+        .header-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 3px solid #e50914;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .header-title-box {
+            flex: 1;
+        }
+        .school-logo {
+            height: 70px;
+            object-fit: contain;
+            margin-left: 20px;
+        }
+        h1 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #e50914;
+            margin: 0 0 4px 0;
+            text-transform: uppercase;
+        }
+        .sub-header {
+            font-size: 0.9rem;
+            color: #555;
+            font-weight: 600;
+            margin: 0;
+        }
+        .academic-info {
+            background-color: #f8f9fa;
+            border-left: 4px solid #54b3d6;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 30px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            font-size: 0.9rem;
+        }
+        .info-item span.label {
+            font-weight: 700;
+            color: #4b5563;
+            display: block;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+        }
+        .info-item span.value {
+            color: #111827;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        .section-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #111827;
+            margin-top: 0;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .content-box {
+            background-color: #fdfdfd;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+        .solution-image-container {
+            text-align: center;
+            margin-bottom: 30px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 15px;
+            background: #fafafa;
+        }
+        .solution-image {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 6px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            object-fit: contain;
+        }
+        .evaluation-box {
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 30px;
+            display: flex;
+            gap: 24px;
+            align-items: center;
+        }
+        .evaluation-box.score-5, .evaluation-box.score-4 {
+            background-color: #f0fdf4;
+            border: 1px solid #bbf7d0;
+        }
+        .evaluation-box.score-3 {
+            background-color: #fffbeb;
+            border: 1px solid #fef3c7;
+        }
+        .evaluation-box.score-2, .evaluation-box.score-1, .evaluation-box.score-0 {
+            background-color: #fef2f2;
+            border: 1px solid #fecaca;
+        }
+        .score-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            flex-shrink: 0;
+        }
+        .evaluation-box.score-5 .score-circle, .evaluation-box.score-4 .score-circle {
+            background-color: #dcfce7;
+            color: #15803d;
+            border: 2px solid #bbf7d0;
+        }
+        .evaluation-box.score-3 .score-circle {
+            background-color: #fef3c7;
+            color: #b45309;
+            border: 2px solid #fcd34d;
+        }
+        .evaluation-box.score-2 .score-circle, .evaluation-box.score-1 .score-circle, .evaluation-box.score-0 .score-circle {
+            background-color: #fee2e2;
+            color: #b91c1c;
+            border: 2px solid #fecaca;
+        }
+        .score-val {
+            font-size: 2.2rem;
+            line-height: 1;
+        }
+        .score-max {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
+        .feedback-text {
+            font-size: 0.95rem;
+            color: #374151;
+            font-weight: 500;
+        }
+        .footer-note {
+            text-align: center;
+            font-size: 0.7rem;
+            color: #9ca3af;
+            margin-top: 50px;
+            border-top: 1px solid #f3f4f6;
+            padding-top: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        @media print {
+            body { padding: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header-container">
+        <div class="header-title-box">
+            <h1>Torneo Math-Flix</h1>
+            <div class="sub-header">UNHEVAL — Huánuco · Reporte de Participación</div>
+        </div>
+        <img class="school-logo" src="${logoUrl}" alt="Logo">
+    </div>
+
+    <div class="academic-info">
+        <div class="info-item">
+            <span class="label">Alumno</span>
+            <span class="value">${alumnoNom}</span>
+        </div>
+        <div class="info-item">
+            <span class="label">Docente</span>
+            <span class="value">Joel Cipriano Tarazona Bardales</span>
+        </div>
+        <div class="info-item">
+            <span class="label">Fecha y Hora</span>
+            <span class="value">${new Date().toLocaleString()}</span>
+        </div>
+        <div class="info-item">
+            <span class="label">Actividad</span>
+            <span class="value">Pregunta ${preguntaActualId} · Torneo en Vivo</span>
+        </div>
+    </div>
+
+    <div class="section-title">Pregunta / Enunciado</div>
+    <div class="content-box">
+        ${ultimaPreguntaTexto}
+    </div>
+
+    ${ultimaFotoUrl ? `
+    <div class="section-title">Tu Resolución (Foto)</div>
+    <div class="solution-image-container">
+        <img class="solution-image" src="${ultimaFotoUrl}" alt="Resolución">
+    </div>
+    ` : ''}
+
+    <div class="section-title">Calificación y Corrección IA</div>
+    <div class="evaluation-box score-${ultimoPuntaje}">
+        <div class="score-circle">
+            <span class="score-val">${ultimoPuntaje}</span>
+            <span class="score-max">de 5</span>
+        </div>
+        <div class="feedback-text">
+            <strong>Retroalimentación del Evaluador IA:</strong><br>
+            ${ultimoFeedback || 'Sin retroalimentación.'}
+        </div>
+    </div>
+
+    <div class="footer-note">
+        Desarrollado por Pablito_DP y su grupo · © 2026 PABLITO_DP
+    </div>
+
+    <script>
+        window.onload = () => {
+            setTimeout(() => {
+                window.print();
+            }, 650);
+        };
+    <\/script>
+</body>
+</html>
+    `;
+
+    win.document.write(html);
+    win.document.close();
+}
+
+// ── Actualizar puntaje en pantalla leaderboard ────────────────────────────────
+async function actualizarMiPuntaje() {
+    if (!alumnoId) return;
+    const { data } = await sbClient
+        .from('participantes')
+        .select('puntaje')
+        .eq('id', alumnoId)
+        .single();
+    if (data) document.getElementById('lb-mi-puntaje').textContent = data.puntaje;
+}
+
+let pendingLobbyTimestamp = '';
+
+function acceptRound() {
+    const timestamp = window.pendingLobbyTimestamp || '';
+    localStorage.setItem('torneo_ronda_timestamp', timestamp);
+    document.getElementById('round-confirm-modal').style.display = 'none';
+    showScreen('lobby');
+}
+
+async function rejectRound() {
+    document.getElementById('round-confirm-modal').style.display = 'none';
+    
+    if (alumnoId) {
+        try {
+            await sbClient.from('participantes').delete().eq('id', alumnoId);
+        } catch (e) {
+            console.error('Error al remover participante:', e);
+        }
+    }
+    
+    localStorage.removeItem('torneo_alumno_id');
+    localStorage.removeItem('torneo_alumno_nom');
+    localStorage.removeItem('torneo_ronda_timestamp');
+    
+    alumnoId = null;
+    alumnoNom = null;
+    
+    document.getElementById('input-nombre').value = '';
+    const btn = document.getElementById('btn-unirse');
+    if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Unirme al Torneo';
+    }
+    
+    showScreen('screen-login');
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+(async function init() {
+    suscribirEstadoJuego();
+
+    // Si ya estaba registrado (recarga)
+    if (alumnoId && alumnoNom) {
+        document.getElementById('lobby-nombre').textContent = `Hola, ${alumnoNom} 👋`;
+        document.getElementById('lb-mi-nombre').textContent  = alumnoNom;
+        suscribirMisRespuestas();
+        await cargarEstadoInicial();
+        const activa = document.querySelector('.screen.active');
+        if (!activa || activa.id === 'screen-login') showScreen('lobby');
+    }
+})();
+</script>
+
+</body>
+</html>

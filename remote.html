@@ -81,8 +81,9 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 20px 20px 10px;
-            gap: 14px;
+            padding: 14px 20px 8px;
+            gap: 10px;
+            width: 100%;
         }
 
         .trackpad-label {
@@ -90,10 +91,18 @@
             text-transform: uppercase; color: var(--muted);
         }
 
-        #trackpad {
+        /* Container of trackpad + scrollpad */
+        .trackpad-container {
             width: 100%;
             max-width: 340px;
-            aspect-ratio: 4 / 3;
+            height: 250px; /* Taller touchpad region */
+            display: flex;
+            gap: 10px;
+            align-items: stretch;
+        }
+
+        #trackpad {
+            flex: 1;
             background: var(--card);
             border: 2px solid var(--border);
             border-radius: 20px;
@@ -131,7 +140,7 @@
             background: var(--red);
             border-radius: 50%;
             transform: translate(-50%, -50%);
-            box-shadow: 0 0 16px 6px rgba(229,9,20,0.6);
+            box-shadow: 0 0 16px 6px rgba(229,9,20,0.65);
             pointer-events: none;
             opacity: 0;
             transition: opacity 0.2s;
@@ -139,33 +148,53 @@
         }
         #trackpad.active #laser-cursor { opacity: 1; }
 
-        /* ── Nav Buttons ────────────────────────────────────────── */
-        .nav-section {
-            padding: 0 20px 16px;
+        /* Scroll pad slider next to trackpad */
+        #scrollpad {
+            width: 55px;
+            background: var(--card);
+            border: 2px solid var(--border);
+            border-radius: 20px;
+            position: relative;
+            touch-action: none;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 0;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        #scrollpad.active {
+            border-color: rgba(229,9,20,0.6);
+            box-shadow: 0 0 20px rgba(229,9,20,0.15);
+        }
+
+        /* ── Nav Buttons ────────────────────────────────────────── */
+        .nav-section {
+            padding: 0 20px 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
 
         .nav-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
+            gap: 8px;
         }
 
         .btn {
             display: flex; align-items: center; justify-content: center;
-            gap: 10px;
-            padding: 18px 12px;
-            border: none; border-radius: 14px;
+            gap: 8px;
+            padding: 12px 10px; /* More compact buttons */
+            border: none; border-radius: 12px;
             font-family: 'Poppins', sans-serif;
-            font-size: 0.9rem; font-weight: 700;
+            font-size: 0.82rem; font-weight: 700;
             cursor: pointer;
             transition: transform 0.1s, box-shadow 0.2s, opacity 0.2s;
             -webkit-tap-highlight-color: transparent;
             letter-spacing: 0.3px;
         }
-        .btn:active { transform: scale(0.94); }
+        .btn:active { transform: scale(0.95); }
 
         .btn-prev {
             background: var(--card);
@@ -186,8 +215,8 @@
             color: var(--muted);
             border: 1px solid var(--border);
             grid-column: 1 / -1;
-            padding: 12px;
-            font-size: 0.78rem;
+            padding: 10px;
+            font-size: 0.72rem;
         }
 
         .btn:hover { opacity: 0.88; }
@@ -213,76 +242,222 @@
             letter-spacing: 1px; text-transform: uppercase;
         }
 
-        /* ── Torneito Section ───────────────────────────────────── */
-        .torneo-section {
-            padding: 16px 20px;
-            border-top: 1px solid var(--border);
+        /* Switch UI para el Puntero Absoluto/Relativo */
+        .mando-switch-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 340px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            padding: 10px 16px;
+            border-radius: 12px;
+            margin-bottom: 12px;
         }
-        .torneo-title {
-            font-size: 0.78rem;
+        .mando-switch-label {
+            font-size: 0.72rem;
             font-weight: 700;
-            letter-spacing: 1.5px;
             text-transform: uppercase;
-            color: #a78bfa;
-            margin-bottom: 4px;
+            color: var(--muted);
+            letter-spacing: 0.5px;
             display: flex;
             align-items: center;
             gap: 6px;
         }
-        .torneo-subtitle {
-            font-size: 0.62rem;
-            color: var(--muted);
-            margin-bottom: 12px;
-            letter-spacing: 0.5px;
+        .mando-switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 22px;
         }
-        .torneo-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-bottom: 10px;
+        .mando-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
         }
-        .btn-torneo {
+        .mando-slider {
+            position: absolute;
+            cursor: pointer;
+            inset: 0;
+            background-color: #333;
+            transition: .3s;
+            border-radius: 34px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .mando-slider:before {
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+        input:checked + .mando-slider {
+            background-color: var(--red);
+        }
+        input:checked + .mando-slider:before {
+            transform: translateX(22px);
+        }
+
+        /* ── Tab Bar ──────────────────────────────────────────────────── */
+        .tab-bar {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+            background: rgba(0,0,0,0.4);
+            position: sticky; top: 0; z-index: 20;
+        }
+        .tab-btn {
+            flex: 1; padding: 11px 8px;
+            background: transparent;
+            border: none; border-bottom: 2px solid transparent;
+            color: var(--muted); font-family: 'Poppins', sans-serif;
+            font-size: 0.73rem; font-weight: 700;
+            letter-spacing: 0.5px; cursor: pointer;
+            transition: color 0.2s, border-color 0.2s;
+        }
+        .tab-btn.active {
+            color: var(--red);
+            border-bottom-color: var(--red);
+        }
+        .tab-content {
+            display: none;
+            flex: 1;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        .tab-content.active { display: flex; }
+
+        /* ── Torneo Inputs ─────────────────────────────────────────────── */
+        .torneo-section-title {
+            font-size: 0.58rem; font-weight: 700; letter-spacing: 2px;
+            text-transform: uppercase; color: rgba(255,255,255,0.22);
+            text-align: center; padding: 12px 0 4px;
+        }
+        .t-input {
+            width: 100%; padding: 10px 12px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 10px;
+            color: var(--text); font-family: 'Poppins', sans-serif;
+            font-size: 0.85rem; font-weight: 600;
+            outline: none;
+        }
+        .t-input:focus { border-color: rgba(229,9,20,0.5); }
+        .t-textarea {
+            width: 100%; padding: 10px 12px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 10px;
+            color: var(--text); font-family: 'Poppins', sans-serif;
+            font-size: 0.82rem; font-weight: 500;
+            outline: none; resize: vertical; min-height: 80px;
+        }
+        .t-textarea:focus { border-color: rgba(229,9,20,0.5); }
+        .t-label {
+            font-size: 0.58rem; font-weight: 700; letter-spacing: 1px;
+            text-transform: uppercase; color: rgba(255,255,255,0.35);
+            display: block; margin-bottom: 5px;
+        }
+        .t-field { display: flex; flex-direction: column; gap: 4px; }
+        .btn-time-add {
+            flex: 0 0 auto;
+            padding: 10px 14px;
+            background: rgba(84,179,214,0.15);
+            border: 1px solid rgba(84,179,214,0.3);
+            border-radius: 10px; color: #54b3d6;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.78rem; font-weight: 700;
+            cursor: pointer; white-space: nowrap;
+        }
+        .btn-run {
+            width: 100%; padding: 13px;
+            background: var(--red); border: none; border-radius: 12px;
+            color: #fff; font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem; font-weight: 800;
+            cursor: pointer; display: flex; align-items: center;
+            justify-content: center; gap: 8px;
+            transition: transform 0.1s, opacity 0.2s;
+        }
+        .btn-run:active { transform: scale(0.97); }
+
+        /* ══════════════════════════════════════════════════════════════════════════ */
+        /* CUSTOM SIGNATURE FOOTER (ESTILO CREADOR)                                   */
+        /* ══════════════════════════════════════════════════════════════════════════ */
+        .custom-signature-footer {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 6px;
-            padding: 14px 8px;
-            background: rgba(167,139,250,0.06);
-            border: 2px solid rgba(167,139,250,0.2);
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-            -webkit-tap-highlight-color: transparent;
-        }
-        .btn-torneo:active { transform: scale(0.93); }
-        .btn-torneo.active-block {
-            background: rgba(167,139,250,0.2);
-            border-color: #a78bfa;
-            box-shadow: 0 0 16px rgba(167,139,250,0.3);
-        }
-        .torneo-num {
-            font-size: 1.6rem;
-            font-weight: 800;
-            color: #a78bfa;
-            line-height: 1;
-        }
-        .btn-torneo.active-block .torneo-num { color: #c4b5fd; }
-        .torneo-label {
-            font-size: 0.6rem;
-            font-weight: 600;
-            color: var(--muted);
             text-align: center;
-            line-height: 1.3;
+            padding: 8px;
+            width: 100%;
+            margin-top: 16px;
+            font-family: 'Poppins', sans-serif;
+            border-top: 1px solid rgba(255,255,255,0.03);
+            opacity: 0.25;
+            transition: opacity 0.35s ease;
+        }
+
+        .custom-signature-footer:hover {
+            opacity: 0.7;
+        }
+
+        .custom-signature-footer .icon-box {
+            width: auto;
+            height: auto;
+            border: none;
+            background: none;
+            padding: 0;
+            box-shadow: none;
+            margin: 0 auto 3px auto;
+            transition: transform 0.3s ease;
+        }
+
+        .custom-signature-footer .icon-box svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .custom-signature-footer:hover .icon-box {
+            transform: scale(1.06) rotate(3deg);
+        }
+
+        .custom-signature-footer .main-text {
+            font-size: 0.58rem;
+            font-weight: 500;
+            color: #77777a;
             letter-spacing: 0.3px;
+            text-transform: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            flex-wrap: wrap;
+            margin: 0;
+            line-height: 1.4;
         }
-        .btn-torneo.active-block .torneo-label { color: #c4b5fd; }
-        .torneo-active-label {
-            font-size: 0.65rem;
-            color: var(--muted);
-            text-align: center;
+
+        .custom-signature-footer .main-text .heart {
+            color: #ef4444;
+        }
+
+        .custom-signature-footer .main-text .creator-name {
+            color: #c27803;
+            font-weight: 600;
+            text-shadow: none;
+        }
+
+        .custom-signature-footer .sub-text {
+            font-size: 0.48rem;
+            color: #4b5563;
+            font-weight: 500;
             letter-spacing: 1px;
             text-transform: uppercase;
+            margin: 2px 0 0 0;
         }
     </style>
 </head>
@@ -295,63 +470,227 @@
 
 <div id="status-banner">Conectando al servidor...</div>
 
-<div class="trackpad-section">
-    <span class="trackpad-label"><i class="fa-solid fa-crosshairs" style="margin-right:6px;"></i>Área del Puntero Láser</span>
-    <div id="trackpad">
-        <div class="trackpad-hint">
-            <i class="fa-regular fa-hand-pointer"></i>
-            <p>Desliza el dedo aquí</p>
+<!-- ── Tab Bar ──────────────────────────────────────────────────────── -->
+<div class="tab-bar">
+    <button class="tab-btn active" id="tab-btn-slides" onclick="switchTab('slides')">
+        &#x1F4FA; Diapositivas
+    </button>
+    <button class="tab-btn" id="tab-btn-torneo" onclick="switchTab('torneo')">
+        &#x1F3C6; Torneo
+    </button>
+    <button class="tab-btn" id="tab-btn-alumnos" onclick="switchTab('alumnos')">
+        &#x1F393; Alumnos
+    </button>
+    <button class="tab-btn" id="tab-btn-admin" onclick="switchTab('admin')">
+        ⚙️ Admin
+    </button>
+</div>
+
+<!-- ── TAB 1: DIAPOSITIVAS ─────────────────────────────────────────────── -->
+<div class="tab-content active" id="tab-slides">
+
+    <div class="trackpad-section">
+        <span class="trackpad-label"><i class="fa-solid fa-crosshairs" style="margin-right:6px;"></i>Área del Puntero Láser</span>
+        <div class="mando-switch-container">
+            <span class="mando-switch-label"><i class="fa-solid fa-wand-magic-sparkles"></i> Puntero Absoluto</span>
+            <label class="mando-switch">
+                <input type="checkbox" id="puntero-modo-abs" onchange="togglePunteroModo(this.checked)">
+                <span class="mando-slider"></span>
+            </label>
         </div>
-        <div id="laser-cursor"></div>
+        <div class="trackpad-container">
+            <div id="trackpad">
+                <div class="trackpad-hint">
+                    <i class="fa-regular fa-hand-pointer"></i>
+                    <p>Desliza el dedo aquí</p>
+                </div>
+                <div id="laser-cursor"></div>
+            </div>
+            <div id="scrollpad">
+                <i class="fa-solid fa-chevron-up" style="color: rgba(255,255,255,0.15);"></i>
+                <span style="font-size: 0.55rem; color: rgba(255,255,255,0.2); font-weight: bold; writing-mode: vertical-lr; text-transform: uppercase; letter-spacing: 2px;">Scroll</span>
+                <i class="fa-solid fa-chevron-down" style="color: rgba(255,255,255,0.15);"></i>
+            </div>
+        </div>
+        <span style="font-size:0.62rem;color:rgba(255,255,255,0.2);letter-spacing:1px;">ARRASTRAR = MOVER PUNTERO</span>
     </div>
-    <span style="font-size:0.62rem;color:rgba(255,255,255,0.2);letter-spacing:1px;">ARRASTRAR = MOVER PUNTERO</span>
-</div>
 
-<div class="nav-section">
-    <div class="nav-row">
-        <button class="btn btn-prev" id="btn-prev" onclick="sendNav('prev')">
-            <i class="fa-solid fa-chevron-left"></i> Anterior
-        </button>
-        <button class="btn btn-next" id="btn-next" onclick="sendNav('next')">
-            Siguiente <i class="fa-solid fa-chevron-right"></i>
-        </button>
+    <div class="nav-section">
+        <div class="nav-row">
+            <button class="btn btn-prev" id="btn-prev" onclick="sendNav('prev')">
+                <i class="fa-solid fa-chevron-left"></i> Anterior
+            </button>
+            <button class="btn btn-next" id="btn-next" onclick="sendNav('next')">
+                Siguiente <i class="fa-solid fa-chevron-right"></i>
+            </button>
+        </div>
+        <div class="nav-row">
+            <button class="btn btn-start" id="btn-start" onclick="sendCommand('start-presentation')">
+                <i class="fa-solid fa-play"></i> Iniciar Presentación
+            </button>
+        </div>
+        <div class="nav-row">
+            <button class="btn btn-exit" id="btn-exit" onclick="sendCommand('exit-presentation')">
+                <i class="fa-solid fa-compress"></i> Salir del Modo Presentación
+            </button>
+        </div>
     </div>
-    <div class="nav-row">
-        <button class="btn btn-start" id="btn-start" onclick="sendCommand('start-presentation')">
-            <i class="fa-solid fa-play"></i> Iniciar Presentación
-        </button>
-    </div>
-    <div class="nav-row">
-        <button class="btn btn-exit" id="btn-exit" onclick="sendCommand('exit-presentation')">
-            <i class="fa-solid fa-compress"></i> Salir del Modo Presentación
-        </button>
-    </div>
-</div>
 
-<!-- ── Torneito Block Management ──────────────────────────────────────────── -->
-<div class="torneo-section">
-    <div class="torneo-title">
-        <i class="fa-solid fa-trophy"></i> Gestión del Torneito
-    </div>
-    <div class="torneo-subtitle">Selecciona el bloque de preguntas activo</div>
-    <div class="torneo-grid">
-        <button class="btn-torneo" id="btn-block-0" onclick="sendBlockChange(0)">
-            <span class="torneo-num">1</span>
-            <span class="torneo-label">Clásicos<br>de Planteo</span>
-        </button>
-        <button class="btn-torneo" id="btn-block-1" onclick="sendBlockChange(1)">
-            <span class="torneo-num">2</span>
-            <span class="torneo-label">Problemas<br>Mixtos</span>
-        </button>
-        <button class="btn-torneo" id="btn-block-2" onclick="sendBlockChange(2)">
-            <span class="torneo-num">3</span>
-            <span class="torneo-label">Nivel<br>UNI</span>
-        </button>
-    </div>
-    <div class="torneo-active-label" id="torneo-active-label">Bloque activo: 1</div>
-</div>
+</div><!-- /tab-slides -->
 
-<footer>ECUACIONES.io · Mando Remoto · Supabase Realtime</footer>
+<!-- ── TAB 2: TORNEO ──────────────────────────────────────────────────── -->
+<div class="tab-content" id="tab-torneo">
+    <div class="nav-section" style="padding-top:14px;">
+
+        <!-- Estado de fase actual -->
+        <div id="torneo-fase-banner" style="
+            text-align:center; font-size:0.65rem; font-weight:700;
+            letter-spacing:1.5px; text-transform:uppercase;
+            padding:7px 14px; border-radius:10px;
+            background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08);
+            color:#6d6d6e;
+        ">Torneo: cargando...</div>
+
+        <!-- Controles rápidos de fase -->
+        <div class="torneo-section-title">🎮 Control de Fase</div>
+        <div class="nav-row">
+            <button class="btn btn-prev" id="btn-t-lobby" onclick="sendTorneoCmd('lobby')" title="Ir al Lobby">
+                <i class="fa-solid fa-house"></i> Lobby
+            </button>
+            <button class="btn btn-next" id="btn-t-pregunta" onclick="sendTorneoCmd('pregunta')" title="Lanzar Pregunta">
+                <i class="fa-solid fa-play"></i> Pregunta
+            </button>
+        </div>
+        <div class="nav-row">
+            <button class="btn btn-start" id="btn-t-lb" onclick="sendTorneoCmd('leaderboard')">
+                <i class="fa-solid fa-trophy"></i> Tabla de Posiciones
+            </button>
+        </div>
+        <div class="nav-row">
+            <button class="btn btn-prev" id="btn-t-next" onclick="sendTorneoCmd('next-question')">
+                <i class="fa-solid fa-forward-step"></i> Sig. Pregunta
+            </button>
+            <button class="btn btn-exit" id="btn-t-reset" onclick="sendTorneoCmd('reset-tournament')" style="color:#e50914;border-color:rgba(229,9,20,0.3);">
+                <i class="fa-solid fa-rotate-left"></i> Reset
+            </button>
+        </div>
+
+        <!-- Añadir tiempo personalizado -->
+        <div class="torneo-section-title">⏱️ Tiempo</div>
+        <div class="t-field">
+            <label class="t-label">Segundos a añadir</label>
+            <div style="display:flex;gap:8px;align-items:center;">
+                <input type="number" id="input-tiempo-add" class="t-input" value="30" min="5" max="600" style="max-width:90px;">
+                <button class="btn-time-add" onclick="sendTorneoCmd('add-time')">
+                    <i class="fa-solid fa-plus"></i> Añadir Tiempo
+                </button>
+            </div>
+        </div>
+
+        <!-- Lanzador de pregunta personalizada -->
+        <div class="torneo-section-title">📝 Pregunta Personalizada</div>
+        <div class="t-field">
+            <label class="t-label">Número de pregunta</label>
+            <input type="number" id="input-custom-pregunta-id" class="t-input" value="1" min="1" max="99" style="max-width:80px;">
+        </div>
+        <div class="t-field">
+            <label class="t-label">Enunciado de la pregunta</label>
+            <textarea id="input-custom-pregunta-texto" class="t-textarea"
+                placeholder="Escribe el enunciado del problema aquí..."></textarea>
+        </div>
+        <div class="t-field">
+            <label class="t-label">Tiempo límite (segundos)</label>
+            <input type="number" id="input-custom-tiempo" class="t-input" value="60" min="10" max="600" style="max-width:90px;">
+        </div>
+        <button class="btn-run" onclick="sendTorneoCmd('run-custom')">
+            <i class="fa-solid fa-play"></i> Lanzar Pregunta (Run)
+        </button>
+
+    </div>
+</div><!-- /tab-torneo -->
+
+<!-- ── TAB 3: ALUMNOS ─────────────────────────────────────────────────── -->
+<div class="tab-content" id="tab-alumnos">
+    <div class="nav-section" style="padding-top:14px;">
+        <div class="torneo-section-title">&#x1F393; Participantes &amp; Puntajes</div>
+        <div id="remote-alumnos-list" style="display:flex;flex-direction:column;gap:8px;width:100%;"></div>
+        <div style="margin-top:12px;">
+            <button class="btn-run" onclick="remoteRecargarAlumnos()" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);">
+                <i class="fa-solid fa-rotate"></i> Actualizar
+            </button>
+        </div>
+    </div>
+</div><!-- /tab-alumnos -->
+
+<!-- ── TAB 4: ADMIN ───────────────────────────────────────────────────── -->
+<div class="tab-content" id="tab-admin">
+    <div class="nav-section" style="padding-top:14px; gap:16px;">
+        <div class="torneo-section-title">⚙️ Panel de Administración</div>
+        
+        <!-- Tarjeta de Gestión de Base de Datos -->
+        <div style="background:var(--card); border:1px solid var(--border); border-radius:14px; padding:16px; display:flex; flex-direction:column; gap:12px;">
+            <h4 style="font-size:0.75rem; font-weight:700; text-transform:uppercase; color:rgba(255,255,255,0.4); border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:6px; display:flex; align-items:center; gap:6px;">
+                <i class="fa-solid fa-database" style="color:var(--muted); font-size: 0.8rem;"></i> Limpieza del Torneo
+            </h4>
+            
+            <div style="display:flex; flex-direction:column; gap:8px;">
+                <button class="btn btn-exit" onclick="adminLimpiarRespuestas()" style="grid-column:auto; padding:11px; font-size:0.78rem; text-align:left; justify-content:flex-start; color:#fff; border-color:rgba(255,255,255,0.08); background:rgba(255,255,255,0.02);">
+                    <i class="fa-solid fa-file-pen" style="color:#f59e0b; width:16px; margin-right:4px;"></i> Vaciar Respuestas
+                </button>
+                <button class="btn btn-exit" onclick="adminEliminarParticipantes()" style="grid-column:auto; padding:11px; font-size:0.78rem; text-align:left; justify-content:flex-start; color:#fff; border-color:rgba(255,255,255,0.08); background:rgba(255,255,255,0.02);">
+                    <i class="fa-solid fa-users-slash" style="color:#ef4444; width:16px; margin-right:4px;"></i> Eliminar Participantes
+                </button>
+                <button class="btn btn-exit" onclick="adminBorrarHistorial()" style="grid-column:auto; padding:11px; font-size:0.78rem; text-align:left; justify-content:flex-start; color:#fff; border-color:rgba(255,255,255,0.08); background:rgba(255,255,255,0.02);">
+                    <i class="fa-solid fa-clock-rotate-left" style="color:#54b3d6; width:16px; margin-right:4px;"></i> Borrar Historial de Rondas
+                </button>
+            </div>
+        </div>
+
+        <!-- Tarjeta de Almacenamiento y Retos -->
+        <div style="background:var(--card); border:1px solid var(--border); border-radius:14px; padding:16px; display:flex; flex-direction:column; gap:12px;">
+            <h4 style="font-size:0.75rem; font-weight:700; text-transform:uppercase; color:rgba(255,255,255,0.4); border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:6px; display:flex; align-items:center; gap:6px;">
+                <i class="fa-solid fa-cloud" style="color:var(--muted); font-size: 0.8rem;"></i> Storage &amp; Retos
+            </h4>
+            
+            <div style="display:flex; flex-direction:column; gap:8px;">
+                <button class="btn btn-exit" onclick="adminLimpiarFotosStorage()" style="grid-column:auto; padding:11px; font-size:0.78rem; text-align:left; justify-content:flex-start; color:#fff; border-color:rgba(255,255,255,0.08); background:rgba(255,255,255,0.02);">
+                    <i class="fa-solid fa-images" style="color:#10b981; width:16px; margin-right:4px;"></i> Limpiar Fotos Guardadas
+                </button>
+                <button class="btn btn-exit" onclick="adminLimpiarRetosIA()" style="grid-column:auto; padding:11px; font-size:0.78rem; text-align:left; justify-content:flex-start; color:#fff; border-color:rgba(255,255,255,0.08); background:rgba(255,255,255,0.02);">
+                    <i class="fa-solid fa-robot" style="color:#a855f7; width:16px; margin-right:4px;"></i> Limpiar Retos IA
+                </button>
+            </div>
+        </div>
+
+        <!-- Tarjeta de Pánico / Resets -->
+        <div style="background:rgba(229,9,20,0.03); border:1px solid rgba(229,9,20,0.2); border-radius:14px; padding:16px; display:flex; flex-direction:column; gap:12px;">
+            <h4 style="font-size:0.75rem; font-weight:700; text-transform:uppercase; color:#ef4444; border-bottom:1px solid rgba(229,9,20,0.1); padding-bottom:6px; display:flex; align-items:center; gap:6px;">
+                <i class="fa-solid fa-triangle-exclamation" style="color:#ef4444; font-size: 0.8rem;"></i> Acciones Críticas
+            </h4>
+            <p style="font-size:0.68rem; color:var(--muted); line-height:1.4;">
+                El Super Reset borrará todas las respuestas, participantes, historiales, retos de IA, fotos subidas y reiniciará el juego al lobby.
+            </p>
+            <button class="btn" onclick="adminSuperReset()" style="background:#e50914; color:#fff; font-size:0.82rem; font-weight:800;">
+                <i class="fa-solid fa-bomb" style="margin-right:6px;"></i> SUPER RESET TOTAL
+            </button>
+        </div>
+    </div>
+</div><!-- /tab-admin -->
+
+<div class="custom-signature-footer">
+    <div class="icon-box">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 3C12 7.5 16.5 12 21 12C16.5 12 12 16.5 12 21C12 16.5 7.5 12 3 12C7.5 12 12 7.5 12 3Z" fill="#f59e0b"/>
+            <circle cx="7" cy="17" r="1.5" fill="#f59e0b" opacity="0.8"/>
+        </svg>
+    </div>
+    <p class="main-text">
+        Sistema creado con <span class="heart">🧡</span> por <span class="creator-name">Pablito_DP y su grupo</span>
+    </p>
+    <p class="sub-text">
+        &copy; 2026 PABLITO_DP &mdash; Acceso Clasificado
+    </p>
+</div>
 
 <script>
 // ── Config ──────────────────────────────────────────────────────────────────
@@ -363,6 +702,22 @@ const CHANNEL_NAME  = 'presentation-planteo-ecuaciones';
 // ── Init Supabase channel ────────────────────────────────────────────────────
 const client  = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const channel = client.channel(CHANNEL_NAME);
+
+// ── Validación de clave de seguridad del mando ──────────────────────────────
+(async () => {
+    const params = new URLSearchParams(window.location.search);
+    const keyParam = params.get('key');
+    const { data } = await client.from('estado_juego').select('remote_key').eq('id', 'global').single();
+    if (data?.remote_key && data.remote_key !== keyParam) {
+        document.body.innerHTML = `
+            <div style="min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+                        background:#0f0f0f;color:#fff;font-family:Poppins,sans-serif;padding:32px;text-align:center;">
+                <div style="font-size:3rem;margin-bottom:16px;">🔐</div>
+                <h1 style="font-size:1.4rem;font-weight:800;color:#e50914;margin-bottom:8px;">Acceso Denegado</h1>
+                <p style="color:#6d6d6e;font-size:0.88rem;max-width:280px;">Este enlace no es válido o ha caducado. Pide al profesor que genere un nuevo código QR.</p>
+            </div>`;
+    }
+})();
 
 const statusDot    = document.getElementById('status-dot');
 const statusBanner = document.getElementById('status-banner');
@@ -395,12 +750,25 @@ function sendCommand(event) {
     rippleEffect(btn);
 }
 
+// ── Tab navigation ──────────────────────────────────────────────────────────
+function switchTab(tab) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-btn-' + tab).classList.add('active');
+    document.getElementById('tab-' + tab).classList.add('active');
+}
+
 // ── Laser Trackpad ───────────────────────────────────────────────────────────
 const trackpad    = document.getElementById('trackpad');
 const laserCursor = document.getElementById('laser-cursor');
 let lastTouch = null;
 let throttleTimer = null;
 const THROTTLE_MS = 30; // ~33fps max send rate
+let isAbsoluteMode = false;
+
+function togglePunteroModo(checked) {
+    isAbsoluteMode = checked;
+}
 
 function handleTrackpadMove(clientX, clientY) {
     const rect = trackpad.getBoundingClientRect();
@@ -412,15 +780,41 @@ function handleTrackpadMove(clientX, clientY) {
     laserCursor.style.left  = relX + 'px';
     laserCursor.style.top   = relY + 'px';
 
-    if (lastTouch && throttleTimer === null) {
+    if (throttleTimer === null) {
         throttleTimer = setTimeout(() => { throttleTimer = null; }, THROTTLE_MS);
-        const dx = (clientX - lastTouch.x) / rect.width;
-        const dy = (clientY - lastTouch.y) / rect.height;
-        if (Math.abs(dx) > 0.001 || Math.abs(dy) > 0.001) {
-            channel.send({ type: 'broadcast', event: 'laser-move', payload: { dx, dy } });
+        if (isAbsoluteMode) {
+            const pctX = relX / rect.width;
+            const pctY = relY / rect.height;
+            channel.send({ type: 'broadcast', event: 'laser-absolute', payload: { x: pctX, y: pctY } });
+        } else if (lastTouch) {
+            const dx = (clientX - lastTouch.x) / rect.width;
+            const dy = (clientY - lastTouch.y) / rect.height;
+            if (Math.abs(dx) > 0.001 || Math.abs(dy) > 0.001) {
+                channel.send({ type: 'broadcast', event: 'laser-move', payload: { dx, dy } });
+            }
         }
     }
     lastTouch = { x: clientX, y: clientY };
+}
+
+// Click & Scroll & Move handling for Trackpad + Scrollpad
+let touchStartTime = 0;
+let touchStartX = 0;
+let touchStartY = 0;
+let hasMovedSignificant = false;
+
+function triggerTrackpadRipple(clientX, clientY) {
+    const rect = trackpad.getBoundingClientRect();
+    const x = clientX - rect.left;
+    const y = clientY - rect.top;
+    const ripple = document.createElement('span');
+    ripple.className = 'ripple';
+    ripple.style.background = 'rgba(229,9,20,0.4)';
+    ripple.style.width = ripple.style.height = '40px';
+    ripple.style.left = (x - 20) + 'px';
+    ripple.style.top = (y - 20) + 'px';
+    trackpad.appendChild(ripple);
+    ripple.addEventListener('animationend', () => ripple.remove());
 }
 
 // Touch events
@@ -428,38 +822,104 @@ trackpad.addEventListener('touchstart', (e) => {
     e.preventDefault();
     trackpad.classList.add('active');
     const t = e.touches[0];
+    touchStartTime = Date.now();
+    touchStartX = t.clientX;
+    touchStartY = t.clientY;
+    hasMovedSignificant = false;
     lastTouch = { x: t.clientX, y: t.clientY };
+    if (isAbsoluteMode) {
+        handleTrackpadMove(t.clientX, t.clientY);
+    }
 }, { passive: false });
 
 trackpad.addEventListener('touchmove', (e) => {
     e.preventDefault();
     const t = e.touches[0];
+    const dx = t.clientX - touchStartX;
+    const dy = t.clientY - touchStartY;
+    if (Math.abs(dx) > 10 || Math.abs(dy) > 10) {
+        hasMovedSignificant = true;
+    }
     handleTrackpadMove(t.clientX, t.clientY);
 }, { passive: false });
 
 trackpad.addEventListener('touchend', (e) => {
     e.preventDefault();
     trackpad.classList.remove('active');
+    
+    // Tap detection (<250ms and small movement)
+    const duration = Date.now() - touchStartTime;
+    if (!hasMovedSignificant && duration < 250) {
+        channel.send({ type: 'broadcast', event: 'laser-click', payload: {} });
+        triggerTrackpadRipple(touchStartX, touchStartY);
+    }
+    
     lastTouch = null;
 }, { passive: false });
 
 // Mouse events (for testing on desktop)
 trackpad.addEventListener('mousedown', (e) => {
     trackpad.classList.add('active');
+    touchStartTime = Date.now();
+    touchStartX = e.clientX;
+    touchStartY = e.clientY;
+    hasMovedSignificant = false;
     lastTouch = { x: e.clientX, y: e.clientY };
+    if (isAbsoluteMode) {
+        handleTrackpadMove(e.clientX, e.clientY);
+    }
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mouseup', onMouseUp);
 });
 
 function onMouseMove(e) {
+    const dx = e.clientX - touchStartX;
+    const dy = e.clientY - touchStartY;
+    if (Math.abs(dx) > 10 || Math.abs(dy) > 10) {
+        hasMovedSignificant = true;
+    }
     handleTrackpadMove(e.clientX, e.clientY);
 }
-function onMouseUp() {
+
+function onMouseUp(e) {
     trackpad.classList.remove('active');
+    
+    const duration = Date.now() - touchStartTime;
+    if (!hasMovedSignificant && duration < 250) {
+        channel.send({ type: 'broadcast', event: 'laser-click', payload: {} });
+        triggerTrackpadRipple(e.clientX, e.clientY);
+    }
+    
     lastTouch = null;
     document.removeEventListener('mousemove', onMouseMove);
     document.removeEventListener('mouseup', onMouseUp);
 }
+
+// Scrollpad events
+const scrollpad = document.getElementById('scrollpad');
+let lastScrollTouchY = null;
+
+scrollpad.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    scrollpad.classList.add('active');
+    lastScrollTouchY = e.touches[0].clientY;
+}, { passive: false });
+
+scrollpad.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+    if (lastScrollTouchY !== null) {
+        const currentY = e.touches[0].clientY;
+        const dy = (currentY - lastScrollTouchY) * 2.5; // Scroll speed multiplier
+        channel.send({ type: 'broadcast', event: 'scroll', payload: { dy: dy } });
+        lastScrollTouchY = currentY;
+    }
+}, { passive: false });
+
+scrollpad.addEventListener('touchend', (e) => {
+    e.preventDefault();
+    scrollpad.classList.remove('active');
+    lastScrollTouchY = null;
+}, { passive: false });
 
 // ── Ripple Effect ────────────────────────────────────────────────────────────
 function rippleEffect(btn) {
@@ -473,27 +933,341 @@ function rippleEffect(btn) {
     btn.appendChild(ripple);
     ripple.addEventListener('animationend', () => ripple.remove());
 }
+// ── Tournament Controls ──────────────────────────────────────────────────────
+const TORNEO_PREGUNTAS_REMOTE = [
+    { id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 }
+];
+let _torneoFaseActual   = 'lobby';
+let _torneoPreguntaId   = 1;
 
-// ── Torneito Block Change ─────────────────────────────────────────────────────
-let currentActiveBlock = 0;
+async function sendTorneoCmd(cmd) {
+    const banner = document.getElementById('torneo-fase-banner');
+    try {
+        if (cmd === 'lobby' || cmd === 'pregunta' || cmd === 'leaderboard') {
+            await client.from('estado_juego').update({
+                pantalla_actual:       cmd,
+                tiempo_restante:       60,
+                pregunta_actual_id:    _torneoPreguntaId,
+                pregunta_custom_texto: null,
+                updated_at:            new Date().toISOString()
+            }).eq('id', 'global');
+            _torneoFaseActual = cmd;
 
-function sendBlockChange(blockIndex) {
-    channel.send({ type: 'broadcast', event: 'change-block', payload: { blockIndex } });
-    currentActiveBlock = blockIndex;
-    updateBlockButtons();
-    const blockNames = ['Clásicos de Planteo', 'Problemas Mixtos', 'Nivel UNI'];
-    const label = document.getElementById('torneo-active-label');
-    if (label) label.textContent = `Bloque activo: ${blockIndex + 1} — ${blockNames[blockIndex]}`;
+        } else if (cmd === 'next-question') {
+            _torneoPreguntaId = Math.min(99, _torneoPreguntaId + 1);
+            await client.from('estado_juego').update({
+                pantalla_actual:       'pregunta',
+                pregunta_actual_id:    _torneoPreguntaId,
+                tiempo_restante:       60,
+                pregunta_custom_texto: null,
+                updated_at:            new Date().toISOString()
+            }).eq('id', 'global');
+            _torneoFaseActual = 'pregunta';
+
+        } else if (cmd === 'add-time') {
+            // Leer el tiempo actual y sumar los segundos definidos
+            const segundosAnadir = parseInt(document.getElementById('input-tiempo-add')?.value) || 30;
+            const { data: estadoActual } = await client.from('estado_juego').select('tiempo_restante, updated_at').eq('id', 'global').single();
+            const ahora = Date.now();
+            const updatedAt = estadoActual?.updated_at ? new Date(estadoActual.updated_at).getTime() : ahora;
+            const transcurrido = Math.floor((ahora - updatedAt) / 1000);
+            const restante = Math.max(0, (estadoActual?.tiempo_restante || 60) - transcurrido);
+            const nuevoTiempo = restante + segundosAnadir;
+            await client.from('estado_juego').update({
+                tiempo_restante: nuevoTiempo,
+                updated_at:      new Date().toISOString()
+            }).eq('id', 'global');
+            if (banner) banner.textContent = `⏱️ +${segundosAnadir}s añadidos (total: ${nuevoTiempo}s)`;
+            return;
+
+        } else if (cmd === 'run-custom') {
+            const pregId   = parseInt(document.getElementById('input-custom-pregunta-id')?.value) || 1;
+            const texto    = document.getElementById('input-custom-pregunta-texto')?.value.trim();
+            const tiempoS  = parseInt(document.getElementById('input-custom-tiempo')?.value) || 60;
+            if (!texto) { alert('Por favor escribe el enunciado de la pregunta.'); return; }
+            _torneoPreguntaId = pregId;
+            await client.from('estado_juego').update({
+                pantalla_actual:       'pregunta',
+                pregunta_actual_id:    pregId,
+                tiempo_restante:       tiempoS,
+                pregunta_custom_texto: texto,
+                updated_at:            new Date().toISOString()
+            }).eq('id', 'global');
+            _torneoFaseActual = 'pregunta';
+
+        } else if (cmd === 'reset-tournament') {
+            const nombreRonda = prompt('¿Nombre de la ronda a archivar? (deja en blanco para no archivar)');
+            if (nombreRonda === null) return;
+            if (!confirm('¿Resetear el torneo? Se borrarán respuestas y puntajes.')) return;
+            // Archivar si se dio nombre
+            if (nombreRonda.trim()) {
+                const pregId = _torneoPreguntaId || 1;
+                const { data: ronda, error: rondaErr } = await client.from('historial_rondas')
+                    .insert({ nombre_ronda: nombreRonda.trim(), pregunta_id: pregId }).select().single();
+                if (rondaErr || !ronda) {
+                    alert('Error al crear la ronda en el historial: ' + (rondaErr?.message || 'No se pudo crear la ronda.'));
+                    return;
+                }
+                const { data: resp } = await client.from('respuestas')
+                    .select('*, participantes(nombre)').eq('procesado', true);
+                if (resp?.length) {
+                    const histRows = resp.map(r => ({
+                        ronda_id: ronda.id, nombre_alumno: r.participantes?.nombre || 'Desconocido',
+                        pregunta_id: r.pregunta_id, puntaje_asignado: r.puntaje_asignado,
+                        feedback: r.feedback, transcripcion_interna: r.transcripcion_interna, url_foto: r.url_foto
+                    }));
+                    const { error: histErr } = await client.from('historial_respuestas').insert(histRows);
+                    if (histErr) {
+                        alert('Error al archivar respuestas: ' + histErr.message);
+                        // Borrar la ronda vacía para no dejar basura
+                        await client.from('historial_rondas').delete().eq('id', ronda.id);
+                        return;
+                    }
+                }
+            }
+            await client.from('respuestas').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+            await client.from('participantes').update({ puntaje: 0 }).neq('id', '00000000-0000-0000-0000-000000000000');
+            await client.from('estado_juego').update({
+                pantalla_actual: 'lobby', pregunta_actual_id: 1, tiempo_restante: 60,
+                pregunta_custom_texto: null
+            }).eq('id', 'global');
+            _torneoPreguntaId = 1;
+            _torneoFaseActual = 'lobby';
+        }
+
+        const btn = event && event.target ? event.target.closest('.btn, .btn-run') : null;
+        if (btn) rippleEffect(btn);
+        _actualizarFaseBanner(_torneoFaseActual, _torneoPreguntaId);
+
+    } catch (err) {
+        if (banner) banner.textContent = '❌ Error: ' + err.message;
+    }
 }
 
-function updateBlockButtons() {
-    document.querySelectorAll('.btn-torneo').forEach((btn, i) => {
-        btn.classList.toggle('active-block', i === currentActiveBlock);
-    });
+function _actualizarFaseBanner(fase, pregId) {
+    const banner = document.getElementById('torneo-fase-banner');
+    if (!banner) return;
+    const faseMap = { lobby: '🏠 Lobby', pregunta: `▶ Pregunta ${pregId}`, leaderboard: '🏆 Leaderboard' };
+    banner.textContent = 'Torneo: ' + (faseMap[fase] || fase);
+    banner.style.color     = fase === 'pregunta' ? '#e50914' : fase === 'leaderboard' ? '#f59e0b' : '#46d369';
+    banner.style.borderColor = fase === 'pregunta' ? 'rgba(229,9,20,0.3)' : fase === 'leaderboard' ? 'rgba(245,158,11,0.25)' : 'rgba(70,211,105,0.25)';
 }
 
-// Initialize block buttons state
-updateBlockButtons();
+// Suscribirse a cambios del torneo para reflejar fase actual en el mando
+client.channel('remote-torneo-estado')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'estado_juego' }, ({ new: payload }) => {
+        _torneoFaseActual = payload.pantalla_actual;
+        _torneoPreguntaId = payload.pregunta_actual_id || 1;
+        _actualizarFaseBanner(_torneoFaseActual, _torneoPreguntaId);
+    })
+    .subscribe();
+
+// Cargar estado inicial del torneo
+(async () => {
+    const { data } = await client.from('estado_juego').select('*').eq('id', 'global').single();
+    if (data) {
+        _torneoFaseActual = data.pantalla_actual;
+        _torneoPreguntaId = data.pregunta_actual_id || 1;
+        _actualizarFaseBanner(_torneoFaseActual, _torneoPreguntaId);
+    }
+    // Cargar alumnos al iniciar
+    await remoteRecargarAlumnos();
+})();
+
+// ── Pestaña Alumnos ──────────────────────────────────────────────────────────
+async function remoteRecargarAlumnos() {
+    const list = document.getElementById('remote-alumnos-list');
+    if (!list) return;
+    list.innerHTML = '<div style="color:#6d6d6e;font-size:0.82rem;text-align:center;padding:16px;">Cargando...</div>';
+
+    const { data } = await client.from('participantes')
+        .select('id, nombre, puntaje').order('puntaje', { ascending: false });
+
+    if (!data?.length) {
+        list.innerHTML = '<div style="color:#6d6d6e;font-size:0.82rem;text-align:center;padding:16px;">Sin participantes aún.</div>';
+        return;
+    }
+
+    const medals = ['🥇','🥈','🥉'];
+    list.innerHTML = data.map((p, i) => `
+        <div style="display:flex;align-items:center;justify-content:space-between;
+                    padding:10px 14px;background:rgba(255,255,255,0.05);
+                    border:1px solid rgba(255,255,255,0.08);border-radius:10px;gap:8px;">
+            <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">
+                <span style="font-size:${i<3?'1.2rem':'0.85rem'};min-width:28px;text-align:center;">${medals[i]||`#${i+1}`}</span>
+                <span style="font-size:0.82rem;font-weight:700;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p.nombre}</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+                <span style="font-size:1rem;font-weight:800;color:#f59e0b;">${p.puntaje}<span style="font-size:0.6rem;color:#6d6d6e;margin-left:2px;">pts</span></span>
+                <button onclick="remoteEditarPuntaje('${p.id}','${p.nombre.replace(/'/g,'').replace(/"/g,'')}',${p.puntaje})" style="
+                    padding:5px 10px;background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.3);
+                    color:#f59e0b;border-radius:7px;font-size:0.7rem;font-weight:700;cursor:pointer;">
+                    &#x270F; Editar
+                </button>
+            </div>
+        </div>`).join('');
+}
+
+async function remoteEditarPuntaje(id, nombre, puntajeActual) {
+    // Buscar la última respuesta del alumno para la pregunta actual
+    const { data: resp } = await client.from('respuestas')
+        .select('id, puntaje_asignado')
+        .eq('participante_id', id)
+        .eq('pregunta_id', _torneoPreguntaId)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+    if (resp) {
+        // Si hay respuesta para la pregunta actual, editamos la nota de esta pregunta (0 a 5 pts)
+        const input = prompt(`Editar calificación de Pregunta ${_torneoPreguntaId} para ${nombre}\n(0 a 5 puntos)`, resp.puntaje_asignado ?? 0);
+        if (input === null) return;
+        const nuevoNota = parseInt(input);
+        if (isNaN(nuevoNota) || nuevoNota < 0 || nuevoNota > 5) { alert('El puntaje de la respuesta debe ser entre 0 y 5.'); return; }
+        const diff = nuevoNota - (resp.puntaje_asignado ?? 0);
+        
+        // Actualizar respuesta
+        await client.from('respuestas').update({ puntaje_asignado: nuevoNota }).eq('id', resp.id);
+        // Actualizar puntaje total acumulado (sumar diff)
+        if (diff !== 0) {
+            await client.rpc('sumar_puntaje_alumno', { alumno_id: id, puntos: diff });
+        }
+    } else {
+        // Si no hay respuesta, editamos el puntaje acumulado directamente
+        const input = prompt(`Editar puntaje acumulado de ${nombre}\n(0 a 999)`, puntajeActual);
+        if (input === null) return;
+        const nuevoAcumulado = parseInt(input);
+        if (isNaN(nuevoAcumulado) || nuevoAcumulado < 0) { alert('Valor acumulado inválido.'); return; }
+        await client.from('participantes').update({ puntaje: nuevoAcumulado }).eq('id', id);
+    }
+    await remoteRecargarAlumnos();
+}
+
+// Suscribirse a cambios de puntajes para actualizar la lista en tiempo real
+client.channel('remote-alumnos-puntajes')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'participantes' }, () => {
+        remoteRecargarAlumnos();
+    })
+    .subscribe();
+
+// ── Funciones de Administración ──────────────────────────────────────────────
+async function adminLimpiarRespuestas() {
+    if (!confirm('¿Seguro que deseas eliminar TODAS las respuestas registradas? El puntaje de los alumnos no cambiará.')) return;
+    try {
+        const { error } = await client.from('respuestas').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+        if (error) throw error;
+        alert('✅ Todas las respuestas han sido eliminadas.');
+    } catch (err) {
+        alert('❌ Error al eliminar respuestas: ' + err.message);
+    }
+}
+
+async function adminEliminarParticipantes() {
+    if (!confirm('¿Seguro que deseas eliminar a TODOS los participantes? Esto también eliminará sus respuestas y tendrán que volver a escanear el QR.')) return;
+    try {
+        const { error } = await client.from('participantes').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+        if (error) throw error;
+        alert('✅ Todos los participantes han sido eliminados.');
+        await remoteRecargarAlumnos();
+    } catch (err) {
+        alert('❌ Error al eliminar participantes: ' + err.message);
+    }
+}
+
+async function adminBorrarHistorial() {
+    if (!confirm('¿Seguro que deseas vaciar el historial de rondas y sus respuestas archivadas? Esto es permanente.')) return;
+    try {
+        const { error } = await client.from('historial_rondas').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+        if (error) throw error;
+        alert('✅ Historial de rondas vaciado.');
+    } catch (err) {
+        alert('❌ Error al borrar el historial: ' + err.message);
+    }
+}
+
+async function adminLimpiarFotosStorage() {
+    if (!confirm('¿Seguro que deseas eliminar todas las fotos de exámenes guardadas en el Storage?')) return;
+    try {
+        const { data: files, error: listErr } = await client.storage.from('examenes').list();
+        if (listErr) throw listErr;
+        if (!files || files.length === 0) {
+            alert('ℹ️ No hay fotos guardadas en el Storage.');
+            return;
+        }
+        
+        const fileNames = files.map(f => f.name).filter(name => name !== '.emptyFolderPlaceholder');
+        if (fileNames.length === 0) {
+            alert('ℹ️ No hay fotos para borrar.');
+            return;
+        }
+
+        const { error: deleteErr } = await client.storage.from('examenes').remove(fileNames);
+        if (deleteErr) throw deleteErr;
+        alert(`✅ Se eliminaron ${fileNames.length} fotos del Storage.`);
+    } catch (err) {
+        alert('❌ Error al limpiar fotos del Storage: ' + err.message);
+    }
+}
+
+async function adminLimpiarRetosIA() {
+    if (!confirm('¿Seguro que deseas vaciar todos los retos generados por IA en la pantalla de exposición?')) return;
+    try {
+        const { error } = await client.from('exposicion_retos').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+        if (error) throw error;
+        alert('✅ Retos de exposición eliminados.');
+    } catch (err) {
+        alert('❌ Error al borrar retos IA: ' + err.message);
+    }
+}
+
+async function adminSuperReset() {
+    const input = prompt('Para confirmar el RESET COMPLETO de la presentación y torneo, escribe "RESET" (en mayúsculas):');
+    if (input !== 'RESET') {
+        alert('Confirmación incorrecta. No se ha realizado ninguna acción.');
+        return;
+    }
+    
+    try {
+        // 1. Borrar todas las respuestas
+        await client.from('respuestas').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+        
+        // 2. Borrar participantes
+        await client.from('participantes').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+        
+        // 3. Borrar historial
+        await client.from('historial_rondas').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+        
+        // 4. Borrar retos IA
+        await client.from('exposicion_retos').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+        
+        // 5. Reiniciar estado del juego
+        await client.from('estado_juego').update({
+            pantalla_actual: 'lobby',
+            pregunta_actual_id: 1,
+            tiempo_restante: 60,
+            pregunta_custom_texto: null
+        }).eq('id', 'global');
+        
+        // 6. Limpiar fotos de storage
+        const { data: files } = await client.storage.from('examenes').list();
+        if (files && files.length > 0) {
+            const fileNames = files.map(f => f.name).filter(name => name !== '.emptyFolderPlaceholder');
+            if (fileNames.length > 0) {
+                await client.storage.from('examenes').remove(fileNames);
+            }
+        }
+        
+        alert('⚡ RESET COMPLETO COMPLETADO CON ÉXITO. La base de datos y la presentación están limpias y en su estado inicial.');
+        
+        // Actualizar UI del mando
+        _torneoPreguntaId = 1;
+        _torneoFaseActual = 'lobby';
+        _actualizarFaseBanner(_torneoFaseActual, _torneoPreguntaId);
+        await remoteRecargarAlumnos();
+    } catch (err) {
+        alert('❌ Error durante el Super Reset: ' + err.message);
+    }
+}
 </script>
 </body>
 </html>

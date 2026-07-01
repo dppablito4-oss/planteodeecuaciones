@@ -41,55 +41,60 @@
 <!-- PANTALLA DE SELECCIÓN DE PERFILES                                         -->
 <!-- ═══════════════════════════════════════════════════════════════════════ -->
 <div id="profile-screen" role="dialog" aria-label="Seleccionar perfil de estudiante">
-    <div class="netflix-logo-top">ECUACIONES<span style="color:#fff">.io</span></div>
-
-    <h1 class="profile-title">¿Quién está aprendiendo hoy?</h1>
-
-    <div class="profiles-grid">
-        <!-- Perfil Samuel -->
-        <div class="profile-card" role="button" tabindex="0" aria-label="Seleccionar perfil de Samuel Pablo"
-             onclick="selectProfile('Samuel Pablo', 'assets/avatar_samuel.png', '#e50914')"
-             onkeydown="if(event.key==='Enter') selectProfile('Samuel Pablo','assets/avatar_samuel.png','#e50914')">
-            <div class="profile-avatar">
-                <img src="assets/avatar_samuel.png" alt="Avatar de Samuel Pablo" onerror="this.parentElement.innerHTML='<div style=\'width:100%;height:100%;background:linear-gradient(135deg,#7b0008,#c0000f);display:flex;align-items:center;justify-content:center;font-size:3rem;\'>🎓</div>'">
+    <!-- Header: Co-branding UNHEVAL + ECUACIONES.io -->
+    <header class="profile-screen-header" style="display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 1200px; margin-bottom: 20px;">
+        <div class="profile-uni-info" style="display: flex; align-items: center; gap: 14px;">
+            <img src="assets/escudo_unheval.png" alt="Escudo UNHEVAL" class="uni-logo-img" style="height: 52px; object-fit: contain; filter: drop-shadow(0 0 8px rgba(255,255,255,0.15));" onerror="this.style.display='none'; document.getElementById('uni-logo-fallback').style.display='flex';">
+            <img src="assets/logo_educacion_myf.png" alt="Logo Educación M&F" class="school-logo-img" style="height: 52px; object-fit: contain; filter: drop-shadow(0 0 8px rgba(255,255,255,0.15));" onerror="this.style.display='none';">
+            <div id="uni-logo-fallback" style="display: none; width: 44px; height: 44px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); border-radius: 50%; align-items: center; justify-content: center; font-size: 1.3rem;">🏛️</div>
+            <div class="profile-uni-text" style="display: flex; flex-direction: column; text-align: left;">
+                <span style="font-family: var(--font-heading); font-size: 0.95rem; font-weight: 800; color: #fff; letter-spacing: 0.5px;">UNHEVAL</span>
+                <span style="font-size: 0.72rem; color: var(--color-text-muted); font-weight: 600;">E.P. de Matemática y Física</span>
             </div>
-            <span class="profile-name">Samuel Pablo</span>
         </div>
+        <div class="netflix-logo-top" style="position: static; font-family: var(--font-heading); font-size: 1.8rem; font-weight: 800; color: var(--color-accent); letter-spacing: -1px; margin: 0;">
+            ECUACIONES<span style="color:#fff">.io</span>
+        </div>
+    </header>
 
-        <!-- Perfil Integrante 2 -->
-        <div class="profile-card" role="button" tabindex="0" aria-label="Seleccionar perfil de Integrante 2"
-             onclick="selectProfile('Compañero 1', 'assets/avatar_2.png', '#6366f1')"
-             onkeydown="if(event.key==='Enter') selectProfile('Compañero 1','assets/avatar_2.png','#6366f1')">
-            <div class="profile-avatar">
-                <img src="assets/avatar_2.png" alt="Avatar del integrante 2" onerror="this.parentElement.innerHTML='<div style=\'width:100%;height:100%;background:linear-gradient(135deg,#312e81,#4f46e5);display:flex;align-items:center;justify-content:center;font-size:3rem;\'>📐</div>'">
-            </div>
-            <span class="profile-name">Compañero/a 1</span>
+    <!-- Center: Profile Selection -->
+    <div class="profile-screen-center" style="display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; width: 100%;">
+        <h1 class="profile-title" style="margin-bottom: var(--space-8);">¿Quién está aprendiendo hoy?</h1>
+        <div class="profiles-grid" id="profiles-grid-container">
+            <!-- Se genera dinámicamente desde JS -->
         </div>
-
-        <!-- Perfil Integrante 3 -->
-        <div class="profile-card" role="button" tabindex="0" aria-label="Seleccionar perfil de Integrante 3"
-             onclick="selectProfile('Compañero 2', 'assets/avatar_3.png', '#10b981')"
-             onkeydown="if(event.key==='Enter') selectProfile('Compañero 2','assets/avatar_3.png','#10b981')">
-            <div class="profile-avatar">
-                <img src="assets/avatar_3.png" alt="Avatar del integrante 3" onerror="this.parentElement.innerHTML='<div style=\'width:100%;height:100%;background:linear-gradient(135deg,#064e3b,#059669);display:flex;align-items:center;justify-content:center;font-size:3rem;\'>∑</div>'">
-            </div>
-            <span class="profile-name">Compañero/a 2</span>
-        </div>
-
-        <!-- Perfil Invitado -->
-        <div class="profile-card" role="button" tabindex="0" aria-label="Entrar como invitado"
-             onclick="selectProfile('Invitado', null, '#6d6d6e')"
-             onkeydown="if(event.key==='Enter') selectProfile('Invitado',null,'#6d6d6e')">
-            <div class="profile-avatar-icon" style="background:rgba(109,109,110,0.2); border:3px solid transparent;">
-                <i class="fa-solid fa-user-plus" style="color:#6d6d6e;"></i>
-            </div>
-            <span class="profile-name">Invitado</span>
-        </div>
+        <button class="profile-manage" onclick="openProfileManageModal()">
+            Gestionar perfiles
+        </button>
     </div>
 
-    <button class="profile-manage" onclick="showToast('Funcionalidad en desarrollo para la próxima versión.', 'info')">
-        Gestionar perfiles
-    </button>
+    <!-- Footer: Academic metadata -->
+    <footer class="profile-screen-footer" style="display: flex; flex-direction: column; align-items: center; gap: 6px; width: 100%; max-width: 1200px; margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: var(--space-4);">
+        <div class="profile-academic-meta" style="display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; justify-content: center;">
+            <span style="font-size: 0.7rem; font-weight: 800; color: var(--color-neon-cyan); border: 1px solid rgba(0, 243, 255, 0.35); background: rgba(0, 243, 255, 0.05); padding: 3px 10px; border-radius: 4px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 0 8px rgba(0, 243, 255, 0.15);">Clase Magistral</span>
+            <span style="font-size: 0.82rem; color: var(--color-text-secondary); font-weight: 700;">Curso: Didáctica de la Matemática</span>
+            <span style="color: rgba(255,255,255,0.15);">|</span>
+            <span style="font-size: 0.82rem; color: var(--color-text-secondary); font-weight: 600;">Docente: Joel Cipriano Tarazona Bardales</span>
+            <span style="color: rgba(255,255,255,0.15);">|</span>
+            <span style="font-size: 0.82rem; color: var(--color-text-muted);">Semestre: 2026-I</span>
+        </div>
+        <div style="font-size: 0.65rem; color: var(--color-text-faint); font-family: var(--font-body); letter-spacing: 0.5px; margin-bottom: var(--space-4);">Universidad Nacional Hermilio Valdizán de Huánuco</div>
+        
+        <div class="custom-signature-footer" style="margin-top: var(--space-4); padding-top: var(--space-4); border-top: 1px solid rgba(255,255,255,0.03); width: 100%;">
+            <div class="icon-box">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 3C12 7.5 16.5 12 21 12C16.5 12 12 16.5 12 21C12 16.5 7.5 12 3 12C7.5 12 12 7.5 12 3Z" fill="#f59e0b"/>
+                    <circle cx="7" cy="17" r="1.5" fill="#f59e0b" opacity="0.8"/>
+                </svg>
+            </div>
+            <p class="main-text">
+                Sistema creado con <span class="heart">🧡</span> por <span class="creator-name">Pablito_DP y su grupo</span>
+            </p>
+            <p class="sub-text">
+                &copy; 2026 PABLITO_DP &mdash; Acceso Clasificado
+            </p>
+        </div>
+    </footer>
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════════════ -->
@@ -107,8 +112,9 @@
             <a href="#browse-content" class="active">Inicio</a>
             <a href="#row-fundamentos">Fundamentos</a>
             <a href="#row-ejemplos">Ejemplos</a>
-            <a href="#row-retos">Retos UNI</a>
+            <a href="#row-retos">Retos UNHEVAL</a>
             <a href="#ai-section">Taller IA</a>
+            <a href="#" onclick="openTorneoOverlay();return false;" style="color:#f59e0b;font-weight:700;">🏆 Torneo</a>
         </nav>
 
         <div class="header-right">
@@ -121,15 +127,10 @@
                 <i class="fa-solid fa-mobile-screen"></i>
                 <span class="pulse-dot" aria-hidden="true"></span>
             </button>
-            <button onclick="startPresenterMode()" aria-label="Iniciar modo presentación" 
+            <button id="btn-presenter" onclick="startPresenterMode()" aria-label="Iniciar modo presentación" 
                     style="padding:6px 14px;background:transparent;border:1px solid rgba(255,255,255,0.3);color:#fff;border-radius:4px;font-size:0.8rem;font-weight:600;cursor:pointer;transition:border-color 0.2s;"
                     onmouseover="this.style.borderColor='#fff'" onmouseout="this.style.borderColor='rgba(255,255,255,0.3)'">
-                <i class="fa-solid fa-expand"></i> Presentar
-            </button>
-            <button id="btn-admin" onclick="openAdminModal()" aria-label="Panel de administración del Torneito"
-                    style="padding:6px 12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);color:#b3b3b3;border-radius:4px;font-size:0.8rem;cursor:pointer;transition:all 0.2s;"
-                    onmouseover="this.style.color='#fff';this.style.borderColor='rgba(255,255,255,0.4)'" onmouseout="this.style.color='#b3b3b3';this.style.borderColor='rgba(255,255,255,0.15)'">
-                <i class="fa-solid fa-gear"></i>
+                <i class="fa-solid fa-expand"></i> <span class="btn-text">Presentar</span>
             </button>
         </div>
     </header>
@@ -164,10 +165,10 @@
                 <span class="match">98% relevante</span>
                 <span class="year">2025</span>
                 <span class="rating">PG</span>
-                <span class="duration">7 secciones · Nivel Básico–UNI</span>
+                <span class="duration">7 secciones · Nivel Básico–UNHEVAL</span>
             </div>
             <p class="hero-description">
-                Aprende a traducir el lenguaje cotidiano al lenguaje universal de las matemáticas. Desde fundamentos hasta problemas de preselección UNI, con un taller inteligente impulsado por IA.
+                Aprende a traducir el lenguaje cotidiano al lenguaje universal de las matemáticas. Desde fundamentos hasta problemas de preselección UNHEVAL, con un taller inteligente impulsado por IA.
             </p>
             <div class="hero-actions">
                 <button class="btn-play" onclick="startPresenterMode()" aria-label="Iniciar presentación en pantalla completa">
@@ -396,28 +397,53 @@
             </div>
         </section>
 
-        <!-- ── FILA 3: El Torneito ──────────────────────────────────── -->
-        <section id="row-torneo" class="netflix-row row-theme-purple reveal" aria-label="Sección El Torneito">
+        <!-- ── FILA 3: Retos UNHEVAL ─────────────────────────────────────── -->
+        <section id="row-retos" class="netflix-row row-theme-purple reveal" aria-label="Sección Retos de Alto Voltaje UNHEVAL">
             <div class="netflix-row-header">
-                <h2 class="netflix-row-title"><i class="fa-solid fa-trophy" style="color:#a78bfa;margin-right:8px;"></i>El Torneito 🏆</h2>
-                <span id="torneo-block-label" style="font-size:0.78rem;font-weight:700;color:#e50914;opacity:0.85;">Bloque 1 — Clásicos de Planteo</span>
-                <span class="netflix-row-see-all" onclick="openAdminModal()" style="margin-left:auto;display:flex;align-items:center;gap:6px;">
-                    <i class="fa-solid fa-pen-to-square"></i> Gestionar bloques
-                </span>
+                <h2 class="netflix-row-title"><i class="fa-solid fa-star" style="color:#a78bfa;margin-right:8px;"></i>Retos de Alto Voltaje · Nivel UNHEVAL</h2>
+                <span class="netflix-row-see-all">Ver retos</span>
             </div>
             <div class="carousel-wrapper">
-                <button class="carousel-btn prev" aria-label="Anterior" onclick="slideCarousel('row-torneo', -1)"><i class="fa-solid fa-chevron-left"></i></button>
-                <div class="carousel-track" id="track-row-torneo">
-                    <!-- Las tarjetas se inyectan dinámicamente por renderTorneoCards() -->
+                <button class="carousel-btn prev" aria-label="Anterior" onclick="slideCarousel('row-retos', -1)"><i class="fa-solid fa-chevron-left"></i></button>
+                <div class="carousel-track" id="track-row-retos">
+                    <div class="slide-card" onclick="openSlideModal('slide-ej6')" data-yt-id="F71H4y2t5aY" data-yt-start="120">
+                        <div class="slide-card-thumb">
+                            <div class="slide-card-thumb-inner">
+                                <div class="slide-card-icon" style="color:#a78bfa;">⭐</div>
+                                <div class="slide-card-label">Reto UNHEVAL I<br>Edades en el Tiempo</div>
+                                <div class="slide-card-math">(A-a)/(B-a) = 5/4</div>
+                            </div>
+                        </div>
+                        <div class="slide-card-info">
+                            <div class="slide-card-actions"><button class="card-btn play" onclick="event.stopPropagation();openSlideModal('slide-ej6')"><i class="fa-solid fa-play"></i></button><button class="card-btn"><i class="fa-solid fa-ellipsis"></i></button></div>
+                            <div class="slide-card-info-title">Reto UNHEVAL I: Edades en el Tiempo</div>
+                            <div class="slide-card-info-tags"><span class="card-tag" style="color:#e50914;font-weight:700;">Avanzado</span><span class="card-tag">UNHEVAL</span></div>
+                        </div>
+                    </div>
+                    <div class="slide-card" onclick="openSlideModal('slide-ej7')" data-yt-id="F71H4y2t5aY" data-yt-start="240">
+                        <div class="slide-card-thumb">
+                            <div class="slide-card-thumb-inner">
+                                <div class="slide-card-icon" style="color:#a78bfa;">⭐⭐</div>
+                                <div class="slide-card-label">Reto UNHEVAL II<br>Modelado Diofántico</div>
+                                <div class="slide-card-math">3x + 2y = 50, y > 2x</div>
+                            </div>
+                        </div>
+                        <div class="slide-card-info">
+                            <div class="slide-card-actions"><button class="card-btn play" onclick="event.stopPropagation();openSlideModal('slide-ej7')"><i class="fa-solid fa-play"></i></button><button class="card-btn"><i class="fa-solid fa-ellipsis"></i></button></div>
+                            <div class="slide-card-info-title">Reto UNHEVAL II: Modelado Diofántico</div>
+                            <div class="slide-card-info-tags"><span class="card-tag" style="color:#e50914;font-weight:700;">Avanzado</span><span class="card-tag">Diofántico</span></div>
+                        </div>
+                    </div>
                 </div>
-                <button class="carousel-btn next" aria-label="Siguiente" onclick="slideCarousel('row-torneo', 1)"><i class="fa-solid fa-chevron-right"></i></button>
+                <button class="carousel-btn next" aria-label="Siguiente" onclick="slideCarousel('row-retos', 1)"><i class="fa-solid fa-chevron-right"></i></button>
             </div>
         </section>
 
         <!-- ── FILA 4: Taller IA ─────────────────────────────────────── -->
         <section id="ai-section" class="reveal" aria-label="Taller Inteligente con IA">
-            <div class="netflix-row-header" style="padding-top: 8px;">
-                <h2 class="netflix-row-title"><i class="fa-solid fa-wand-magic-sparkles" style="color:#46d369;margin-right:8px;"></i>✨ Taller Inteligente con IA</h2>
+            <div class="netflix-row-header" style="padding-top: 8px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                <h2 class="netflix-row-title" style="margin: 0;"><i class="fa-solid fa-wand-magic-sparkles" style="color:#46d369;margin-right:8px;"></i>✨ Taller Inteligente con IA</h2>
+                <span id="ai-status-badge" class="ai-status-badge offline"><i class="fa-solid fa-cloud-slash"></i> Offline (Simulación)</span>
             </div>
 
             <div class="ai-panels">
@@ -440,6 +466,8 @@
                             <select id="select-topic" class="ai-select" aria-label="Seleccionar tema">
                                 <option value="Edades">Edades y Tiempo</option>
                                 <option value="Geometría">Geometría Plana</option>
+                                <option value="Móviles">Móviles (Velocidad)</option>
+                                <option value="Grifos">Grifos (Trabajo)</option>
                             </select>
                         </div>
                     </div>
@@ -454,6 +482,9 @@
                             <i class="fa-solid fa-eye"></i> Solución
                         </button>
                     </div>
+                    <!-- Contenedor separado para la resolución paso a paso -->
+                    <div id="ai-solution-output" role="status" aria-live="polite" class="ai-output-box" style="display: none; margin-top: 12px; min-height: 120px;"></div>
+
                 </div>
 
                 <!-- Panel Analizador -->
@@ -469,7 +500,10 @@
                     <div id="ai-analysis-output" role="status" aria-live="polite" class="ai-output-box" style="margin-top:10px;min-height:100px;">
                         El análisis paso a paso aparecerá aquí...
                     </div>
-                    <div style="display:flex;justify-content:flex-end;margin-top:12px;">
+                    <div style="display:flex;justify-content:flex-end;margin-top:12px;gap:8px;align-items:center;">
+                        <button class="speaker-btn" style="margin-left:0; width: 36px; height: 36px;" onclick="speakText(document.getElementById('user-problem-input').value)" title="Escuchar enunciado">
+                            <i class="fa-solid fa-volume-high"></i>
+                        </button>
                         <button onclick="analyzeUserProblem()" id="btn-analyze-ai" class="btn-netflix-red" aria-label="Analizar y resolver el problema ingresado">
                             <i class="fa-solid fa-brain"></i> Resolver con IA ✨
                         </button>
@@ -479,13 +513,21 @@
         </section>
 
         <!-- FOOTER -->
-        <footer id="browse-footer">
-            <div class="footer-logo">ECUACIONES.io</div>
-            <p class="footer-text">
-                Escuela Profesional de Matemática y Física · Clase Magistral 2025<br>
-                Presentación interactiva con IA impulsada por Supabase Edge Functions.<br>
-                <em>Consola: <code style="color:#e50914;">exportSolutionsToPDF()</code> para exportar a PDF.</em>
-            </p>
+        <footer id="browse-footer" style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+            <div class="custom-signature-footer" style="width: 100%; margin-top: 0; padding-top: 0;">
+                <div class="icon-box">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 3C12 7.5 16.5 12 21 12C16.5 12 12 16.5 12 21C12 16.5 7.5 12 3 12C7.5 12 12 7.5 12 3Z" fill="#f59e0b"/>
+                        <circle cx="7" cy="17" r="1.5" fill="#f59e0b" opacity="0.8"/>
+                    </svg>
+                </div>
+                <p class="main-text">
+                    Sistema creado con <span class="heart">🧡</span> por <span class="creator-name">Pablito_DP y su grupo</span>
+                </p>
+                <p class="sub-text">
+                    &copy; 2026 PABLITO_DP &mdash; Acceso Clasificado
+                </p>
+            </div>
         </footer>
 
     </main>
@@ -507,10 +549,8 @@
 <!-- MODO PRESENTADOR FULLSCREEN                                                -->
 <!-- ═══════════════════════════════════════════════════════════════════════ -->
 <div id="presenter-overlay" role="dialog" aria-modal="true" aria-label="Modo presentación">
-    <div class="presenter-slide-view">
-        <div class="presenter-slide-inner" id="presenter-slide-content">
-            <!-- Contenido de diapositiva activa inyectado por JS -->
-        </div>
+    <div class="presenter-slide-view" id="presenter-slide-view">
+        <!-- Todas las diapositivas se renderizan aquí en orden vertical por JS -->
     </div>
     <div class="presenter-bar" role="toolbar" aria-label="Controles de la presentación">
         <button class="pbar-btn exit" onclick="exitPresenterMode()" aria-label="Salir del modo presentación">
@@ -545,45 +585,293 @@
     </div>
 </div>
 
-<!-- ADMIN MODAL — PANEL DE ADMINISTRACIÓN DEL TORNEITO -->
-<div id="admin-modal" role="dialog" aria-modal="true" aria-label="Panel de administración del Torneito" onclick="if(event.target===this)closeAdminModal()">
-    <div class="admin-modal-box">
-        <div class="admin-modal-header">
-            <div class="admin-modal-title">
-                <i class="fa-solid fa-trophy" style="color:#a78bfa;"></i>
-                Panel de Administración — El Torneito
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- TORNEO EN VIVO — OVERLAY PANTALLA GRANDE                                   -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<div id="tournament-overlay" role="dialog" aria-modal="true" aria-label="Torneo en Vivo" style="
+    display:none; position:fixed; inset:0; z-index:900;
+    background:#0a0a0a;
+    flex-direction:column;
+    font-family:'Poppins',sans-serif;
+">
+    <!-- Barra superior del torneo -->
+    <div id="torneo-topbar" style="
+        display:flex; align-items:center; justify-content:space-between;
+        padding:14px 32px; background:rgba(0,0,0,0.6);
+        backdrop-filter:blur(12px); border-bottom:1px solid rgba(255,255,255,0.07);
+    ">
+        <div style="font-size:1.4rem; font-weight:800; color:#e50914;">MATH<span style="color:#fff">-FLIX</span> <span style="font-size:0.75rem;color:#f59e0b;font-weight:700;letter-spacing:2px;">TORNEO EN VIVO</span></div>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+            <!-- Controles del profesor -->
+            <button onclick="abrirHistorialRondas()" style="padding:7px 14px;background:rgba(84,179,214,0.12);border:1px solid rgba(84,179,214,0.3);color:#54b3d6;border-radius:8px;font-size:0.75rem;font-weight:700;cursor:pointer;">&#x1F4CB; Rondas</button>
+            <button onclick="torneoSetPantalla('lobby')"    id="tc-lobby"    style="padding:7px 14px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#fff;border-radius:8px;font-size:0.75rem;font-weight:700;cursor:pointer;">&#x1F3E0; Lobby</button>
+            <button onclick="torneoSetPantalla('pregunta')" id="tc-pregunta" style="padding:7px 14px;background:rgba(229,9,20,0.15);border:1px solid rgba(229,9,20,0.35);color:#e50914;border-radius:8px;font-size:0.75rem;font-weight:700;cursor:pointer;">&#x25B6; Pregunta</button>
+            <button onclick="torneoSetPantalla('leaderboard')" id="tc-lb"   style="padding:7px 14px;background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.3);color:#f59e0b;border-radius:8px;font-size:0.75rem;font-weight:700;cursor:pointer;">&#x1F3C6; Ranking</button>
+            <button onclick="torneoSiguientePregunta()" style="padding:7px 14px;background:rgba(84,179,214,0.12);border:1px solid rgba(84,179,214,0.3);color:#54b3d6;border-radius:8px;font-size:0.75rem;font-weight:700;cursor:pointer;">&#x23ED; Siguiente</button>
+            <button onclick="torneoReset()" style="padding:7px 14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:#6d6d6e;border-radius:8px;font-size:0.72rem;cursor:pointer;">&#x21BA; Reset</button>
+            <!-- Exportación de reportes PDF de la ronda activa -->
+            <button onclick="descargarRondaCompletaPDF('alfabetico')" style="padding:7px 14px;background:rgba(70,211,105,0.15);border:1px solid rgba(70,211,105,0.35);color:#46d369;border-radius:8px;font-size:0.75rem;font-weight:700;cursor:pointer;" title="Descargar respuestas de la ronda en orden alfabético A-Z">
+                <i class="fa-solid fa-file-pdf"></i> Ronda A-Z
+            </button>
+            <button onclick="descargarRondaCompletaPDF('puntaje')" style="padding:7px 14px;background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.35);color:#f59e0b;border-radius:8px;font-size:0.75rem;font-weight:700;cursor:pointer;" title="Descargar respuestas de la ronda ordenadas por puntaje">
+                <i class="fa-solid fa-file-pdf"></i> Ronda Puntaje
+            </button>
+            <button onclick="closeTorneoOverlay()" style="padding:7px 14px;background:transparent;border:1px solid rgba(255,255,255,0.12);color:#b3b3b3;border-radius:8px;font-size:0.75rem;cursor:pointer;"><i class="fa-solid fa-xmark"></i> Cerrar</button>
+        </div>
+    </div>
+
+    <!-- Área de contenido del torneo -->
+    <div id="torneo-content" style="flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+
+        <!-- PANEL LOBBY -->
+        <div id="torneo-panel-lobby" style="display:none;flex-direction:column;align-items:center;gap:32px;padding:40px 32px;text-align:center;width:100%;max-width:1100px;">
+            <div style="font-size:1rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#e50914;">Esperando participantes...</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;width:100%;align-items:start;">
+                <!-- QR -->
+                <div style="display:flex;flex-direction:column;align-items:center;gap:16px;">
+                    <div style="font-size:0.7rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#b3b3b3;">Escanea para unirte</div>
+                    <div id="torneo-qr-wrapper" style="background:#fff;padding:16px;border-radius:12px;box-shadow:0 0 40px rgba(229,9,20,0.2);">
+                        <img id="torneo-qr-img" src="" alt="QR Torneo" width="220" height="220">
+                    </div>
+                    <div id="torneo-qr-url" style="font-size:0.65rem;color:#6d6d6e;word-break:break-all;max-width:260px;"></div>
+                </div>
+                <!-- Lista de participantes -->
+                <div style="display:flex;flex-direction:column;gap:12px;">
+                    <div style="font-size:0.7rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#b3b3b3;">Participantes conectados (<span id="torneo-count">0</span>)</div>
+                    <div id="torneo-participantes-grid" style="display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-start;"></div>
+                </div>
             </div>
-            <button class="admin-modal-close" onclick="closeAdminModal()" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
         </div>
 
-        <!-- Block Tabs -->
-        <div class="admin-block-tabs">
-            <button class="admin-block-tab active" id="admin-tab-0" onclick="switchAdminTab(0)">
-                <i class="fa-solid fa-1"></i> Bloque 1
-            </button>
-            <button class="admin-block-tab" id="admin-tab-1" onclick="switchAdminTab(1)">
-                <i class="fa-solid fa-2"></i> Bloque 2
-            </button>
-            <button class="admin-block-tab" id="admin-tab-2" onclick="switchAdminTab(2)">
-                <i class="fa-solid fa-3"></i> Bloque 3
-            </button>
-            <div class="admin-block-tabs-divider"></div>
-            <button class="admin-activate-btn" onclick="switchTorneoBlock(adminActiveBlockTab)">
-                <i class="fa-solid fa-bolt"></i> Activar este bloque
+        <!-- PANEL PREGUNTA -->
+        <div id="torneo-panel-pregunta" style="display:none;flex-direction:column;align-items:center;gap:24px;padding:32px;width:100%;max-width:900px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
+                <div id="torneo-p-badge" style="font-size:0.7rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#e50914;background:rgba(229,9,20,0.12);border:1px solid rgba(229,9,20,0.25);padding:6px 14px;border-radius:20px;">Pregunta 1</div>
+                <div style="display:flex;gap:20px;align-items:center;">
+                    <div style="text-align:center;">
+                        <div style="font-size:0.6rem;color:#6d6d6e;text-transform:uppercase;letter-spacing:1px;">Respuestas</div>
+                        <div id="torneo-resp-count" style="font-size:1.4rem;font-weight:800;color:#46d369;">0</div>
+                    </div>
+                    <div id="torneo-timer" style="font-size:3rem;font-weight:800;color:#46d369;font-variant-numeric:tabular-nums;min-width:80px;text-align:center;">60</div>
+                </div>
+            </div>
+            <!-- Enunciado -->
+            <div style="width:100%;background:#1a1a1a;border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:32px;">
+                <div style="font-size:0.65rem;color:#6d6d6e;text-transform:uppercase;letter-spacing:2px;margin-bottom:12px;">Enunciado</div>
+                <div id="torneo-p-texto" style="font-size:1.3rem;color:#e5e5e5;line-height:1.7;font-weight:500;"></div>
+            </div>
+            <!-- Barra de progreso -->
+            <div style="width:100%;">
+                <div style="display:flex;justify-content:space-between;font-size:0.65rem;color:#6d6d6e;margin-bottom:6px;">
+                    <span>Progreso de entregas</span>
+                    <span id="torneo-prog-text">0 de 0 alumnos</span>
+                </div>
+                <div style="width:100%;height:6px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden;">
+                    <div id="torneo-prog-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#e50914,#f59e0b);border-radius:99px;transition:width 0.5s ease;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PANEL LEADERBOARD -->
+        <div id="torneo-panel-leaderboard" style="display:none;flex-direction:column;align-items:center;gap:20px;padding:32px;width:100%;max-width:700px;">
+            <div style="font-size:0.7rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#f59e0b;">🏆 Tabla de Posiciones</div>
+            <div id="torneo-leaderboard-list" style="width:100%;display:flex;flex-direction:column;gap:10px;"></div>
+        </div>
+
+    </div><!-- /torneo-content -->
+</div><!-- /tournament-overlay -->
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- MODAL: DETALLE DE SOLUCIÓN DEL ALUMNO                                   -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<div id="torneo-detalle-alumno-modal" onclick="if(event.target===this)cerrarDetalleAlumnoModal()" style="
+    display:none; position:fixed; inset:0; z-index:9100;
+    background:rgba(0,0,0,0.88); backdrop-filter:blur(10px);
+    align-items:center; justify-content:center; padding:20px;
+">
+    <div style="
+        background:#141414; border:1px solid rgba(255,255,255,0.1);
+        border-radius:20px; width:100%; max-width:900px;
+        max-height:90vh; overflow:auto;
+        display:flex; flex-direction:column;
+        box-shadow:0 30px 80px rgba(0,0,0,0.7);
+        animation:torneoFadeIn 0.3s ease;
+    ">
+        <!-- Header del modal -->
+        <div style="
+            display:flex; align-items:center; justify-content:space-between;
+            padding:20px 28px 0; flex-shrink:0;
+        ">
+            <div>
+                <div style="font-size:0.65rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#e50914;">
+                    Solución del Alumno
+                </div>
+                <div id="tdm-nombre" style="font-size:1.1rem;font-weight:800;color:#fff;margin-top:4px;"></div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;">
+                <button onclick="descargarAlumnoPDFActual()" style="
+                    background:rgba(70,211,105,0.15); border:1px solid rgba(70,211,105,0.3);
+                    color:#46d369; border-radius:8px; padding:7px 14px;
+                    font-size:0.78rem; font-weight:700; cursor:pointer;
+                    display:flex;align-items:center;gap:6px;
+                "><i class="fa-solid fa-file-pdf"></i> Descargar PDF</button>
+                <button onclick="editarPuntajeAlumnoManual()" style="
+                    background:rgba(245,158,11,0.15); border:1px solid rgba(245,158,11,0.3);
+                    color:#f59e0b; border-radius:8px; padding:7px 14px;
+                    font-size:0.78rem; font-weight:700; cursor:pointer;
+                    display:flex;align-items:center;gap:6px;
+                "><i class="fa-solid fa-pen"></i> Editar Nota</button>
+                <button onclick="cerrarDetalleAlumnoModal()" style="
+                    background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.12);
+                    color:#b3b3b3; border-radius:8px; padding:7px 14px;
+                    font-size:0.82rem; cursor:pointer;
+                "><i class="fa-solid fa-xmark"></i> Cerrar</button>
+            </div>
+        </div>
+
+        <!-- Cuerpo del modal -->
+        <div style="display:flex;flex-wrap:wrap;gap:24px;padding:24px 28px 28px;">
+            <!-- Columna izquierda: Imagen manuscrita -->
+            <div style="flex:1;min-width:220px;max-width:420px;">
+                <div style="font-size:0.6rem;color:#6d6d6e;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;">
+                    Foto de la Solución
+                </div>
+                <div style="
+                    background:#1a1a1a; border:1px solid rgba(255,255,255,0.08);
+                    border-radius:12px; overflow:hidden; min-height:180px;
+                    display:flex;align-items:center;justify-content:center;
+                ">
+                    <img id="tdm-foto" src="" alt="Solución manuscrita"
+                         style="width:100%;height:auto;display:block;border-radius:0;"
+                         onerror="this.style.display='none'">
+                </div>
+            </div>
+
+            <!-- Columna derecha: Detalles de la evaluación -->
+            <div style="flex:1;min-width:220px;display:flex;flex-direction:column;gap:16px;">
+
+                <!-- Puntaje badge -->
+                <div style="display:flex;align-items:center;gap:16px;">
+                    <div id="tdm-puntaje" style="
+                        font-size:3.5rem;font-weight:800;min-width:80px;text-align:center;
+                        color:#46d369;
+                    ">—</div>
+                    <div>
+                        <div style="font-size:0.6rem;color:#6d6d6e;text-transform:uppercase;letter-spacing:1px;">Puntaje</div>
+                        <div id="tdm-pregunta-label" style="font-size:0.78rem;color:#b3b3b3;font-weight:600;margin-top:4px;"></div>
+                    </div>
+                </div>
+
+                <!-- Transcripción limpia de la IA -->
+                <div style="background:#1a1a1a;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:16px;">
+                    <div style="font-size:0.6rem;color:#6d6d6e;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">
+                        <i class="fa-solid fa-magnifying-glass" style="color:#54b3d6;margin-right:5px;"></i>
+                        Lo que leyó la IA (Transcripción)
+                    </div>
+                    <div id="tdm-transcripcion" style="font-size:0.82rem;color:#e5e5e5;line-height:1.7;font-family:'Fira Code',monospace;word-break:break-word;">
+                        —
+                    </div>
+                </div>
+
+                <!-- Feedback -->
+                <div style="background:#1a1a1a;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:16px;">
+                    <div style="font-size:0.6rem;color:#6d6d6e;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">
+                        <i class="fa-solid fa-comment-dots" style="color:#f59e0b;margin-right:5px;"></i>
+                        Feedback del Profesor IA
+                    </div>
+                    <div id="tdm-feedback" style="font-size:0.85rem;color:#b3b3b3;line-height:1.7;">
+                        —
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+@keyframes torneoFadeIn { from{ opacity:0; transform:scale(0.96) translateY(10px); } to{ opacity:1; transform:none; } }
+</style>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- MODAL: HISTORIAL DE RONDAS                                               -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<div id="torneo-historial-modal" onclick="if(event.target===this)cerrarHistorialRondas()" style="
+    display:none; position:fixed; inset:0; z-index:9200;
+    background:rgba(0,0,0,0.88); backdrop-filter:blur(10px);
+    align-items:center; justify-content:center; padding:20px;
+">
+    <div style="
+        background:#141414; border:1px solid rgba(255,255,255,0.1);
+        border-radius:20px; width:100%; max-width:680px;
+        max-height:80vh; overflow:auto;
+        display:flex; flex-direction:column;
+        box-shadow:0 30px 80px rgba(0,0,0,0.7);
+        animation:torneoFadeIn 0.3s ease;
+    ">
+        <!-- Header -->
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 28px 0;flex-shrink:0;">
+            <div>
+                <div style="font-size:0.65rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#54b3d6;">Historial</div>
+                <div style="font-size:1.1rem;font-weight:800;color:#fff;margin-top:4px;">&#x1F4CB; Rondas Archivadas</div>
+            </div>
+            <button onclick="cerrarHistorialRondas()" style="
+                background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);
+                color:#b3b3b3;border-radius:8px;padding:7px 14px;font-size:0.82rem;cursor:pointer;
+            "><i class="fa-solid fa-xmark"></i> Cerrar</button>
+        </div>
+        <!-- Lista -->
+        <div id="historial-rondas-list" style="display:flex;flex-direction:column;gap:10px;padding:20px 28px 28px;"></div>
+    </div>
+</div>
+
+<!-- GESTIONAR PERFILES MODAL -->
+<div id="profile-manage-modal" role="dialog" aria-modal="true" aria-label="Gestionar Perfiles" onclick="if(event.target===this)closeProfileManageModal()">
+    <div class="profile-manage-box">
+        <button class="profile-manage-close" onclick="closeProfileManageModal()" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
+        <div class="profile-manage-title">👥 Gestionar Perfiles</div>
+        
+        <div id="profile-list-view">
+            <div class="profile-manage-list" id="profile-manage-list">
+                <!-- Se genera dinámicamente desde JS -->
+            </div>
+            <button class="btn-profile-add" onclick="showAddProfileForm()">
+                <i class="fa-solid fa-plus"></i> Añadir Perfil
             </button>
         </div>
 
-        <!-- Questions Container (rendered dynamically) -->
-        <div id="admin-questions-container" class="admin-questions-container"></div>
-
-        <!-- Footer Actions -->
-        <div class="admin-modal-footer">
-            <button class="admin-btn-reset" onclick="resetAdminBlock()">
-                <i class="fa-solid fa-rotate-left"></i> Restaurar bloque
-            </button>
-            <button class="admin-btn-save" onclick="saveAdminChanges()">
-                <i class="fa-solid fa-floppy-disk"></i> Guardar cambios
-            </button>
+        <div id="profile-form-view" style="display: none;">
+            <h3 id="profile-form-title" style="margin-bottom: 16px; font-size: 1rem; font-family: var(--font-heading);">Añadir Perfil</h3>
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+                <div>
+                    <label for="profile-input-name" style="font-size:0.75rem; color:var(--color-text-muted); display:block; margin-bottom:6px; font-weight: 600; text-transform: uppercase;">Nombre</label>
+                    <input type="text" id="profile-input-name" class="ai-select" style="margin-bottom:0;" placeholder="Nombre del estudiante">
+                </div>
+                <div>
+                    <label style="font-size:0.75rem; color:var(--color-text-muted); display:block; margin-bottom:6px; font-weight: 600; text-transform: uppercase;">Avatar / Icono</label>
+                    <div class="avatar-choices" id="avatar-choices" style="display:flex; gap:8px;">
+                        <span class="avatar-choice-item active" onclick="selectAvatarChoice(this)">🎓</span>
+                        <span class="avatar-choice-item" onclick="selectAvatarChoice(this)">📐</span>
+                        <span class="avatar-choice-item" onclick="selectAvatarChoice(this)">∑</span>
+                        <span class="avatar-choice-item" onclick="selectAvatarChoice(this)">🔍</span>
+                        <span class="avatar-choice-item" onclick="selectAvatarChoice(this)">🧪</span>
+                        <span class="avatar-choice-item" onclick="selectAvatarChoice(this)">💡</span>
+                    </div>
+                </div>
+                <div>
+                    <label style="font-size:0.75rem; color:var(--color-text-muted); display:block; margin-bottom:6px; font-weight: 600; text-transform: uppercase;">Color de Acento</label>
+                    <div class="color-choices" id="color-choices" style="display:flex; gap:12px;">
+                        <span class="color-choice-item active" style="background:#e50914;" data-color="#e50914" onclick="selectColorChoice(this)"></span>
+                        <span class="color-choice-item" style="background:#6366f1;" data-color="#6366f1" onclick="selectColorChoice(this)"></span>
+                        <span class="color-choice-item" style="background:#10b981;" data-color="#10b981" onclick="selectColorChoice(this)"></span>
+                        <span class="color-choice-item" style="background:#f59e0b;" data-color="#f59e0b" onclick="selectColorChoice(this)"></span>
+                        <span class="color-choice-item" style="background:#a78bfa;" data-color="#a78bfa" onclick="selectColorChoice(this)"></span>
+                        <span class="color-choice-item" style="background:#e02424;" data-color="#e02424" onclick="selectColorChoice(this)"></span>
+                    </div>
+                </div>
+                <div style="display:flex; gap:12px; margin-top:12px;">
+                    <button class="btn-netflix-red" onclick="saveProfileForm()" style="flex:1; justify-content:center; padding: 10px;">Guardar</button>
+                    <button class="btn-netflix-grey" onclick="cancelProfileForm()" style="flex:1; justify-content:center; padding: 10px;">Cancelar</button>
+                </div>
+            </div>
         </div>
     </div>
 </div>

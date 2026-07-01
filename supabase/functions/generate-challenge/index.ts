@@ -6,17 +6,17 @@
 
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 
-// Cabeceras CORS para permitir llamadas desde GitHub Pages / localhost
-const CORS = {
-  "Access-Control-Allow-Origin": "https://planteodeecuaciones.sypablitodp.site",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-};
-
 serve(async (req: Request) => {
   // Responder al preflight de CORS
+  const origin = req.headers.get("origin") || "*";
+  const headers = {
+    "Access-Control-Allow-Origin": origin,
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+  };
+
   if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: CORS });
+    return new Response("ok", { headers });
   }
 
   try {
@@ -27,7 +27,8 @@ serve(async (req: Request) => {
 Siempre respondes en JSON con exactamente esta forma:
 {
   "problem": "enunciado del problema en lenguaje natural (2-4 oraciones)",
-  "solution": "solución HTML con 5 pasos usando etiquetas <p> y la clase step-pill en spans de pasos"
+  "solution": "solución HTML con 5 pasos usando etiquetas <p> y la clase step-pill en spans de pasos",
+  "answer": "la respuesta numérica o cadena de valores finales exacta sin unidades de texto (ejemplo: '12' o '20 y 30' o '6 y 10')"
 }
 Los problemas deben requerir plantear UNA ecuación de primer grado.
 No uses fórmulas complejas. Usa LaTeX inline con $...$`;
@@ -52,22 +53,29 @@ Los 5 pasos de oro son: Identificar, Traducir, Igualar, Coherencia, Comprobar.`;
       throw new Error("No hay API Key configurada. Añade DEEPSEEK_API_KEY o OPENAI_API_KEY en los secretos de Supabase.");
     }
 
+    const requestBody: any = {
+      model,
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user",   content: userPrompt },
+      ],
+      response_format: { type: "json_object" },
+      temperature: 0.8,
+    };
+
+    if (model === "gpt-4o-mini") {
+      requestBody.max_completion_tokens = 800;
+    } else {
+      requestBody.max_tokens = 800;
+    }
+
     const aiRes = await fetch(apiURL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${apiKey}`,
       },
-      body: JSON.stringify({
-        model,
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user",   content: userPrompt },
-        ],
-        response_format: { type: "json_object" },
-        temperature: 0.8,
-        max_tokens: 800,
-      }),
+      body: JSON.stringify(requestBody),
     });
 
     if (!aiRes.ok) {
@@ -83,13 +91,14 @@ Los 5 pasos de oro son: Identificar, Traducir, Igualar, Coherencia, Comprobar.`;
       JSON.stringify({
         problem:  parsed.problem  ?? "No se pudo generar el problema.",
         solution: parsed.solution ?? "<p>No se pudo generar la solución.</p>",
+        answer:   parsed.answer   ?? "",
       }),
-      { headers: { ...CORS, "Content-Type": "application/json" } }
+      { headers: { ...headers, "Content-Type": "application/json" } }
     );
   } catch (err) {
     return new Response(
       JSON.stringify({ error: err.message }),
-      { status: 500, headers: { ...CORS, "Content-Type": "application/json" } }
+      { status: 500, headers: { ...headers, "Content-Type": "application/json" } }
     );
   }
 });

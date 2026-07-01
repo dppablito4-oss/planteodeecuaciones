@@ -10,8 +10,8 @@ const SUPABASE_CONFIG = {
     useEdgeFunctions: true
 };
 
-const supabaseClient = (typeof window !== 'undefined' && window.supabase && SUPABASE_CONFIG.url) 
-    ? window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey) 
+const supabaseClient = (typeof window !== 'undefined' && window.supabase && SUPABASE_CONFIG.url)
+    ? window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey)
     : null;
 
 // ── Slide Data (contenido de cada diapositiva para modal y presentador) ─────
@@ -54,10 +54,10 @@ const SLIDES_DATA = {
         content: `
             <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:16px;">
                 ${[
-                    ['🔍','1. Identificar','Aislar y definir claramente las variables o incógnitas del sistema.'],
-                    ['🗣️','2. Traducir','Mapear los conectores lógicos de cantidad a operadores algebraicos.'],
-                    ['⚖️','3. Igualar','Establecer el punto de balance o igualdad de la ecuación.']
-                ].map(([icon,title,desc]) => `
+                ['🔍', '1. Identificar', 'Aislar y definir claramente las variables o incógnitas del sistema.'],
+                ['🗣️', '2. Traducir', 'Mapear los conectores lógicos de cantidad a operadores algebraicos.'],
+                ['⚖️', '3. Igualar', 'Establecer el punto de balance o igualdad de la ecuación.']
+            ].map(([icon, title, desc]) => `
                     <div style="background:rgba(229,9,20,0.05);border:1px solid rgba(229,9,20,0.15);border-radius:10px;padding:20px;text-align:center;">
                         <div style="font-size:2.5rem;margin-bottom:12px;">${icon}</div>
                         <div style="font-weight:700;font-family:var(--font-heading);margin-bottom:8px;color:var(--color-accent);">${title}</div>
@@ -66,9 +66,9 @@ const SLIDES_DATA = {
             </div>
             <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px;">
                 ${[
-                    ['📐','4. Coherencia','Asegurar homogeneidad dimensional de todos los términos (unidades).'],
-                    ['✔️','5. Comprobar','Validar la consistencia lógica del resultado en el contexto original.']
-                ].map(([icon,title,desc]) => `
+                ['📐', '4. Coherencia', 'Asegurar homogeneidad dimensional de todos los términos (unidades).'],
+                ['✔️', '5. Comprobar', 'Validar la consistencia lógica del resultado en el contexto original.']
+            ].map(([icon, title, desc]) => `
                     <div style="background:rgba(229,9,20,0.05);border:1px solid rgba(229,9,20,0.15);border-radius:10px;padding:20px;text-align:center;">
                         <div style="font-size:2.5rem;margin-bottom:12px;">${icon}</div>
                         <div style="font-weight:700;font-family:var(--font-heading);margin-bottom:8px;color:var(--color-accent);">${title}</div>
@@ -109,10 +109,10 @@ const SLIDES_DATA = {
         content: `
             <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;">
                 ${[
-                    ['❌','Olvidar Paréntesis','Al multiplicar el "doble de la suma", el multiplicador afecta a todos los términos dentro.'],
-                    ['⚠️','Mezclar Unidades','No operes minutos con horas o metros con centímetros sin antes hacer la conversión.'],
-                    ['🤔','Resultados Absurdos','Si el cálculo de una edad da fraccionario o negativo, revisa el planteamiento original.']
-                ].map(([icon,title,desc]) => `
+                ['❌', 'Olvidar Paréntesis', 'Al multiplicar el "doble de la suma", el multiplicador afecta a todos los términos dentro.'],
+                ['⚠️', 'Mezclar Unidades', 'No operes minutos con horas o metros con centímetros sin antes hacer la conversión.'],
+                ['🤔', 'Resultados Absurdos', 'Si el cálculo de una edad da fraccionario o negativo, revisa el planteamiento original.']
+            ].map(([icon, title, desc]) => `
                     <div style="background:rgba(229,9,20,0.08);border:1px solid rgba(229,9,20,0.25);border-radius:12px;padding:24px;text-align:center;">
                         <div style="font-size:3rem;margin-bottom:12px;">${icon}</div>
                         <h3 style="font-weight:700;font-family:var(--font-heading);margin-bottom:10px;color:#fff;">${title}</h3>
@@ -129,11 +129,11 @@ const SLIDES_DATA = {
         content: `
             <ul style="list-style:none;display:flex;flex-direction:column;gap:20px;">
                 ${[
-                    'Lee el problema al menos 3 veces antes de estructurar variables.',
-                    'Traduce palabra por palabra metódicamente al lenguaje formal.',
-                    'Conserva el orden en cada una de las operaciones algebraicas.',
-                    'Comprueba siempre el valor obtenido con el enunciado original.'
-                ].map(tip => `
+                'Lee el problema al menos 3 veces antes de estructurar variables.',
+                'Traduce palabra por palabra metódicamente al lenguaje formal.',
+                'Conserva el orden en cada una de las operaciones algebraicas.',
+                'Comprueba siempre el valor obtenido con el enunciado original.'
+            ].map(tip => `
                     <li style="display:flex;align-items:center;gap:16px;font-size:1.05rem;color:var(--color-text-secondary);">
                         <span style="color:#46d369;font-size:1.5rem;flex-shrink:0;">✓</span>
                         ${tip}
@@ -241,13 +241,14 @@ const SLIDES_DATA = {
             <div class="modal-solution-tag"><i class="fa-solid fa-circle-check"></i> Niño A = <strong style="margin:0 4px;">20</strong> · Niño B = <strong style="margin:0 4px;">30</strong> caramelos.</div>`
     },
     'slide-ej6': {
-        title: 'Reto UNI I — Edades en el Tiempo',
+        title: 'Reto UNHEVAL I — Edades en el Tiempo',
         icon: '⭐',
         heroColor: 'linear-gradient(135deg, #1a0030, #0d0020)',
-        description: 'Problema de preselección UNI con razones temporales. Calcular a+b.',
+        coverImage: 'assets/math_problem_solving.png',
+        description: 'Problema de preselección UNHEVAL con razones temporales. Calcular a+b.',
         content: `
             <p style="font-size:0.9rem;color:var(--color-text-muted);margin-bottom:16px;border-left:3px solid #a78bfa;padding-left:12px;">
-                <strong>Problema (UNI):</strong> La edad de A hace $a$ años era a la de B como 5:4. Dentro de $b$ años la razón será 7:6. La suma de edades es 46 y la diferencia es 4. Calcule $a+b$.
+                <strong>Problema (UNHEVAL):</strong> La edad de A hace $a$ años era a la de B como 5:4. Dentro de $b$ años la razón será 7:6. La suma de edades es 46 y la diferencia es 4. Calcule $a+b$.
             </p>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
                 <div style="background:rgba(167,139,250,0.05);border:1px solid rgba(167,139,250,0.2);border-radius:10px;padding:16px;">
@@ -265,16 +266,17 @@ const SLIDES_DATA = {
                     </div>
                 </div>
             </div>
-            <div class="modal-solution-tag"><i class="fa-solid fa-circle-check"></i> Resultado: $a + b = 5 + 3 = $ <strong style="margin-left:6px;font-size:1.3rem;color:#46d369;">8</strong></div>`
+            <div class="modal-solution-tag"><i class="fa-solid fa-circle-check"></i> Resultado: $a + b = 5 + b = $ <strong style="margin-left:6px;font-size:1.3rem;color:#46d369;">8</strong></div>`
     },
     'slide-ej7': {
-        title: 'Reto UNI II — Modelado Diofántico',
+        title: 'Reto UNHEVAL II — Modelado Diofántico',
         icon: '⭐⭐',
         heroColor: 'linear-gradient(135deg, #1a0030, #0d0020)',
+        coverImage: 'assets/math_logic_concept.png',
         description: 'Ecuación diofántica con restricción de enteros positivos. Cantidad máxima de textos.',
         content: `
             <p style="font-size:0.9rem;color:var(--color-text-muted);margin-bottom:16px;border-left:3px solid #a78bfa;padding-left:12px;">
-                <strong>Problema (UNI):</strong> Textos de Física a $30 y de Química a $20. Gastó $500. Los de Química exceden al doble de Física. Determina la cantidad máxima de textos de Química.
+                <strong>Problema (UNHEVAL):</strong> Textos de Física a $30 y de Química a $20. Gastó $500. Los de Química exceden al doble de Física. Determina la cantidad máxima de textos de Química.
             </p>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
                 <div style="background:rgba(167,139,250,0.05);border:1px solid rgba(167,139,250,0.2);border-radius:10px;padding:16px;">
@@ -295,519 +297,375 @@ const SLIDES_DATA = {
                 </div>
             </div>
             <div class="modal-solution-tag"><i class="fa-solid fa-circle-check"></i> Máximo de textos de Química: <strong style="margin-left:6px;font-size:1.3rem;color:#46d369;">22</strong></div>`
+    },
+    'slide-fin': {
+        title: 'Clase Completada',
+        icon: '🎬',
+        heroColor: 'linear-gradient(135deg, #09090b, #111115)',
+        description: 'Has completado la Clase Magistral de Planteo de Ecuaciones.',
+        content: `
+            <div class="netflix-ending-container">
+                <div class="netflix-ending-left">
+                    <div class="netflix-credits-box">
+                        <h3 class="credits-logo">ECUACIONES<span>.io</span></h3>
+                        <p class="credits-title">Clase Magistral de Planteo de Ecuaciones</p>
+                        <div class="credits-roll">
+                            <div class="credit-row"><span class="credit-label">Presentador:</span> <span class="credit-value">Joel Cipriano Tarazona Bardales</span></div>
+                            <div class="credit-row"><span class="credit-label">Especialidad:</span> <span class="credit-value">Matemática y Física</span></div>
+                            <div class="credit-row"><span class="credit-label">Universidad:</span> <span class="credit-value">UNHEVAL (Huánuco)</span></div>
+                            <div class="credit-row"><span class="credit-label">Plataforma:</span> <span class="credit-value">Math-Flix Presenter 2.0</span></div>
+                        </div>
+                        <div class="thanks-message">🏆 ¡Muchas gracias por su atención! 🏆</div>
+                    </div>
+                </div>
+                <div class="netflix-ending-right">
+                    <div class="netflix-next-card">
+                        <div class="next-banner">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> RECOMENDADO A CONTINUACIÓN
+                        </div>
+                        <div class="next-card-content">
+                            <div class="next-title">Taller Inteligente con IA</div>
+                            <p class="next-desc">Traduce problemas reales y obtén resoluciones automáticas explicadas con los 5 Pasos de Oro en tiempo real.</p>
+                            <div class="countdown-row">
+                                <button class="btn-netflix-red btn-next-act" onclick="exitPresenterMode(); window.location.hash='#ai-section'; document.getElementById('ai-section').scrollIntoView({behavior:'smooth'});" style="padding:10px 20px; font-weight:700;">
+                                    Ir al Taller ahora <span class="countdown-sec" id="ending-countdown">10</span>
+                                </button>
+                                <button class="btn-netflix-grey btn-next-act" onclick="exitPresenterMode(); window.location.hash='#row-fundamentos'; document.getElementById('row-fundamentos').scrollIntoView({behavior:'smooth'});" style="padding:10px 20px;">
+                                    Volver al catálogo
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="other-recs-title">Otros recomendados en esta categoría:</div>
+                    <div class="other-recs-grid">
+                        <div class="rec-mini-card" onclick="exitPresenterMode(); openTorneoOverlay();">
+                            <div class="rec-mini-icon">🏆</div>
+                            <div class="rec-mini-info">
+                                <div class="rec-mini-title">Torneo en Vivo</div>
+                                <div class="rec-mini-genre">Competencia Math-Flix</div>
+                            </div>
+                        </div>
+                        <div class="rec-mini-card" onclick="exitPresenterMode(); openSlideModal('slide-ej6');">
+                            <div class="rec-mini-icon">⭐</div>
+                            <div class="rec-mini-info">
+                                <div class="rec-mini-title">Reto UNHEVAL I</div>
+                                <div class="rec-mini-genre">Edades en el Tiempo</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>`
     }
 };
 
-// ── Torneo Data (3 bloques x 5 niveles) ─────────────────────────────────────
-const DEFAULT_TORNEO_BLOCKS = [
-    // ══════════ BLOQUE 1 ══════════
-    {
-        id: 'bloque-1',
-        nombre: 'Bloque 1 — Clásicos de Planteo',
-        color: '#e50914',
-        preguntas: [
-            {
-                nivel: 1,
-                titulo: 'Nivel 1: El Número Misterioso',
-                subtitulo: 'Básico · Traducción directa',
-                icono: '🔢',
-                ecuacion: '2x + 12 = 42',
-                enunciado: 'El doble de un número, aumentado en 12, es igual a 42. Hallar el número.',
-                planteamiento: `<p><span class="modal-step-pill">Incógnita</span> El número desconocido: $x$</p>
-                <p style="margin-top:8px;"><span class="modal-step-pill">Traducción</span> El doble del número: $2x$. Aumentado en 12: $+12$.</p>
-                <p style="margin-top:8px;"><span class="modal-step-pill">Ecuación</span> $$2x + 12 = 42$$</p>`,
-                resolucion: `<p><span class="modal-step-pill">Paso 1</span> Restamos 12 a ambos lados: $$2x = 42 - 12 = 30$$</p>
-                <p style="margin-top:8px;"><span class="modal-step-pill">Paso 2</span> Dividimos entre 2: $$x = \\frac{30}{2} = 15$$</p>`,
-                respuesta: 'El número es <strong>15</strong>.'
-            },
-            {
-                nivel: 2,
-                titulo: 'Nivel 2: Los Hermanos Consecutivos',
-                subtitulo: 'Intermedio-Bajo · Consecutivos',
-                icono: '👫',
-                ecuacion: 'x + (x+1) + (x+2) = 105',
-                enunciado: 'La suma de tres números enteros consecutivos es igual a 105. ¿Cuál es el número mayor?',
-                planteamiento: `<p><span class="modal-step-pill">Variables</span> Primer número: $x$. Segundo: $x+1$. Tercero (mayor): $x+2$.</p>
-                <p style="margin-top:8px;"><span class="modal-step-pill">Ecuación</span> $$x + (x+1) + (x+2) = 105$$</p>`,
-                resolucion: `<p><span class="modal-step-pill">Paso 1</span> Agrupamos términos semejantes: $$3x + 3 = 105$$</p>
-                <p style="margin-top:8px;"><span class="modal-step-pill">Paso 2</span> $$3x = 102 \\Rightarrow x = 34$$</p>
-                <p style="margin-top:8px;"><span class="modal-step-pill">Paso 3</span> El mayor es $x + 2 = 34 + 2 = 36$.</p>`,
-                respuesta: 'El número mayor es <strong>36</strong>.'
-            },
-            {
-                nivel: 3,
-                titulo: 'Nivel 3: Desafío en la Granja',
-                subtitulo: 'Intermedio · Cabezas y patas',
-                icono: '🐓',
-                ecuacion: '4c + 2(35 - c) = 116',
-                enunciado: 'En una granja hay gallinas y conejos. En total se cuentan 35 cabezas y 116 patas. ¿Cuántos conejos hay?',
-                planteamiento: `<p><span class="modal-step-pill">Variables</span> Conejos: $c$ (4 patas). Gallinas: $35 - c$ (2 patas).</p>
-                <p style="margin-top:8px;"><span class="modal-step-pill">Ecuación</span> $$4c + 2(35 - c) = 116$$</p>`,
-                resolucion: `<p><span class="modal-step-pill">Paso 1</span> Aplicamos distributiva: $$4c + 70 - 2c = 116$$</p>
-                <p style="margin-top:8px;"><span class="modal-step-pill">Paso 2</span> $$2c = 116 - 70 = 46$$</p>
-                <p style="margin-top:8px;"><span class="modal-step-pill">Paso 3</span> $$c = 23$$</p>`,
-                respuesta: 'Hay <strong>23 conejos</strong> en la granja.'
-            },
-            {
-                nivel: 4,
-                titulo: 'Nivel 4: Gastos Compartidos',
-                subtitulo: 'Intermedio-Avanzado · Aporte variable',
-                icono: '🎁',
-                ecuacion: '10A = 8(A + 5)',
-                enunciado: 'Un grupo de 10 amigos compra un regalo. 2 no pudieron pagar, y los restantes pusieron 5 soles más cada uno. ¿Cuánto costó el regalo?',
-                planteamiento: `<p><span class="modal-step-pill">Variables</span> Cuota inicial: $A$. Amigos que pagan: $10 - 2 = 8$. Cuota final: $A + 5$.</p>
-                <p style="margin-top:8px;"><span class="modal-step-pill">Igualdad</span> El costo total es el mismo: $$10A = 8(A + 5)$$</p>`,
-                resolucion: `<p><span class="modal-step-pill">Paso 1</span> $$10A = 8A + 40$$</p>
-                <p style="margin-top:8px;"><span class="modal-step-pill">Paso 2</span> $$2A = 40 \\Rightarrow A = 20 \\text{ soles}$$</p>
-                <p style="margin-top:8px;"><span class="modal-step-pill">Paso 3</span> Costo total: $$10 \\times 20 = 200 \\text{ soles}$$</p>`,
-                respuesta: 'El regalo costó <strong>200 soles</strong>.'
-            },
-            {
-                nivel: 5,
-                titulo: 'Nivel 5: El Dilema de las Edades',
-                subtitulo: 'Avanzado · Cruce temporal',
-                icono: '⏳',
-                ecuacion: '7x = 70',
-                enunciado: 'Yo tengo el triple de la edad que tú tenías cuando yo tenía la edad que tú tienes. Cuando tú tengas la edad que yo tengo, la suma de nuestras edades será 70. ¿Qué edad tengo actualmente?',
-                planteamiento: `<p><span class="modal-step-pill">Clave</span> La diferencia de edades (Yo − Tú) es constante en el tiempo.</p>
-                <p style="margin-top:8px;"><span class="modal-step-pill">Pasado</span> Tú tenías $x$. Yo tenía lo que tú tienes ahora: $y$.</p>
-                <p style="margin-top:8px;"><span class="modal-step-pill">Presente</span> Yo tengo $3x$. Tú tienes $y$.</p>
-                <p style="margin-top:8px;"><span class="modal-step-pill">Relación</span> $$y - x = 3x - y \\Rightarrow 2y = 4x \\Rightarrow y = 2x$$</p>`,
-                resolucion: `<p><span class="modal-step-pill">Futuro</span> Tú tendrás $3x$ (pasan $x$ años). Yo tendré $3x + x = 4x$.</p>
-                <p style="margin-top:8px;"><span class="modal-step-pill">Ecuación</span> $$4x + 3x = 70 \\Rightarrow 7x = 70 \\Rightarrow x = 10$$</p>
-                <p style="margin-top:8px;"><span class="modal-step-pill">Mi edad</span> $$3x = 3(10) = 30 \\text{ años}$$</p>`,
-                respuesta: 'Actualmente tengo <strong>30 años</strong>.'
-            }
-        ]
-    },
-    // ══════════ BLOQUE 2 ══════════
-    {
-        id: 'bloque-2',
-        nombre: 'Bloque 2 — Problemas Mixtos',
-        color: '#6366f1',
-        preguntas: [
-            {
-                nivel: 1,
-                titulo: 'Nivel 1: La Mitad y el Resto',
-                subtitulo: 'Básico · Fracciones de un número',
-                icono: '½',
-                ecuacion: 'x/2 + 8 = 22',
-                enunciado: 'La mitad de un número aumentada en 8 es igual a 22. ¿Cuál es el número?',
-                planteamiento: `<p><span class="modal-step-pill">Incógnita</span> El número: $x$. Su mitad: $\\frac{x}{2}$.</p>
-                <p style="margin-top:8px;"><span class="modal-step-pill">Ecuación</span> $$\\frac{x}{2} + 8 = 22$$</p>`,
-                resolucion: `<p><span class="modal-step-pill">Paso 1</span> $$\\frac{x}{2} = 14$$</p>
-                <p style="margin-top:8px;"><span class="modal-step-pill">Paso 2</span> $$x = 28$$</p>`,
-                respuesta: 'El número es <strong>28</strong>.'
-            },
-            {
-                nivel: 2,
-                titulo: 'Nivel 2: Números Pares Consecutivos',
-                subtitulo: 'Intermedio-Bajo · Pares',
-                icono: '2️⃣',
-                ecuacion: 'x + (x+2) + (x+4) = 90',
-                enunciado: 'La suma de tres números pares consecutivos es 90. Halla el mayor.',
-                planteamiento: `<p><span class="modal-step-pill">Variables</span> Primer par: $x$. Segundo: $x+2$. Tercero (mayor): $x+4$.</p>
-                <p style="margin-top:8px;"><span class="modal-step-pill">Ecuación</span> $$x + (x+2) + (x+4) = 90$$</p>`,
-                resolucion: `<p><span class="modal-step-pill">Paso 1</span> $$3x + 6 = 90 \\Rightarrow 3x = 84 \\Rightarrow x = 28$$</p>
-                <p style="margin-top:8px;"><span class="modal-step-pill">Mayor</span> $$x + 4 = 32$$</p>`,
-                respuesta: 'El número mayor es <strong>32</strong>.'
-            },
-            {
-                nivel: 3,
-                titulo: 'Nivel 3: La Piscina',
-                subtitulo: 'Intermedio · Geometría rectangular',
-                icono: '🏊',
-                ecuacion: '2x + 2(2x+5) = 70',
-                enunciado: 'El largo de una piscina excede al doble del ancho en 5 m. El perímetro es 70 m. Halla el largo.',
-                planteamiento: `<p><span class="modal-step-pill">Variables</span> Ancho: $x$. Largo: $2x + 5$.</p>
-                <p style="margin-top:8px;"><span class="modal-step-pill">Perímetro</span> $$2x + 2(2x + 5) = 70$$</p>`,
-                resolucion: `<p><span class="modal-step-pill">Paso 1</span> $$2x + 4x + 10 = 70 \\Rightarrow 6x = 60 \\Rightarrow x = 10$$</p>
-                <p style="margin-top:8px;"><span class="modal-step-pill">Largo</span> $$2(10) + 5 = 25 \\text{ m}$$</p>`,
-                respuesta: 'El largo mide <strong>25 m</strong>.'
-            },
-            {
-                nivel: 4,
-                titulo: 'Nivel 4: El Viaje en Tren',
-                subtitulo: 'Intermedio-Avanzado · Velocidad',
-                icono: '🚂',
-                ecuacion: '60t = 80(t - 1)',
-                enunciado: 'Un tren parte a 60 km/h. Una hora después sale otro a 80 km/h por la misma ruta. ¿Cuánto tarda el segundo en alcanzar al primero?',
-                planteamiento: `<p><span class="modal-step-pill">Variables</span> Tiempo del 2° tren: $t$ horas. Tiempo del 1°: $t + 1$ horas.</p>
-                <p style="margin-top:8px;"><span class="modal-step-pill">Igualdad</span> Distancias iguales al alcanzar: $$60(t+1) = 80t$$</p>`,
-                resolucion: `<p><span class="modal-step-pill">Paso 1</span> $$60t + 60 = 80t \\Rightarrow 60 = 20t \\Rightarrow t = 3 \\text{ h}$$</p>`,
-                respuesta: 'El segundo tren alcanza al primero en <strong>3 horas</strong>.'
-            },
-            {
-                nivel: 5,
-                titulo: 'Nivel 5: Dos Capitales con Interés',
-                subtitulo: 'Avanzado · Interés simple',
-                icono: '💰',
-                ecuacion: '0.05x + 0.08(20000-x) = 1300',
-                enunciado: 'Se invierten S/. 20,000 en dos cuentas: una al 5% y otra al 8% anual. Los intereses suman S/. 1,300. ¿Cuánto se invirtió en cada cuenta?',
-                planteamiento: `<p><span class="modal-step-pill">Variables</span> Capital al 5%: $x$. Capital al 8%: $20000 - x$.</p>
-                <p style="margin-top:8px;"><span class="modal-step-pill">Ecuación</span> $$0.05x + 0.08(20000 - x) = 1300$$</p>`,
-                resolucion: `<p><span class="modal-step-pill">Paso 1</span> $$0.05x + 1600 - 0.08x = 1300$$</p>
-                <p style="margin-top:8px;"><span class="modal-step-pill">Paso 2</span> $$-0.03x = -300 \\Rightarrow x = 10000$$</p>`,
-                respuesta: '<strong>S/. 10,000 al 5%</strong> y <strong>S/. 10,000 al 8%</strong>.'
-            }
-        ]
-    },
-    // ══════════ BLOQUE 3 ══════════
-    {
-        id: 'bloque-3',
-        nombre: 'Bloque 3 — Nivel UNI',
-        color: '#10b981',
-        preguntas: [
-            {
-                nivel: 1,
-                titulo: 'Nivel 1: División en Partes',
-                subtitulo: 'Básico · Proporciones directas',
-                icono: '📊',
-                ecuacion: '3x + x = 80',
-                enunciado: 'Dividir 80 en dos partes de forma que una sea el triple de la otra. Halla la parte mayor.',
-                planteamiento: `<p><span class="modal-step-pill">Variables</span> Parte menor: $x$. Parte mayor: $3x$.</p>
-                <p style="margin-top:8px;"><span class="modal-step-pill">Ecuación</span> $$3x + x = 80$$</p>`,
-                resolucion: `<p><span class="modal-step-pill">Paso 1</span> $$4x = 80 \\Rightarrow x = 20$$</p>
-                <p style="margin-top:8px;"><span class="modal-step-pill">Mayor</span> $$3x = 60$$</p>`,
-                respuesta: 'La parte mayor es <strong>60</strong>.'
-            },
-            {
-                nivel: 2,
-                titulo: 'Nivel 2: Monedas en la Alcancía',
-                subtitulo: 'Intermedio-Bajo · Sistemas monedas',
-                icono: '🪙',
-                ecuacion: '0.50x + 1.00(30-x) = 20',
-                enunciado: 'Una alcancía tiene 30 monedas de 50 céntimos y 1 sol. En total hay S/. 20. ¿Cuántas monedas de 1 sol hay?',
-                planteamiento: `<p><span class="modal-step-pill">Variables</span> Monedas de 50 cts: $x$. Monedas de 1 sol: $30 - x$.</p>
-                <p style="margin-top:8px;"><span class="modal-step-pill">Ecuación</span> $$0.50x + 1.00(30 - x) = 20$$</p>`,
-                resolucion: `<p><span class="modal-step-pill">Paso 1</span> $$0.50x + 30 - x = 20 \\Rightarrow -0.50x = -10 \\Rightarrow x = 20$$</p>
-                <p style="margin-top:8px;"><span class="modal-step-pill">De 1 sol</span> $$30 - 20 = 10$$</p>`,
-                respuesta: 'Hay <strong>10 monedas de 1 sol</strong>.'
-            },
-            {
-                nivel: 3,
-                titulo: 'Nivel 3: El Descuento Justo',
-                subtitulo: 'Intermedio · Porcentajes comerciales',
-                icono: '🏷️',
-                ecuacion: 'x - 0.15x = 510',
-                enunciado: 'Un artículo tiene un descuento del 15%. Si el precio final es S/. 510, ¿cuál era el precio original?',
-                planteamiento: `<p><span class="modal-step-pill">Variable</span> Precio original: $x$. Con 15% de descuento: $x - 0.15x = 0.85x$.</p>
-                <p style="margin-top:8px;"><span class="modal-step-pill">Ecuación</span> $$0.85x = 510$$</p>`,
-                resolucion: `<p><span class="modal-step-pill">Paso 1</span> $$x = \\frac{510}{0.85} = 600$$</p>`,
-                respuesta: 'El precio original era <strong>S/. 600</strong>.'
-            },
-            {
-                nivel: 4,
-                titulo: 'Nivel 4: La Mezcla de Soluciones',
-                subtitulo: 'Intermedio-Avanzado · Concentración',
-                icono: '🧪',
-                ecuacion: '0.30x + 0.70(10-x) = 0.50(10)',
-                enunciado: 'Se mezclan litros de una solución al 30% y al 70% para obtener 10 L al 50%. ¿Cuántos litros de cada una se necesitan?',
-                planteamiento: `<p><span class="modal-step-pill">Variables</span> Litros al 30%: $x$. Litros al 70%: $10 - x$.</p>
-                <p style="margin-top:8px;"><span class="modal-step-pill">Ecuación</span> $$0.30x + 0.70(10 - x) = 0.50 \\times 10$$</p>`,
-                resolucion: `<p><span class="modal-step-pill">Paso 1</span> $$0.30x + 7 - 0.70x = 5 \\Rightarrow -0.40x = -2 \\Rightarrow x = 5$$</p>`,
-                respuesta: '<strong>5 L al 30%</strong> y <strong>5 L al 70%</strong>.'
-            },
-            {
-                nivel: 5,
-                titulo: 'Nivel 5: Edades en Razón (UNI)',
-                subtitulo: 'Avanzado · Razones y tiempo',
-                icono: '⭐',
-                ecuacion: '(A-5)/(B-5) = 5/4',
-                enunciado: 'La suma de edades de A y B es 46 y su diferencia es 4. Hace $a$ años la razón era 5:4. Dentro de $b$ años será 7:6. Calcule $a+b$.',
-                planteamiento: `<p><span class="modal-step-pill">Sistema</span> $A + B = 46$ y $A - B = 4$. Resolviendo: $A = 25$, $B = 21$.</p>
-                <p style="margin-top:8px;"><span class="modal-step-pill">Pasado</span> $$\\frac{25-a}{21-a} = \\frac{5}{4}$$</p>
-                <p style="margin-top:8px;"><span class="modal-step-pill">Futuro</span> $$\\frac{25+b}{21+b} = \\frac{7}{6}$$</p>`,
-                resolucion: `<p><span class="modal-step-pill">Pasado</span> $4(25-a) = 5(21-a) \\Rightarrow 100-4a = 105-5a \\Rightarrow a = 5$</p>
-                <p style="margin-top:8px;"><span class="modal-step-pill">Futuro</span> $6(25+b) = 7(21+b) \\Rightarrow 150+6b = 147+7b \\Rightarrow b = 3$</p>`,
-                respuesta: '$a + b = 5 + 3 = $ <strong style="color:#46d369;font-size:1.2rem;">8</strong>'
-            }
-        ]
-    }
+// All slides in presenter order
+const PRESENTER_SLIDES = [
+    'slide-planteo', 'slide-pasos', 'slide-diccionario',
+    'slide-ej1', 'slide-ej2', 'slide-ej3', 'slide-ej4', 'slide-ej5',
+    'slide-ej6', 'slide-ej7', 'slide-errores', 'slide-resumen', 'slide-fin'
 ];
-
-// ── Torneo State & Persistence ───────────────────────────────────────────────
-const TORNEO_STORAGE_KEY = 'ecuaciones_io_torneo_v1';
-let torneoActiveBlock = 0; // índice 0, 1 o 2
-let torneoBlocks = null;
-
-function loadTorneoData() {
-    try {
-        const saved = localStorage.getItem(TORNEO_STORAGE_KEY);
-        if (saved) {
-            const parsed = JSON.parse(saved);
-            torneoBlocks = parsed.blocks || JSON.parse(JSON.stringify(DEFAULT_TORNEO_BLOCKS));
-            torneoActiveBlock = typeof parsed.activeBlock === 'number' ? parsed.activeBlock : 0;
-        } else {
-            torneoBlocks = JSON.parse(JSON.stringify(DEFAULT_TORNEO_BLOCKS));
-            torneoActiveBlock = 0;
-        }
-    } catch(e) {
-        torneoBlocks = JSON.parse(JSON.stringify(DEFAULT_TORNEO_BLOCKS));
-        torneoActiveBlock = 0;
-    }
-}
-
-function saveTorneoData() {
-    try {
-        localStorage.setItem(TORNEO_STORAGE_KEY, JSON.stringify({
-            blocks: torneoBlocks,
-            activeBlock: torneoActiveBlock
-        }));
-    } catch(e) { console.warn('No se pudo guardar en localStorage:', e); }
-}
-
-function resetTorneoData() {
-    torneoBlocks = JSON.parse(JSON.stringify(DEFAULT_TORNEO_BLOCKS));
-    torneoActiveBlock = 0;
-    saveTorneoData();
-}
-
-// ── Dynamic SLIDES_DATA injection for Torneo ─────────────────────────────────
-function updateTorneoSlides() {
-    const block = torneoBlocks[torneoActiveBlock];
-    if (!block) return;
-
-    const levelColors = ['#e50914','#f59e0b','#10b981','#6366f1','#a78bfa'];
-
-    block.preguntas.forEach((p, i) => {
-        const slideId = `slide-torneo-${i + 1}`;
-        SLIDES_DATA[slideId] = {
-            title: p.titulo,
-            icon: p.icono,
-            heroColor: `linear-gradient(135deg, #0d0d1a, #1a1a2e)`,
-            description: p.subtitulo,
-            content: `
-                <div style="border-left:4px solid ${levelColors[i]};padding:12px 20px;background:rgba(255,255,255,0.03);border-radius:0 8px 8px 0;margin-bottom:20px;">
-                    <p style="font-size:0.95rem;color:var(--color-text-secondary);line-height:1.7;">${p.enunciado}</p>
-                </div>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
-                    <div>
-                        <p style="font-size:0.7rem;text-transform:uppercase;color:var(--color-text-faint);font-weight:700;letter-spacing:1px;margin-bottom:12px;">📐 Planteamiento</p>
-                        <div class="modal-math-box" style="border-color:${levelColors[i]};">
-                            ${p.planteamiento}
-                        </div>
-                    </div>
-                    <div>
-                        <p style="font-size:0.7rem;text-transform:uppercase;color:var(--color-text-faint);font-weight:700;letter-spacing:1px;margin-bottom:12px;">🔢 Resolución</p>
-                        <div class="modal-math-box" style="border-color:${levelColors[i]};">
-                            ${p.resolucion}
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-solution-tag" style="margin-top:20px;">
-                    <i class="fa-solid fa-circle-check"></i> ${p.respuesta}
-                </div>`
-        };
-    });
-}
-
-function getTorneoPresenterSlides() {
-    return [1,2,3,4,5].map(n => `slide-torneo-${n}`);
-}
-
-// ── Dynamic PRESENTER_SLIDES (computed) ──────────────────────────────────────
-function getPresenterSlides() {
-    return [
-        'slide-planteo', 'slide-pasos', 'slide-diccionario',
-        'slide-ej1', 'slide-ej2', 'slide-ej3', 'slide-ej4', 'slide-ej5',
-        ...getTorneoPresenterSlides(),
-        'slide-errores', 'slide-resumen'
-    ];
-}
-
-// Backward compatibility — mantener PRESENTER_SLIDES como referencia mutable
-let PRESENTER_SLIDES = getPresenterSlides();
-
-// ── Torneo Card Rendering ─────────────────────────────────────────────────────
-function renderTorneoCards() {
-    const track = document.getElementById('track-row-torneo');
-    if (!track) return;
-
-    loadTorneoData();
-    updateTorneoSlides();
-    PRESENTER_SLIDES = getPresenterSlides();
-
-    const block = torneoBlocks[torneoActiveBlock];
-    const levelBadges = ['Básico','Intermedio-Bajo','Intermedio','Intermedio-Avanzado','Avanzado'];
-    const levelColors = ['#46d369','#f59e0b','#f59e0b','#f59e0b','#e50914'];
-    const accentColor = block.color;
-
-    track.innerHTML = block.preguntas.map((p, i) => `
-        <div class="slide-card" onclick="openSlideModal('slide-torneo-${i+1}')" aria-label="Ver: ${p.titulo}">
-            <div class="slide-card-thumb">
-                <div class="slide-card-thumb-inner" style="background:linear-gradient(135deg,#1a1a2e,#0d0d1a);">
-                    <div class="slide-card-icon" style="color:${accentColor};">${p.icono}</div>
-                    <div class="slide-card-label">${p.titulo.replace(/Nivel \d+: /, '')}</div>
-                    <div class="slide-card-math" style="font-family:var(--font-mono);color:rgba(255,255,255,0.3);font-size:0.7rem;">${p.ecuacion}</div>
-                </div>
-            </div>
-            <div class="slide-card-info">
-                <div class="slide-card-actions">
-                    <button class="card-btn play" onclick="event.stopPropagation();openSlideModal('slide-torneo-${i+1}')" aria-label="Abrir diapositiva">
-                        <i class="fa-solid fa-play"></i>
-                    </button>
-                    <button class="card-btn" aria-label="Más opciones"><i class="fa-solid fa-ellipsis"></i></button>
-                </div>
-                <div class="slide-card-info-title">${p.titulo}</div>
-                <div class="slide-card-info-tags">
-                    <span class="card-tag" style="color:${levelColors[i]};font-weight:700;">${levelBadges[i]}</span>
-                    <span class="card-tag">${block.nombre.split('—')[1].trim()}</span>
-                </div>
-            </div>
-        </div>`
-    ).join('');
-
-    // Update section header subtitle
-    const blockLabel = document.getElementById('torneo-block-label');
-    if (blockLabel) {
-        blockLabel.textContent = block.nombre;
-        blockLabel.style.color = block.color;
-    }
-}
-
-// ── Torneo Block Switch (called from Admin & Realtime) ───────────────────────
-function switchTorneoBlock(blockIndex, fromRemote = false) {
-    if (blockIndex < 0 || blockIndex >= torneoBlocks.length) return;
-    torneoActiveBlock = blockIndex;
-    saveTorneoData();
-    renderTorneoCards();
-    const block = torneoBlocks[blockIndex];
-    showToast(`🏆 ${fromRemote ? '📡 Remoto: ' : ''}Bloque activado: ${block.nombre}`, 'success');
-
-    // Broadcast to remote if triggered locally
-    if (!fromRemote && supabaseClient) {
-        try {
-            supabaseClient.channel('presentation-planteo-ecuaciones').send({
-                type: 'broadcast',
-                event: 'change-block',
-                payload: { blockIndex }
-            });
-        } catch(e) {}
-    }
-}
-
-// ── Admin Modal ──────────────────────────────────────────────────────────────
-let adminActiveBlockTab = 0;
-
-function openAdminModal() {
-    loadTorneoData();
-    adminActiveBlockTab = torneoActiveBlock;
-    renderAdminModal();
-    document.getElementById('admin-modal').classList.add('open');
-    document.body.style.overflow = 'hidden';
-}
-
-function closeAdminModal() {
-    document.getElementById('admin-modal').classList.remove('open');
-    document.body.style.overflow = '';
-}
-
-function renderAdminModal() {
-    // Update active block tabs highlight
-    document.querySelectorAll('.admin-block-tab').forEach((tab, i) => {
-        tab.classList.toggle('active', i === adminActiveBlockTab);
-    });
-
-    const block = torneoBlocks[adminActiveBlockTab];
-    const container = document.getElementById('admin-questions-container');
-    if (!container) return;
-
-    container.innerHTML = block.preguntas.map((p, qi) => `
-        <div class="admin-question-card">
-            <div class="admin-question-header">
-                <span class="admin-question-num">Nivel ${qi + 1}</span>
-                <span class="admin-question-icon">${p.icono}</span>
-            </div>
-            <div class="admin-field-group">
-                <label class="admin-label" for="aq-${qi}-titulo">Título</label>
-                <input class="admin-input" id="aq-${qi}-titulo" type="text" value="${p.titulo.replace(/"/g,'&quot;')}" placeholder="Título del nivel">
-            </div>
-            <div class="admin-field-group">
-                <label class="admin-label" for="aq-${qi}-subtitulo">Subtítulo / Etiqueta</label>
-                <input class="admin-input" id="aq-${qi}-subtitulo" type="text" value="${p.subtitulo.replace(/"/g,'&quot;')}" placeholder="Ej: Básico · Traducción">
-            </div>
-            <div class="admin-field-group">
-                <label class="admin-label" for="aq-${qi}-ecuacion">Ecuación (texto plano para la tarjeta)</label>
-                <input class="admin-input" id="aq-${qi}-ecuacion" type="text" value="${p.ecuacion.replace(/"/g,'&quot;')}" placeholder="Ej: 2x + 12 = 42">
-            </div>
-            <div class="admin-field-group">
-                <label class="admin-label" for="aq-${qi}-enunciado">Enunciado del Problema</label>
-                <textarea class="admin-textarea" id="aq-${qi}-enunciado" rows="3" placeholder="Escribe el enunciado del problema...">${p.enunciado}</textarea>
-            </div>
-            <div class="admin-field-group">
-                <label class="admin-label" for="aq-${qi}-planteamiento">Planteamiento (HTML + KaTeX $$...$$)</label>
-                <textarea class="admin-textarea" id="aq-${qi}-planteamiento" rows="5" placeholder="HTML con fórmulas KaTeX...">${p.planteamiento.trim()}</textarea>
-            </div>
-            <div class="admin-field-group">
-                <label class="admin-label" for="aq-${qi}-resolucion">Resolución Paso a Paso (HTML + KaTeX $$...$$)</label>
-                <textarea class="admin-textarea" id="aq-${qi}-resolucion" rows="5" placeholder="HTML con fórmulas KaTeX...">${p.resolucion.trim()}</textarea>
-            </div>
-            <div class="admin-field-group">
-                <label class="admin-label" for="aq-${qi}-respuesta">Respuesta Final (HTML corto)</label>
-                <input class="admin-input" id="aq-${qi}-respuesta" type="text" value="${p.respuesta.replace(/"/g,'&quot;')}" placeholder="Ej: El número es &lt;strong&gt;15&lt;/strong&gt;.">
-            </div>
-        </div>`
-    ).join('');
-}
-
-function switchAdminTab(blockIndex) {
-    adminActiveBlockTab = blockIndex;
-    renderAdminModal();
-}
-
-function saveAdminChanges() {
-    const block = torneoBlocks[adminActiveBlockTab];
-    block.preguntas.forEach((p, qi) => {
-        p.titulo       = document.getElementById(`aq-${qi}-titulo`)?.value       || p.titulo;
-        p.subtitulo    = document.getElementById(`aq-${qi}-subtitulo`)?.value    || p.subtitulo;
-        p.ecuacion     = document.getElementById(`aq-${qi}-ecuacion`)?.value     || p.ecuacion;
-        p.enunciado    = document.getElementById(`aq-${qi}-enunciado`)?.value    || p.enunciado;
-        p.planteamiento = document.getElementById(`aq-${qi}-planteamiento`)?.value || p.planteamiento;
-        p.resolucion   = document.getElementById(`aq-${qi}-resolucion`)?.value   || p.resolucion;
-        p.respuesta    = document.getElementById(`aq-${qi}-respuesta`)?.value    || p.respuesta;
-    });
-
-    saveTorneoData();
-    updateTorneoSlides();
-    if (adminActiveBlockTab === torneoActiveBlock) renderTorneoCards();
-
-    showToast('✅ Cambios guardados correctamente.', 'success');
-}
-
-function resetAdminBlock() {
-    if (!confirm(`¿Restaurar el Bloque ${adminActiveBlockTab + 1} a sus valores originales? Esta acción no se puede deshacer.`)) return;
-    torneoBlocks[adminActiveBlockTab] = JSON.parse(JSON.stringify(DEFAULT_TORNEO_BLOCKS[adminActiveBlockTab]));
-    saveTorneoData();
-    renderAdminModal();
-    if (adminActiveBlockTab === torneoActiveBlock) {
-        updateTorneoSlides();
-        renderTorneoCards();
-    }
-    showToast('🔄 Bloque restaurado a valores originales.', 'info');
-}
 
 // ── State ────────────────────────────────────────────────────────────────────
 let activeProfile = null;
 let presenterIndex = 0;
 let carouselOffsets = {};
 let lastSolutionHtml = '';
+let lastExpectedAnswer = '';
 
-// ── Profile Selection ────────────────────────────────────────────────────────
+// ── Profiles Management & Selection ──────────────────────────────────────────
+const DEFAULT_PROFILES = [
+    { name: 'Joel Cipriano', avatar: '🎓', color: '#e50914' },
+    { name: 'James de la Cruz', avatar: '📐', color: '#6366f1' },
+    { name: 'Deyvis', avatar: '∑', color: '#10b981' }
+];
+
+let currentEditingProfileIndex = null; // null represents adding a new profile
+
+let localProfilesCache = [];
+
+async function initProfiles() {
+    if (!supabaseClient) {
+        // Fallback to localStorage if Supabase is offline
+        let profiles = localStorage.getItem('ecuaciones_profiles');
+        if (!profiles) {
+            profiles = JSON.stringify(DEFAULT_PROFILES);
+            localStorage.setItem('ecuaciones_profiles', profiles);
+        }
+        localProfilesCache = JSON.parse(profiles);
+        renderProfiles();
+        return;
+    }
+
+    try {
+        // Load from Supabase
+        const { data, error } = await supabaseClient.from('perfiles').select('*').order('id', { ascending: true });
+        if (error) throw error;
+
+        if (!data || data.length === 0) {
+            // Seed Supabase with DEFAULT_PROFILES
+            const { data: seeded, error: seedErr } = await supabaseClient.from('perfiles').insert(DEFAULT_PROFILES).select();
+            if (seedErr) throw seedErr;
+            localProfilesCache = seeded;
+        } else {
+            localProfilesCache = data;
+        }
+    } catch (err) {
+        console.error("Error loading profiles from Supabase:", err);
+        // Fallback to localStorage
+        let profiles = localStorage.getItem('ecuaciones_profiles');
+        localProfilesCache = profiles ? JSON.parse(profiles) : DEFAULT_PROFILES;
+    }
+
+    renderProfiles();
+
+    // Subscribe to Realtime changes on perfiles table
+    supabaseClient.channel('realtime-perfiles')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'perfiles' }, async () => {
+            try {
+                // Reload all profiles from Supabase to keep sync and order
+                const { data: updatedData } = await supabaseClient.from('perfiles').select('*').order('id', { ascending: true });
+                if (updatedData) {
+                    localProfilesCache = updatedData;
+                    renderProfiles();
+                    if (document.getElementById('profile-manage-modal')?.classList.contains('open')) {
+                        renderProfileManageList();
+                    }
+                }
+            } catch (err) {
+                console.error("Error reloading profiles on realtime event:", err);
+            }
+        })
+        .subscribe();
+}
+
+function getProfiles() {
+    return localProfilesCache.length > 0 ? localProfilesCache : DEFAULT_PROFILES;
+}
+
+function saveProfiles(profiles) {
+    // Deprecado: ahora se guarda en Supabase de forma asíncrona directamente en el formulario
+    localProfilesCache = profiles;
+}
+
+function renderProfiles() {
+    const grid = document.getElementById('profiles-grid-container');
+    if (!grid) return;
+
+    const profiles = getProfiles();
+    let html = '';
+    profiles.forEach((p, idx) => {
+        const isFile = p.avatar.includes('/');
+        const avatarHtml = isFile
+            ? `<div class="profile-avatar">
+                   <img src="${p.avatar}" alt="Avatar de ${p.name}" onerror="this.parentElement.innerHTML='<div style=\'width:100%;height:100%;background:linear-gradient(135deg,${p.color}aa,${p.color});display:flex;align-items:center;justify-content:center;font-size:3rem;\'>🎓</div>'">
+               </div>`
+            : `<div class="profile-avatar-icon" style="background:linear-gradient(135deg,${p.color}88,${p.color}); color:#fff; display:flex; align-items:center; justify-content:center; font-size:3.5rem;">
+                   ${p.avatar}
+               </div>`;
+
+        html += `
+        <div class="profile-card" role="button" tabindex="0" aria-label="Seleccionar perfil de ${p.name}"
+             onclick="selectProfile('${p.name}', '${p.avatar}', '${p.color}')"
+             onkeydown="if(event.key==='Enter') selectProfile('${p.name}','${p.avatar}','${p.color}')">
+            ${avatarHtml}
+            <span class="profile-name">${p.name}</span>
+        </div>`;
+    });
+
+    // Fixed Guest Profile
+    html += `
+    <div class="profile-card" role="button" tabindex="0" aria-label="Entrar como invitado"
+         onclick="selectProfile('Invitado', '👤', '#6d6d6e')"
+         onkeydown="if(event.key==='Enter') selectProfile('Invitado','👤','#6d6d6e')">
+        <div class="profile-avatar-icon" style="background:rgba(109,109,110,0.2); border:3px solid transparent; color:#6d6d6e; display:flex; align-items:center; justify-content:center; font-size:3.5rem;">
+            <i class="fa-solid fa-user-plus"></i>
+        </div>
+        <span class="profile-name">Invitado</span>
+    </div>`;
+
+    grid.innerHTML = html;
+}
+
+function openProfileManageModal() {
+    renderProfileManageList();
+    document.getElementById('profile-list-view').style.display = 'block';
+    document.getElementById('profile-form-view').style.display = 'none';
+    document.getElementById('profile-manage-modal').classList.add('open');
+}
+
+function closeProfileManageModal() {
+    document.getElementById('profile-manage-modal').classList.remove('open');
+    renderProfiles(); // Refresh landing screen profiles
+}
+
+function renderProfileManageList() {
+    const list = document.getElementById('profile-manage-list');
+    if (!list) return;
+    const profiles = getProfiles();
+    let html = '';
+    profiles.forEach((p, idx) => {
+        const isFile = p.avatar.includes('/');
+        const avatarHtml = isFile
+            ? `<img src="${p.avatar}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;border-radius:4px;">`
+            : p.avatar;
+        html += `
+        <div class="profile-manage-item">
+            <div class="profile-manage-item-info">
+                <div class="profile-manage-item-avatar" style="background:${p.color};">
+                    ${avatarHtml}
+                </div>
+                <span class="profile-manage-item-name">${p.name}</span>
+            </div>
+            <div class="profile-manage-item-actions">
+                <button class="profile-action-btn" onclick="showEditProfileForm(${idx})"><i class="fa-solid fa-pen"></i></button>
+                <button class="profile-action-btn delete" onclick="deleteProfile(${idx})"><i class="fa-solid fa-trash"></i></button>
+            </div>
+        </div>`;
+    });
+    list.innerHTML = html || '<p style="color:var(--color-text-muted);font-size:0.8rem;text-align:center;padding:12px 0;">No hay perfiles personalizados.</p>';
+}
+
+function showAddProfileForm() {
+    currentEditingProfileIndex = null;
+    document.getElementById('profile-form-title').textContent = 'Añadir Perfil';
+    document.getElementById('profile-input-name').value = '';
+
+    document.querySelectorAll('#avatar-choices .avatar-choice-item').forEach((el, i) => {
+        el.classList.toggle('active', i === 0);
+    });
+    document.querySelectorAll('#color-choices .color-choice-item').forEach((el, i) => {
+        el.classList.toggle('active', i === 0);
+    });
+
+    document.getElementById('profile-list-view').style.display = 'none';
+    document.getElementById('profile-form-view').style.display = 'block';
+}
+
+function showEditProfileForm(idx) {
+    currentEditingProfileIndex = idx;
+    const profiles = getProfiles();
+    const p = profiles[idx];
+
+    document.getElementById('profile-form-title').textContent = 'Editar Perfil';
+    document.getElementById('profile-input-name').value = p.name;
+
+    document.querySelectorAll('#avatar-choices .avatar-choice-item').forEach(el => {
+        el.classList.toggle('active', el.textContent.trim() === p.avatar);
+    });
+
+    document.querySelectorAll('#color-choices .color-choice-item').forEach(el => {
+        const elColor = el.getAttribute('data-color');
+        el.classList.toggle('active', elColor === p.color);
+    });
+
+    document.getElementById('profile-list-view').style.display = 'none';
+    document.getElementById('profile-form-view').style.display = 'block';
+}
+
+function selectAvatarChoice(el) {
+    document.querySelectorAll('#avatar-choices .avatar-choice-item').forEach(item => item.classList.remove('active'));
+    el.classList.add('active');
+}
+
+function selectColorChoice(el) {
+    document.querySelectorAll('#color-choices .color-choice-item').forEach(item => item.classList.remove('active'));
+    el.classList.add('active');
+}
+
+async function saveProfileForm() {
+    const name = document.getElementById('profile-input-name').value.trim();
+    if (!name) {
+        showToast('Por favor, ingresa un nombre para el perfil.', 'warning');
+        return;
+    }
+
+    const activeAvatarEl = document.querySelector('#avatar-choices .avatar-choice-item.active');
+    const avatar = activeAvatarEl ? activeAvatarEl.textContent.trim() : '🎓';
+
+    const activeColorEl = document.querySelector('#color-choices .color-choice-item.active');
+    const color = activeColorEl ? activeColorEl.getAttribute('data-color') : '#e50914';
+
+    const profiles = getProfiles();
+
+    try {
+        if (currentEditingProfileIndex === null) {
+            if (supabaseClient) {
+                const { data, error } = await supabaseClient.from('perfiles').insert({ name, avatar, color }).select();
+                if (error) throw error;
+                if (data && data[0]) {
+                    localProfilesCache.push(data[0]);
+                }
+            } else {
+                profiles.push({ name, avatar, color });
+                saveProfiles(profiles);
+            }
+            showToast(`Perfil "${name}" creado exitosamente.`, 'success');
+        } else {
+            const profileToEdit = profiles[currentEditingProfileIndex];
+            if (supabaseClient && profileToEdit.id) {
+                const { error } = await supabaseClient.from('perfiles').update({ name, avatar, color }).eq('id', profileToEdit.id);
+                if (error) throw error;
+                localProfilesCache[currentEditingProfileIndex] = { ...profileToEdit, name, avatar, color };
+            } else {
+                profiles[currentEditingProfileIndex] = { name, avatar, color };
+                saveProfiles(profiles);
+            }
+            showToast(`Perfil "${name}" actualizado.`, 'success');
+        }
+    } catch (err) {
+        console.error("Error saving profile to Supabase:", err);
+        showToast("Error al guardar perfil: " + err.message, "error");
+        return;
+    }
+
+    renderProfileManageList();
+    cancelProfileForm();
+}
+
+async function deleteProfile(idx) {
+    const profiles = getProfiles();
+    const profileToDelete = profiles[idx];
+    const name = profileToDelete.name;
+    if (confirm(`¿Estás seguro de que deseas eliminar el perfil de "${name}"?`)) {
+        try {
+            if (supabaseClient && profileToDelete.id) {
+                const { error } = await supabaseClient.from('perfiles').delete().eq('id', profileToDelete.id);
+                if (error) throw error;
+                localProfilesCache.splice(idx, 1);
+            } else {
+                profiles.splice(idx, 1);
+                saveProfiles(profiles);
+            }
+            showToast(`Perfil "${name}" eliminado.`, 'info');
+        } catch (err) {
+            console.error("Error deleting profile from Supabase:", err);
+            showToast("Error al eliminar perfil: " + err.message, "error");
+            return;
+        }
+        renderProfileManageList();
+    }
+}
+
+function cancelProfileForm() {
+    document.getElementById('profile-list-view').style.display = 'block';
+    document.getElementById('profile-form-view').style.display = 'none';
+}
+
 function selectProfile(name, avatarSrc, accentColor) {
     activeProfile = { name, avatarSrc, accentColor };
 
     // Update header avatar
     const headerAvatar = document.getElementById('header-avatar');
     if (headerAvatar) {
-        if (avatarSrc) {
+        const isEmoji = !avatarSrc || (avatarSrc.length <= 2 && !avatarSrc.includes('/'));
+        if (!isEmoji) {
             headerAvatar.outerHTML = `<div class="header-profile-mini-icon" id="header-avatar" style="background:${accentColor}22;" title="${name}">
                 <img src="${avatarSrc}" alt="${name}" style="width:100%;height:100%;object-fit:cover;border-radius:4px;" onerror="this.outerHTML='🎓'">
             </div>`;
         } else {
-            headerAvatar.style.background = `${accentColor}22`;
-            headerAvatar.textContent = '👤';
-            headerAvatar.title = name;
+            headerAvatar.outerHTML = `<div class="header-profile-mini-icon" id="header-avatar" style="background:${accentColor}22; display:flex; align-items:center; justify-content:center;" title="${name}">
+                ${avatarSrc || '🎓'}
+            </div>`;
         }
     }
 
@@ -821,13 +679,9 @@ function selectProfile(name, avatarSrc, accentColor) {
         profileScreen.style.display = 'none';
         mainApp.classList.add('visible');
 
-        // Init scroll reveal
         initScrollReveal();
         renderAllMath();
-        // Init Netflix-style video previews
         initCardPreviews();
-        // Init Torneo dynamic cards
-        renderTorneoCards();
     }, 800);
 }
 
@@ -856,7 +710,7 @@ function openSlideModal(slideId) {
     const modal = document.getElementById('slide-modal');
     const content = document.getElementById('modal-content');
 
-    const bgStyle = data.coverImage 
+    const bgStyle = data.coverImage
         ? `background: linear-gradient(to top, rgba(20,20,20,1) 0%, rgba(20,20,20,0.4) 50%, rgba(20,20,20,0.85) 100%), url('${data.coverImage}');`
         : `background: ${data.heroColor};`;
 
@@ -879,7 +733,7 @@ function openSlideModal(slideId) {
                 </div>
                 <div class="modal-meta">
                     <p><span class="modal-meta-label">Tema: </span><span class="modal-meta-value">Planteo de Ecuaciones</span></p>
-                    <p><span class="modal-meta-label">Nivel: </span><span class="modal-meta-value">Básico–UNI</span></p>
+                    <p><span class="modal-meta-label">Nivel: </span><span class="modal-meta-value">Básico–UNHEVAL</span></p>
                 </div>
             </div>
             <div class="modal-content-area">
@@ -905,47 +759,104 @@ function closeSlideModal(e) {
 function startPresenterMode() {
     stopAllPreviews();
     presenterIndex = 0;
-    renderPresenterSlide();
+    _presenterRenderAll();
     document.getElementById('presenter-overlay').classList.add('active');
     document.body.style.overflow = 'hidden';
+    requestAnimationFrame(() => _presenterScrollTo(presenterIndex));
 }
 
 function startPresenterFromSlide(slideId) {
     const idx = PRESENTER_SLIDES.indexOf(slideId);
     presenterIndex = idx >= 0 ? idx : 0;
-    renderPresenterSlide();
+    _presenterRenderAll();
     document.getElementById('presenter-overlay').classList.add('active');
     document.body.style.overflow = 'hidden';
+    requestAnimationFrame(() => _presenterScrollTo(presenterIndex));
+}
+
+let endingTimer = null;
+function startEndingCountdown() {
+    stopEndingCountdown();
+    let sec = 10;
+    const el = document.getElementById('ending-countdown');
+    if (el) el.textContent = sec;
+    endingTimer = setInterval(() => {
+        sec--;
+        const el2 = document.getElementById('ending-countdown');
+        if (el2) el2.textContent = sec;
+        if (sec <= 0) {
+            stopEndingCountdown();
+            exitPresenterMode();
+            const aiSec = document.getElementById('ai-section');
+            if (aiSec) aiSec.scrollIntoView({ behavior: 'smooth' });
+            window.location.hash = '#ai-section';
+        }
+    }, 1000);
+}
+function stopEndingCountdown() {
+    if (endingTimer) {
+        clearInterval(endingTimer);
+        endingTimer = null;
+    }
 }
 
 function exitPresenterMode() {
     document.getElementById('presenter-overlay').classList.remove('active');
     document.body.style.overflow = '';
+    stopEndingCountdown();
 }
 
-function renderPresenterSlide() {
-    const slideId = PRESENTER_SLIDES[presenterIndex];
-    const data = SLIDES_DATA[slideId];
-    if (!data) return;
+/** Build all slides as stacked cards inside the scroll container */
+function _presenterRenderAll() {
+    const view = document.getElementById('presenter-slide-view');
+    if (!view) return;
 
-    const container = document.getElementById('presenter-slide-content');
-    const indicator = document.getElementById('pbar-indicator');
+    view.innerHTML = PRESENTER_SLIDES.map((slideId, i) => {
+        const data = SLIDES_DATA[slideId];
+        if (!data) return '';
+        return `<div class="presenter-slide-card${i === presenterIndex ? ' ps-active' : ''}" id="ps-card-${i}" data-ps-index="${i}">
+            <div class="ps-badge"><i class="fa-solid fa-bookmark"></i> ${i + 1} / ${PRESENTER_SLIDES.length}</div>
+            <h2 style="font-family:var(--font-heading);font-size:1.8rem;font-weight:800;margin-bottom:16px;display:flex;align-items:center;gap:12px;padding-bottom:12px;border-bottom:2px solid var(--color-accent);">
+                <span>${data.icon}</span> ${data.title}
+            </h2>
+            <p style="font-size:1rem;color:var(--color-text-muted);margin-bottom:24px;">${data.description}</p>
+            <div style="font-size:1.05rem;line-height:1.8;">${data.content}</div>
+        </div>`;
+    }).join('');
 
-    container.innerHTML = `
-        <h2 style="font-family:var(--font-heading);font-size:1.8rem;font-weight:800;margin-bottom:20px;display:flex;align-items:center;gap:12px;padding-bottom:12px;border-bottom:2px solid var(--color-accent);">
-            <span>${data.icon}</span> ${data.title}
-        </h2>
-        <p style="font-size:1rem;color:var(--color-text-muted);margin-bottom:24px;">${data.description}</p>
-        <div style="font-size:1.05rem;line-height:1.8;">${data.content}</div>`;
-
-    indicator.textContent = `${presenterIndex + 1} / ${PRESENTER_SLIDES.length}`;
+    _presenterUpdateIndicator();
     setTimeout(() => renderAllMath(), 50);
+}
+
+/** Scroll to a card and mark it active */
+function _presenterScrollTo(idx) {
+    const view = document.getElementById('presenter-slide-view');
+    if (!view) return;
+    // Update active class
+    view.querySelectorAll('.presenter-slide-card').forEach((el, i) => {
+        el.classList.toggle('ps-active', i === idx);
+    });
+    const card = document.getElementById(`ps-card-${idx}`);
+    if (card) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    _presenterUpdateIndicator();
+
+    // Check if it's the final slide (Netflix credits/recommendations)
+    if (PRESENTER_SLIDES[idx] === 'slide-fin') {
+        startEndingCountdown();
+    } else {
+        stopEndingCountdown();
+    }
+}
+
+function _presenterUpdateIndicator() {
+    const el = document.getElementById('pbar-indicator');
+    if (el) el.textContent = `${presenterIndex + 1} / ${PRESENTER_SLIDES.length}`;
 }
 
 function presenterNext() {
     if (presenterIndex < PRESENTER_SLIDES.length - 1) {
         presenterIndex++;
-        renderPresenterSlide();
+        _presenterScrollTo(presenterIndex);
     } else {
         showToast('Llegaste a la última diapositiva.', 'info');
     }
@@ -954,11 +865,12 @@ function presenterNext() {
 function presenterPrev() {
     if (presenterIndex > 0) {
         presenterIndex--;
-        renderPresenterSlide();
+        _presenterScrollTo(presenterIndex);
     } else {
         showToast('Estás en la primera diapositiva.', 'info');
     }
 }
+
 
 // Global keyboard navigation
 window.addEventListener('keydown', (e) => {
@@ -970,8 +882,6 @@ window.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') closeQRModal();
     } else if (document.getElementById('slide-modal').classList.contains('open')) {
         if (e.key === 'Escape') closeSlideModal();
-    } else if (document.getElementById('admin-modal').classList.contains('open')) {
-        if (e.key === 'Escape') closeAdminModal();
     }
 });
 
@@ -1014,10 +924,10 @@ function showToast(message, type = 'info') {
 
     const toast = document.createElement('div');
     const colors = {
-        error:   { bg: 'rgba(229,9,20,0.9)', icon: 'fa-triangle-exclamation' },
+        error: { bg: 'rgba(229,9,20,0.9)', icon: 'fa-triangle-exclamation' },
         warning: { bg: 'rgba(180,130,0,0.9)', icon: 'fa-circle-exclamation' },
         success: { bg: 'rgba(70,211,105,0.15)', icon: 'fa-circle-check' },
-        info:    { bg: 'rgba(40,40,40,0.95)', icon: 'fa-circle-info' }
+        info: { bg: 'rgba(40,40,40,0.95)', icon: 'fa-circle-info' }
     };
     const c = colors[type] || colors.info;
 
@@ -1062,7 +972,8 @@ const MOCK_PROBLEMS = {
                 <p><span class="step-pill">Paso 3</span> Ecuación: $4x = 48$.</p>
                 <p><span class="step-pill">Paso 4</span> Resolviendo: $x = 12$.</p>
                 <p><span class="step-pill">Paso 5</span> El hijo tiene 12 años y el padre $3(12) = 36$ años. $12 + 36 = 48$ ✓</p>
-            </div>`
+            </div>`,
+            answer: "12 y 36"
         },
         "Intermedio": {
             problem: "Hace 5 años la edad de María era el doble de la de su prima Lucía. Si hoy sus edades suman 40 años, ¿cuántos años tiene María actualmente?",
@@ -1072,7 +983,8 @@ const MOCK_PROBLEMS = {
                 <p><span class="step-pill">Paso 3</span> $3y + 10 = 40 \\Rightarrow y = 10$.</p>
                 <p><span class="step-pill">Paso 4</span> María = $2(10) + 5 = 25$ años.</p>
                 <p><span class="step-pill">Paso 5</span> $25 + 15 = 40$ ✓</p>
-            </div>`
+            </div>`,
+            answer: "25"
         },
         "Avanzado": {
             problem: "Un abuelo hoy cuadruplica la edad de su nieto. Hace 10 años era el séxtuple. ¿En cuántos años la edad del abuelo será el triple de la del nieto?",
@@ -1082,7 +994,8 @@ const MOCK_PROBLEMS = {
                 <p><span class="step-pill">Paso 3</span> Buscamos $N$: $100+N = 3(25+N) \\Rightarrow N=12.5$ años.</p>
                 <p><span class="step-pill">Paso 4</span> Las edades futuras serán 37.5 y 112.5 años, cantidades coherentes.</p>
                 <p><span class="step-pill">Paso 5</span> En 12.5 años: Nieto=37.5, Abuelo=112.5. $112.5/37.5=3$ ✓</p>
-            </div>`
+            </div>`,
+            answer: "12.5"
         }
     },
     "Geometría": {
@@ -1094,7 +1007,8 @@ const MOCK_PROBLEMS = {
                 <p><span class="step-pill">Paso 3</span> $L = 9$ cm.</p>
                 <p><span class="step-pill">Paso 4</span> Área: $9^2 = 81$ cm².</p>
                 <p><span class="step-pill">Paso 5</span> Perímetro: $9 \\times 4 = 36$ ✓</p>
-            </div>`
+            </div>`,
+            answer: "81"
         },
         "Intermedio": {
             problem: "El largo de un rectángulo mide 4 metros más que el doble de su ancho. Si el perímetro es de 56 metros, calcula sus lados.",
@@ -1104,7 +1018,8 @@ const MOCK_PROBLEMS = {
                 <p><span class="step-pill">Paso 3</span> $6x + 8 = 56 \\Rightarrow x = 8$.</p>
                 <p><span class="step-pill">Paso 4</span> Ancho = 8 m, Largo = 20 m.</p>
                 <p><span class="step-pill">Paso 5</span> $2(8) + 2(20) = 56$ ✓</p>
-            </div>`
+            </div>`,
+            answer: "8 y 20"
         },
         "Avanzado": {
             problem: "En un triángulo rectángulo, la hipotenusa mide 2 cm más que el cateto mayor, y este 2 cm más que el menor. Determina el área.",
@@ -1114,7 +1029,78 @@ const MOCK_PROBLEMS = {
                 <p><span class="step-pill">Paso 3</span> $x^2 - 4x - 12 = 0 \\Rightarrow (x-6)(x+2)=0 \\Rightarrow x=6$.</p>
                 <p><span class="step-pill">Paso 4</span> Catetos: 6 y 8. Área = $\\frac{6 \\times 8}{2} = 24$ cm².</p>
                 <p><span class="step-pill">Paso 5</span> $6^2 + 8^2 = 100 = 10^2$ ✓</p>
-            </div>`
+            </div>`,
+            answer: "24"
+        }
+    },
+    "Móviles": {
+        "Básico": {
+            problem: "Dos autos parten de ciudades a 150 km de distancia y van al encuentro. Uno viaja a 60 km/h y el otro a 40 km/h. ¿En cuántas horas se encontrarán?",
+            solution: `<div style="display:flex;flex-direction:column;gap:10px;">
+                <p><span class="step-pill">Paso 1</span> Variable: Tiempo de encuentro = $t$ horas.</p>
+                <p><span class="step-pill">Paso 2</span> Distancias: Auto A = $60t$, Auto B = $40t$.</p>
+                <p><span class="step-pill">Paso 3</span> Ecuación: $60t + 40t = 150$.</p>
+                <p><span class="step-pill">Paso 4</span> Resolviendo: $100t = 150 \\Rightarrow t = 1.5$ horas.</p>
+                <p><span class="step-pill">Paso 5</span> Se encuentran en 1.5 horas (1 hora y 30 minutos). $60(1.5) + 40(1.5) = 90 + 60 = 150$ ✓</p>
+            </div>`,
+            answer: "1.5"
+        },
+        "Intermedio": {
+            problem: "Un tren viaja a 80 km/h y otro a 100 km/h en la misma dirección. Si el segundo tren sale 1 hora después del primero, ¿en cuántas horas alcanzará al primer tren?",
+            solution: `<div style="display:flex;flex-direction:column;gap:10px;">
+                <p><span class="step-pill">Paso 1</span> Variable: Tiempo del segundo tren = $t$ horas. Tiempo del primer tren = $t+1$ horas.</p>
+                <p><span class="step-pill">Paso 2</span> Distancias iguales: $80(t+1) = 100t$.</p>
+                <p><span class="step-pill">Paso 3</span> Ecuación: $80t + 80 = 100t$.</p>
+                <p><span class="step-pill">Paso 4</span> Resolviendo: $20t = 80 \\Rightarrow t = 4$ horas.</p>
+                <p><span class="step-pill">Paso 5</span> El segundo tren alcanzará al primero en 4 horas. Distancia recorrida = 400 km ✓</p>
+            </div>`,
+            answer: "4"
+        },
+        "Avanzado": {
+            problem: "Un ciclista recorre una distancia de 36 km. Si hubiera viajado a 3 km/h más rápido, habría tardado 1 hora menos. ¿A qué velocidad en km/h viajó?",
+            solution: `<div style="display:flex;flex-direction:column;gap:10px;">
+                <p><span class="step-pill">Paso 1</span> Variable: Velocidad inicial = $v$ km/h. Tiempo = $t = 36/v$.</p>
+                <p><span class="step-pill">Paso 2</span> Nueva condición: $(v + 3)(t - 1) = 36$.</p>
+                <p><span class="step-pill">Paso 3</span> Sustitución: $(v + 3)(\\frac{36}{v} - 1) = 36 \\Rightarrow 36 - v + \\frac{108}{v} - 3 = 36 \\Rightarrow v^2 + 3v - 108 = 0$.</p>
+                <p><span class="step-pill">Paso 4</span> Factorización: $(v - 9)(v + 12) = 0 \\Rightarrow v = 9$ km/h.</p>
+                <p><span class="step-pill">Paso 5</span> La velocidad original fue de 9 km/h. Con 9 km/h tarda 4h; con 12 km/h tarda 3h ✓</p>
+            </div>`,
+            answer: "9"
+        }
+    },
+    "Grifos": {
+        "Básico": {
+            problem: "Un caño A llena una piscina en 4 horas y otro caño B la llena en 6 horas. Si se abren ambos caños a la vez, ¿en cuántas horas se llenará la piscina?",
+            solution: `<div style="display:flex;flex-direction:column;gap:10px;">
+                <p><span class="step-pill">Paso 1</span> Variable: Tiempo de llenado conjunto = $t$ horas.</p>
+                <p><span class="step-pill">Paso 2</span> Fracción por hora: Caño A = $1/4$, Caño B = $1/6$.</p>
+                <p><span class="step-pill">Paso 3</span> Ecuación: $\\frac{1}{4} + \\frac{1}{6} = \\frac{1}{t}$.</p>
+                <p><span class="step-pill">Paso 4</span> Resolviendo: $\\frac{5}{12} = \\frac{1}{t} \\Rightarrow t = 12/5 = 2.4$ horas.</p>
+                <p><span class="step-pill">Paso 5</span> Se llena en 2.4 horas (2 horas y 24 minutos). $\\frac{2.4}{4} + \\frac{2.4}{6} = 0.6 + 0.4 = 1$ (llena) ✓</p>
+            </div>`,
+            answer: "2.4"
+        },
+        "Intermedio": {
+            problem: "Un grifo llena un tanque en 3 horas y un desagüe lo vacía en 5 horas. Si se abren ambos estando el tanque vacío, ¿en cuántas horas se llenará por completo?",
+            solution: `<div style="display:flex;flex-direction:column;gap:10px;">
+                <p><span class="step-pill">Paso 1</span> Variable: Tiempo de llenado = $t$ horas.</p>
+                <p><span class="step-pill">Paso 2</span> Trabajo por hora: Grifo = $+1/3$, Desagüe = $-1/5$.</p>
+                <p><span class="step-pill">Paso 3</span> Ecuación: $\\frac{1}{3} - \\frac{1}{5} = \\frac{1}{t}$.</p>
+                <p><span class="step-pill">Paso 4</span> Resolviendo: $\\frac{2}{15} = \\frac{1}{t} \\Rightarrow t = 7.5$ horas.</p>
+                <p><span class="step-pill">Paso 5</span> El tanque se llenará en 7.5 horas (7 horas y 30 minutos) ✓</p>
+            </div>`,
+            answer: "7.5"
+        },
+        "Avanzado": {
+            problem: "Un tanque se puede llenar por dos caños en 2 horas. Si el primer caño solo tarda 3 horas más que el segundo solo, ¿cuántas horas tardaría el segundo caño solo en llenar el tanque?",
+            solution: `<div style="display:flex;flex-direction:column;gap:10px;">
+                <p><span class="step-pill">Paso 1</span> Variable: Tiempo del segundo caño solo = $x$ horas. Tiempo del primer caño solo = $x+3$ horas.</p>
+                <p><span class="step-pill">Paso 2</span> Trabajo por hora conjunto: $\\frac{1}{x} + \\frac{1}{x+3} = \\frac{1}{2}$.</p>
+                <p><span class="step-pill">Paso 3</span> Ecuación: $\\frac{2x+3}{x(x+3)} = \\frac{1}{2} \\Rightarrow 4x + 6 = x^2 + 3x \\Rightarrow x^2 - x - 6 = 0$.</p>
+                <p><span class="step-pill">Paso 4</span> Factorización: $(x-3)(x+2) = 0 \\Rightarrow x = 3$ horas.</p>
+                <p><span class="step-pill">Paso 5</span> El segundo caño tarda 3 horas. El primero tarda 6 horas. $\\frac{1}{3} + \\frac{1}{6} = \\frac{1}{2}$ ✓</p>
+            </div>`,
+            answer: "3"
         }
     }
 };
@@ -1125,7 +1111,7 @@ class AIService {
             setTimeout(() => {
                 const group = MOCK_PROBLEMS[topic] || MOCK_PROBLEMS['Edades'];
                 const item = group[difficulty] || group['Básico'];
-                resolve({ problem: item.problem, solution: item.solution });
+                resolve({ problem: item.problem, solution: item.solution, answer: item.answer });
             }, 800);
         });
     }
@@ -1232,6 +1218,33 @@ function initRealtimeUplink() {
             clearTimeout(hideTimeout);
             hideTimeout = setTimeout(() => { laser.style.opacity = '0'; }, 1500);
         })
+        .on('broadcast', { event: 'laser-absolute' }, ({ payload }) => {
+            if (!laser) return;
+            laser.style.opacity = '1';
+            laserX = payload.x * window.innerWidth;
+            laserY = payload.y * window.innerHeight;
+            laser.style.left = `${laserX}px`;
+            laser.style.top = `${laserY}px`;
+            clearTimeout(hideTimeout);
+            hideTimeout = setTimeout(() => { laser.style.opacity = '0'; }, 1500);
+        })
+        .on('broadcast', { event: 'laser-click' }, () => {
+            const el = document.elementFromPoint(laserX, laserY);
+            if (el) {
+                el.click();
+                if (typeof el.focus === 'function') {
+                    el.focus();
+                }
+            }
+        })
+        .on('broadcast', { event: 'scroll' }, ({ payload }) => {
+            const slideView = document.querySelector('.presenter-slide-view');
+            if (slideView && document.getElementById('presenter-overlay').classList.contains('active')) {
+                slideView.scrollBy(0, payload.dy);
+            } else {
+                window.scrollBy(0, payload.dy);
+            }
+        })
         .on('broadcast', { event: 'navigate' }, ({ payload }) => {
             if (document.getElementById('presenter-overlay').classList.contains('active')) {
                 if (payload.direction === 'next') presenterNext();
@@ -1246,14 +1259,136 @@ function initRealtimeUplink() {
             exitPresenterMode();
             showToast('⏹️ Presentación detenida desde el mando remoto', 'info');
         })
-        .on('broadcast', { event: 'change-block' }, ({ payload }) => {
-            if (typeof payload.blockIndex === 'number') {
-                switchTorneoBlock(payload.blockIndex, true);
-            }
-        })
         .subscribe((status) => {
             if (status === 'SUBSCRIBED') showToast('🔗 Mando remoto listo', 'success');
         });
+}
+
+// ── Verification Helpers ──────────────────────────────────────────────────────
+function getNumbers(str) {
+    if (!str) return [];
+    const matches = str.match(/\d+(\.\d+)?/g);
+    return matches ? matches.map(Number).sort((a, b) => a - b) : [];
+}
+
+function verifyUserAnswer(userText, expectedText) {
+    const userNums = getNumbers(userText);
+    const expectedNums = getNumbers(expectedText);
+
+    if (userNums.length === 0 || expectedNums.length === 0) {
+        return userText.toLowerCase().trim() === expectedText.toLowerCase().trim();
+    }
+
+    if (userNums.length !== expectedNums.length) return false;
+
+    return userNums.every((num, idx) => Math.abs(num - expectedNums[idx]) < 0.01);
+}
+
+function checkTallerAnswer() {
+    const input = document.getElementById('practice-user-answer');
+    const feedback = document.getElementById('practice-feedback-msg');
+    if (!input || !feedback) return;
+
+    const userVal = input.value.trim();
+    if (!userVal) {
+        showToast('Por favor, escribe una respuesta primero.', 'warning');
+        return;
+    }
+
+    if (!lastExpectedAnswer) {
+        showToast('No hay una respuesta esperada registrada para este problema.', 'info');
+        return;
+    }
+
+    const isCorrect = verifyUserAnswer(userVal, lastExpectedAnswer);
+
+    feedback.className = 'practice-feedback ' + (isCorrect ? 'success' : 'error');
+    feedback.innerHTML = isCorrect
+        ? `<i class="fa-solid fa-face-grin-stars"></i> <strong>¡Correcto!</strong> La respuesta es ${lastExpectedAnswer}. ¡Excelente trabajo!`
+        : `<i class="fa-solid fa-face-frown"></i> <strong>Inténtalo de nuevo.</strong> Sigue intentando y revisa tu planteamiento.`;
+
+    if (isCorrect) {
+        showToast('¡Respuesta Correcta! 🎉', 'success');
+    } else {
+        showToast('Respuesta incorrecta. Inténtalo otra vez.', 'warning');
+    }
+}
+
+// ── Web Speech Synthesis (Lector de Voz) ──────────────────────────────────────
+function speakText(text) {
+    if (!text) {
+        showToast('No hay texto para leer.', 'warning');
+        return;
+    }
+
+    // Verificar soporte de Web Speech API
+    if (!window.speechSynthesis || !window.SpeechSynthesisUtterance) {
+        showToast('Tu navegador no soporta la reproducción de voz.', 'warning');
+        return;
+    }
+
+    // Cancelar cualquier audio en curso
+    window.speechSynthesis.cancel();
+
+    // Limpiar LaTeX para lectura natural
+    const cleanText = text
+        .replace(/\$/g, '')
+        .replace(/\\Rightarrow/g, ' significa ')
+        .replace(/\\quad/g, ' ')
+        .replace(/\\land/g, ' y ')
+        .replace(/\\/g, '')
+        .replace(/=/g, ' es igual a ')
+        .replace(/\+/g, ' más ')
+        .replace(/-/g, ' menos ');
+
+    try {
+        const utterance = new SpeechSynthesisUtterance(cleanText);
+        utterance.lang = 'es-ES';
+
+        // Usar la primera voz disponible en español
+        const voices = window.speechSynthesis.getVoices();
+        const esVoice = voices.find(v => v.lang.startsWith('es'));
+        if (esVoice) utterance.voice = esVoice;
+
+        utterance.rate = 0.95; // Un poco más despacio para mejor comprensión
+
+        utterance.onerror = (e) => {
+            console.error('SpeechSynthesis error:', e);
+            showToast('Error al reproducir el audio.', 'error');
+        };
+
+        window.speechSynthesis.speak(utterance);
+        showToast('🔊 Reproduciendo enunciado en voz alta...', 'info');
+    } catch (e) {
+        console.error('SpeechSynthesis creation error:', e);
+        showToast('Error al inicializar el lector de voz.', 'error');
+    }
+}
+
+function checkAIServiceStatus() {
+    const badge = document.getElementById('ai-status-badge');
+    if (!badge) return;
+
+    if (SUPABASE_CONFIG.useEdgeFunctions && SUPABASE_CONFIG.url && SUPABASE_CONFIG.anonKey) {
+        // Realizar un preflight ping (OPTIONS) para comprobar si responde el endpoint
+        fetch(`${SUPABASE_CONFIG.url}/functions/v1/generate-challenge`, {
+            method: 'OPTIONS'
+        }).then(res => {
+            if (res.ok) {
+                badge.className = 'ai-status-badge online';
+                badge.innerHTML = '<i class="fa-solid fa-bolt"></i> Cloud IA (DeepSeek / OpenAI)';
+            } else {
+                badge.className = 'ai-status-badge offline';
+                badge.innerHTML = '<i class="fa-solid fa-cloud-slash"></i> Offline (Simulación)';
+            }
+        }).catch(() => {
+            badge.className = 'ai-status-badge offline';
+            badge.innerHTML = '<i class="fa-solid fa-cloud-slash"></i> Offline (Simulación)';
+        });
+    } else {
+        badge.className = 'ai-status-badge offline';
+        badge.innerHTML = '<i class="fa-solid fa-cloud-slash"></i> Offline (Simulación)';
+    }
 }
 
 // ── AI Button Handlers ────────────────────────────────────────────────────────
@@ -1264,6 +1399,13 @@ async function generateAIProblem() {
     const output = document.getElementById('ai-problem-output');
     const btnSol = document.getElementById('btn-reveal-solution');
 
+    // Limpiamos y ocultamos el contenedor de solución separado
+    const solOutput = document.getElementById('ai-solution-output');
+    if (solOutput) {
+        solOutput.innerHTML = '';
+        solOutput.style.display = 'none';
+    }
+
     output.innerHTML = `<div style="display:flex;align-items:center;gap:10px;height:100%;justify-content:center;">
         <i class="fa-solid fa-spinner fa-spin" style="color:var(--color-accent);font-size:1.5rem;"></i>
         <span style="color:var(--color-text-muted);">Generando desafío matemático...</span>
@@ -1273,10 +1415,28 @@ async function generateAIProblem() {
     try {
         const challenge = await AIService.generateProblem(topic, diff);
         output.innerHTML = `<div>
-            <p style="color:#46d369;font-weight:700;font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">¡Nuevo Desafío!</p>
-            <p style="color:var(--color-text-secondary);line-height:1.65;">${challenge.problem}</p>
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+                <p style="color:#46d369;font-weight:700;font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;margin:0;">¡Nuevo Desafío!</p>
+                <button class="speaker-btn" style="margin-left:0; width: 30px; height: 30px;" onclick="speakText(document.getElementById('challenge-text').textContent)" title="Escuchar problema">
+                    <i class="fa-solid fa-volume-high"></i>
+                </button>
+            </div>
+            <p id="challenge-text" style="color:var(--color-text-secondary);line-height:1.65;margin-bottom:12px;">${challenge.problem}</p>
+            
+            <!-- Contenedor interactivo de práctica -->
+            <div class="practice-container">
+                <span class="practice-title">📝 ¡Ponte a prueba!</span>
+                <div class="practice-input-row">
+                    <input type="text" id="practice-user-answer" class="practice-input" placeholder="Ingresa tu respuesta (ej: 12 o 20 y 30)..." onkeydown="if(event.key==='Enter') checkTallerAnswer()">
+                    <button class="practice-btn-check" onclick="checkTallerAnswer()">
+                        <i class="fa-solid fa-circle-check"></i> Verificar
+                    </button>
+                </div>
+                <div id="practice-feedback-msg" class="practice-feedback"></div>
+            </div>
         </div>`;
         lastSolutionHtml = challenge.solution;
+        lastExpectedAnswer = challenge.answer || '';
         btnSol.disabled = false;
         setTimeout(() => renderAllMath(), 50);
     } catch (e) {
@@ -1289,14 +1449,19 @@ async function generateAIProblem() {
 
 function toggleAISolution() {
     if (!lastSolutionHtml) return;
-    const output = document.getElementById('ai-problem-output');
-    output.insertAdjacentHTML('beforeend', `<div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.08);">
-        <p style="color:#46d369;font-weight:700;font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Resolución Paso a Paso:</p>
-        <div style="font-size:0.82rem;display:flex;flex-direction:column;gap:8px;">${lastSolutionHtml}</div>
-    </div>`);
+    const solOutput = document.getElementById('ai-solution-output');
+    if (solOutput) {
+        solOutput.innerHTML = `<div>
+            <p style="color:#46d369;font-weight:700;font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Resolución Paso a Paso:</p>
+            <div style="font-size:0.82rem;display:flex;flex-direction:column;gap:8px;">${lastSolutionHtml}</div>
+        </div>`;
+        solOutput.style.display = 'block';
+        solOutput.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
     document.getElementById('btn-reveal-solution').disabled = true;
     setTimeout(() => renderAllMath(), 50);
 }
+
 
 async function analyzeUserProblem() {
     const text = document.getElementById('user-problem-input').value.trim();
@@ -1324,9 +1489,10 @@ async function analyzeUserProblem() {
 }
 
 // ── QR Modal ──────────────────────────────────────────────────────────────────
-function openQRModal() {
+async function openQRModal() {
     const base = window.location.origin + window.location.pathname.replace(/[^\/]*$/, '');
-    const remoteURL = base + 'remote.html';
+    const key = await _generarObtenerRemoteKey();
+    const remoteURL = base + 'remote.html?key=' + encodeURIComponent(key);
     const encoded = encodeURIComponent(remoteURL);
     const qrAPI = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&color=141414&bgcolor=ffffff&data=${encoded}`;
 
@@ -1403,8 +1569,8 @@ function initCardPreviews() {
     document.querySelectorAll('.slide-card[data-yt-id]').forEach((card, index) => {
         if (card.dataset.previewInit) return;
         card.dataset.previewInit = 'true';
-        
-        const ytId    = card.dataset.ytId;
+
+        const ytId = card.dataset.ytId;
         const ytStart = parseInt(card.dataset.ytStart || '0', 10);
         const cardKey = ytId + '_' + index;
 
@@ -1504,16 +1670,16 @@ function _destroyCardPreview(card) {
     if (container) {
         const iframe = container.querySelector('iframe');
         if (iframe) iframe.src = ''; // stops audio immediately
-        
+
         const video = container.querySelector('video');
         if (video) {
             video.pause();
             video.src = '';
             try {
                 video.load();
-            } catch(e) {}
+            } catch (e) { }
         }
-        
+
         container.remove();
     }
     const badge = thumb.querySelector('.card-video-badge');
@@ -1538,20 +1704,1206 @@ window.stopAllPreviews = stopAllPreviews;
 window.initCardPreviews = initCardPreviews;
 window.openQRModal = openQRModal;
 window.closeQRModal = closeQRModal;
-window.openAdminModal = openAdminModal;
-window.closeAdminModal = closeAdminModal;
-window.switchAdminTab = switchAdminTab;
-window.saveAdminChanges = saveAdminChanges;
-window.resetAdminBlock = resetAdminBlock;
-window.switchTorneoBlock = switchTorneoBlock;
-window.renderTorneoCards = renderTorneoCards;
+window.openProfileManageModal = openProfileManageModal;
+window.closeProfileManageModal = closeProfileManageModal;
+window.showAddProfileForm = showAddProfileForm;
+window.showEditProfileForm = showEditProfileForm;
+window.selectAvatarChoice = selectAvatarChoice;
+window.selectColorChoice = selectColorChoice;
+window.saveProfileForm = saveProfileForm;
+window.deleteProfile = deleteProfile;
+window.cancelProfileForm = cancelProfileForm;
+window.checkTallerAnswer = checkTallerAnswer;
+window.speakText = speakText;
+window.initCardBackgrounds = initCardBackgrounds;
+
+/**
+ * Aplica de forma dinámica las imágenes de fondo opacas (con overlays) 
+ * a cada tarjeta de diapositiva basadas en SLIDES_DATA.
+ */
+function initCardBackgrounds() {
+    document.querySelectorAll('.slide-card').forEach(card => {
+        const onclickAttr = card.getAttribute('onclick') || '';
+        const match = onclickAttr.match(/openSlideModal\(['"]([^'"]+)['"]\)/);
+        if (!match) return;
+
+        const slideId = match[1];
+        const slideData = SLIDES_DATA[slideId];
+        if (!slideData || !slideData.coverImage) return;
+
+        const thumbInner = card.querySelector('.slide-card-thumb-inner');
+        if (thumbInner) {
+            // Aplicamos degradado semi-opaco oscuro estilo Netflix y la imagen del tema/subtema
+            thumbInner.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0.85) 100%), url('${slideData.coverImage}')`;
+            thumbInner.style.backgroundSize = 'cover';
+            thumbInner.style.backgroundPosition = 'center';
+            thumbInner.style.backgroundRepeat = 'no-repeat';
+        }
+    });
+}
 
 // ── Init on DOM Ready ─────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
     initRealtimeUplink();
+    initProfiles();
+    checkAIServiceStatus();
     renderAllMath();
-    // Pre-load torneo data so it's ready when the user selects a profile
-    loadTorneoData();
-    updateTorneoSlides();
-    PRESENTER_SLIDES = getPresenterSlides();
+    initCardBackgrounds();
+    initTorneo();
 });
+
+// ═══════════════════════════════════════════════════════════════════════════
+// MÓDULO: TORNEO EN VIVO "MATH-FLIX"
+// ═══════════════════════════════════════════════════════════════════════════
+
+// ── Banco de preguntas del torneo ────────────────────────────────────────────
+const TORNEO_PREGUNTAS = [
+    { id: 1, texto: 'La suma de tres números consecutivos es 72. Halla los números.' },
+    { id: 2, texto: 'El doble de un número aumentado en 5 es igual a 21. Encuentra el número.' },
+    { id: 3, texto: 'La edad de Ana es el triple de la de su hijo. Dentro de 10 años será el doble. ¿Qué edad tiene cada uno?' },
+    { id: 4, texto: 'En un rectángulo el largo es 4 cm mayor que el ancho y su perímetro es 32 cm. Halla sus dimensiones.' },
+    { id: 5, texto: 'Se reparten 50 caramelos entre dos niños de modo que uno recibe 10 más que el otro. ¿Cuántos recibe cada uno?' },
+];
+
+// ── Estado local del torneo ───────────────────────────────────────────────────
+let torneoEstado = { pantalla_actual: 'lobby', pregunta_actual_id: 1, tiempo_restante: 60 };
+let torneoTimerInterval = null;
+let torneoParticipantes = [];
+let torneoRespuestasActuales = 0;
+let _remoteKeyActual = null;
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+function initTorneo() {
+    if (!supabaseClient) return;
+
+    // Suscribirse a cambios en estado_juego (para el overlay de la pantalla grande)
+    supabaseClient
+        .channel('torneo-estado-grande')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'estado_juego' }, ({ new: payload }) => {
+            torneoEstado = payload;
+            if (document.getElementById('tournament-overlay').style.display !== 'none') {
+                _torneoRenderPanel(payload);
+            }
+        })
+        .subscribe();
+
+    // Suscribirse a participantes
+    supabaseClient
+        .channel('torneo-participantes-grande')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'participantes' }, () => {
+            _torneoRecargarParticipantes();
+        })
+        .subscribe();
+
+    // Suscribirse a respuestas (para el contador en tiempo real durante pregunta)
+    supabaseClient
+        .channel('torneo-respuestas-grande')
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'respuestas' }, () => {
+            torneoRespuestasActuales++;
+            _torneoActualizarContadorRespuestas();
+        })
+        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'respuestas', filter: 'procesado=eq.true' }, () => {
+            // Cuando una respuesta queda procesada, refrescar leaderboard si está visible
+            if (torneoEstado.pantalla_actual === 'leaderboard') _torneoRenderLeaderboard();
+        })
+        .subscribe();
+}
+
+// ── Abrir / cerrar overlay ────────────────────────────────────────────────────
+async function openTorneoOverlay() {
+    const overlay = document.getElementById('tournament-overlay');
+    overlay.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+
+    // Generar QR para torneo.html
+    const base = window.location.origin + window.location.pathname.replace(/[^/]*$/, '');
+    const torneoURL = base + 'torneo.html';
+
+    // Generar/obtener clave de seguridad del mando
+    _remoteKeyActual = await _generarObtenerRemoteKey();
+    const remoteURL = base + 'remote.html?key=' + encodeURIComponent(_remoteKeyActual);
+
+    document.getElementById('torneo-qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&color=141414&bgcolor=ffffff&data=${encodeURIComponent(torneoURL)}`;
+    document.getElementById('torneo-qr-url').textContent = torneoURL;
+
+    // Si existe un QR para el mando en el overlay, actualizarlo
+    const remoteQrImg = document.getElementById('torneo-remote-qr-img');
+    if (remoteQrImg) {
+        remoteQrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&color=141414&bgcolor=ffffff&data=${encodeURIComponent(remoteURL)}`;
+    }
+    const remoteQrUrl = document.getElementById('torneo-remote-qr-url');
+    if (remoteQrUrl) remoteQrUrl.textContent = remoteURL;
+
+    // Cargar estado actual
+    if (supabaseClient) {
+        const { data } = await supabaseClient.from('estado_juego').select('*').eq('id', 'global').single();
+        if (data) { torneoEstado = data; _torneoRenderPanel(data); }
+        else _torneoRenderPanel(torneoEstado);
+    } else {
+        _torneoRenderPanel(torneoEstado);
+    }
+
+    await _torneoRecargarParticipantes();
+}
+
+function closeTorneoOverlay() {
+    document.getElementById('tournament-overlay').style.display = 'none';
+    document.body.style.overflow = '';
+    clearInterval(torneoTimerInterval);
+}
+
+// ── Render central ────────────────────────────────────────────────────────────
+function _torneoRenderPanel(estado) {
+    ['lobby', 'pregunta', 'leaderboard'].forEach(p => {
+        const el = document.getElementById(`torneo-panel-${p}`);
+        if (el) el.style.display = 'none';
+    });
+
+    const panelId = estado.pantalla_actual === 'pregunta' ? 'pregunta' : estado.pantalla_actual;
+    const panel = document.getElementById(`torneo-panel-${panelId}`);
+    if (panel) panel.style.display = 'flex';
+
+    if (estado.pantalla_actual === 'pregunta') {
+        _torneoRenderPregunta(estado);
+    } else if (estado.pantalla_actual === 'leaderboard') {
+        _torneoRenderLeaderboard();
+    }
+}
+
+// ── Panel: Lobby ──────────────────────────────────────────────────────────────
+async function _torneoRecargarParticipantes() {
+    if (!supabaseClient) return;
+    const { data } = await supabaseClient
+        .from('participantes')
+        .select('id, nombre, puntaje')
+        .order('created_at', { ascending: true });
+
+    if (!data) return;
+    torneoParticipantes = data;
+
+    const countEl = document.getElementById('torneo-count');
+    const grid = document.getElementById('torneo-participantes-grid');
+    if (!countEl || !grid) return;
+
+    countEl.textContent = data.length;
+    grid.innerHTML = data.map(p => `
+        <div onclick="abrirDetalleAlumno('${p.id}','${p.nombre.replace(/'/g, "'")}')"
+             style="
+            background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.09);
+            border-radius:10px; padding:8px 14px;
+            font-size:0.8rem; font-weight:600; color:#e5e5e5;
+            display:flex; align-items:center; gap:8px;
+            animation:fadeInCard 0.4s ease;
+            cursor:pointer; transition:background 0.15s;
+        " onmouseover="this.style.background='rgba(255,255,255,0.11)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">
+            <span style="width:28px;height:28px;border-radius:50%;background:rgba(229,9,20,0.15);
+                display:flex;align-items:center;justify-content:center;font-size:0.9rem;">🎓</span>
+            ${p.nombre}
+        </div>`).join('');
+}
+
+// ── Panel: Pregunta ───────────────────────────────────────────────────────────
+async function _torneoRenderPregunta(estado) {
+    const pid = estado.pregunta_actual_id || 1;
+    // Usar texto personalizado si existe, sino banco estático
+    const textoCustom = estado.pregunta_custom_texto;
+    const pregunta = TORNEO_PREGUNTAS.find(p => p.id === pid) || TORNEO_PREGUNTAS[0];
+    const textoFinal = textoCustom || pregunta.texto;
+
+    document.getElementById('torneo-p-badge').textContent = `Pregunta ${pid}`;
+    document.getElementById('torneo-p-texto').textContent = textoFinal;
+
+    // Contar SOLO respuestas procesadas (evaluadas por la IA) de esta pregunta
+    if (supabaseClient) {
+        const { count } = await supabaseClient
+            .from('respuestas')
+            .select('*', { count: 'exact', head: true })
+            .eq('pregunta_id', pid)
+            .eq('procesado', true);
+        torneoRespuestasActuales = count || 0;
+    }
+    _torneoActualizarContadorRespuestas();
+
+    // Timer
+    clearInterval(torneoTimerInterval);
+    const ahora = new Date().getTime();
+    const updatedAt = estado.updated_at ? new Date(estado.updated_at).getTime() : ahora;
+    const segundosTranscurridos = Math.floor((ahora - updatedAt) / 1000);
+    let t = Math.max(0, (estado.tiempo_restante || 60) - segundosTranscurridos);
+
+    const timerEl = document.getElementById('torneo-timer');
+    const _tick = () => {
+        if (!timerEl) { clearInterval(torneoTimerInterval); return; }
+        timerEl.textContent = t;
+        timerEl.style.color = t <= 10 ? '#e50914' : '#46d369';
+        if (t <= 0) {
+            clearInterval(torneoTimerInterval);
+            return;
+        }
+        t--;
+    };
+    _tick();
+    torneoTimerInterval = setInterval(_tick, 1000);
+}
+
+function _torneoActualizarContadorRespuestas() {
+    const el = document.getElementById('torneo-resp-count');
+    const progBar = document.getElementById('torneo-prog-bar');
+    const progText = document.getElementById('torneo-prog-text');
+    if (!el) return;
+
+    const total = torneoParticipantes.length || 1;
+    const pct = Math.min(100, Math.round((torneoRespuestasActuales / total) * 100));
+
+    el.textContent = torneoRespuestasActuales;
+    if (progText) progText.textContent = `${torneoRespuestasActuales} de ${torneoParticipantes.length} alumnos`;
+    if (progBar) progBar.style.width = `${pct}%`;
+}
+
+// ── Panel: Leaderboard ────────────────────────────────────────────────────────
+async function _torneoRenderLeaderboard() {
+    if (!supabaseClient) return;
+    const { data } = await supabaseClient
+        .from('participantes')
+        .select('id, nombre, puntaje')
+        .order('puntaje', { ascending: false })
+        .limit(20);
+
+    const list = document.getElementById('torneo-leaderboard-list');
+    if (!list || !data) return;
+
+    const medals = ['🥇', '🥈', '🥉'];
+    list.innerHTML = data.map((p, i) => {
+        const medal = medals[i] || `#${i + 1}`;
+        const isTop = i < 3;
+        const accent = i === 0 ? '#f59e0b' : i === 1 ? '#9ca3af' : i === 2 ? '#b87333' : '#b3b3b3';
+        return `
+        <div onclick="abrirDetalleAlumno('${p.id || ''}','${(p.nombre || '').replace(/'/g, "'")}')"
+             style="
+            display:flex; align-items:center; justify-content:space-between;
+            padding:14px 20px;
+            background:${isTop ? `rgba(255,255,255,0.05)` : `rgba(255,255,255,0.02)`};
+            border:1px solid ${isTop ? `rgba(255,255,255,0.12)` : `rgba(255,255,255,0.05)`};
+            border-radius:12px;
+            ${i === 0 ? 'box-shadow:0 0 24px rgba(245,158,11,0.15);' : ''}
+            animation:fadeInCard 0.3s ease ${i * 0.06}s both;
+            cursor:pointer; transition:background 0.12s;
+        " onmouseover="this.style.filter='brightness(1.12)'" onmouseout="this.style.filter=''">
+            <div style="display:flex;align-items:center;gap:14px;">
+                <span style="font-size:${isTop ? '1.5rem' : '1rem'};min-width:32px;text-align:center;">${medal}</span>
+                <span style="font-size:${isTop ? '1rem' : '0.88rem'};font-weight:${isTop ? '700' : '500'};color:#fff;">${p.nombre}</span>
+            </div>
+            <span style="font-size:${isTop ? '1.4rem' : '1rem'};font-weight:800;color:${accent};">${p.puntaje}<span style="font-size:0.6rem;color:#6d6d6e;margin-left:2px;">pts</span></span>
+        </div>`;
+    }).join('');
+}
+
+// ── Controles del Profesor ────────────────────────────────────────────────────
+async function torneoSetPantalla(pantalla) {
+    if (!supabaseClient) return showToast('Supabase no conectado', 'error');
+
+    const pregId = torneoEstado.pregunta_actual_id || 1;
+    const { error } = await supabaseClient
+        .from('estado_juego')
+        .update({ pantalla_actual: pantalla, pregunta_actual_id: pregId, tiempo_restante: 60, updated_at: new Date().toISOString() })
+        .eq('id', 'global');
+
+    if (error) return showToast('Error: ' + error.message, 'error');
+
+    torneoEstado.pantalla_actual = pantalla;
+    _torneoRenderPanel(torneoEstado);
+    showToast(`Pantalla cambiada a: ${pantalla}`, 'success');
+}
+
+async function torneoSiguientePregunta() {
+    const nextId = Math.min(TORNEO_PREGUNTAS.length, (torneoEstado.pregunta_actual_id || 1) + 1);
+    if (!supabaseClient) return;
+
+    const { error } = await supabaseClient
+        .from('estado_juego')
+        .update({ pregunta_actual_id: nextId, pantalla_actual: 'pregunta', tiempo_restante: 60, updated_at: new Date().toISOString() })
+        .eq('id', 'global');
+
+    if (error) return showToast('Error: ' + error.message, 'error');
+    torneoEstado.pregunta_actual_id = nextId;
+    torneoEstado.pantalla_actual = 'pregunta';
+    torneoRespuestasActuales = 0;
+    _torneoRenderPanel(torneoEstado);
+    showToast(`Pregunta ${nextId} lanzada`, 'success');
+}
+
+async function torneoReset() {
+    if (!supabaseClient) return;
+    const nombreRonda = prompt('¿Cómo quieres llamar a esta ronda antes de limpiar? (ej: Ronda 1, Etapa A)\nEscribe el nombre o cancela para no archivar.');
+    if (nombreRonda === null) return; // Cancelado
+
+    if (!confirm('¿Resetear el torneo? Esto borrará respuestas y reiniciará puntajes a 0. Los datos serán archivados si ingresaste un nombre.')) return;
+
+    // Archivar ronda antes de borrar (si se ingresó nombre)
+    if (nombreRonda.trim()) {
+        const success = await archivarRondaActual(nombreRonda.trim());
+        if (!success) return; // Detener reset si archivar falló
+    }
+
+    await supabaseClient.from('respuestas').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+    await supabaseClient.from('participantes').update({ puntaje: 0 }).neq('id', '00000000-0000-0000-0000-000000000000');
+    await supabaseClient.from('estado_juego').update({ pantalla_actual: 'lobby', pregunta_actual_id: 1, tiempo_restante: 60 }).eq('id', 'global');
+
+    torneoEstado = { pantalla_actual: 'lobby', pregunta_actual_id: 1, tiempo_restante: 60 };
+    torneoRespuestasActuales = 0;
+    _torneoRenderPanel(torneoEstado);
+    await _torneoRecargarParticipantes();
+    showToast(nombreRonda.trim() ? `Ronda "${nombreRonda.trim()}" archivada y torneo reseteado.` : 'Torneo reseteado correctamente', 'info');
+}
+
+// ── Global bindings (torneo) ─────────────────────────────────────────────────
+window.openTorneoOverlay = openTorneoOverlay;
+window.closeTorneoOverlay = closeTorneoOverlay;
+window.torneoSetPantalla = torneoSetPantalla;
+window.torneoSiguientePregunta = torneoSiguientePregunta;
+window.torneoReset = torneoReset;
+window.abrirDetalleAlumno = abrirDetalleAlumno;
+window.cerrarDetalleAlumnoModal = cerrarDetalleAlumnoModal;
+
+// ── Modal Visor de Soluciones ────────────────────────────────────────────────
+async function abrirDetalleAlumno(participanteId, nombre) {
+    if (!supabaseClient || !participanteId) return;
+    const modal = document.getElementById('torneo-detalle-alumno-modal');
+    if (!modal) return;
+
+    // Rellenar con datos básicos mientras carga
+    document.getElementById('tdm-nombre').textContent = nombre || '—';
+    document.getElementById('tdm-puntaje').textContent = '…';
+    document.getElementById('tdm-transcripcion').textContent = '…';
+    document.getElementById('tdm-feedback').textContent = '…';
+    document.getElementById('tdm-foto').src = '';
+    document.getElementById('tdm-pregunta-label').textContent = '';
+    modal.style.display = 'flex';
+
+    // Inicializar _detalleAlumnoActual
+    const part = torneoParticipantes.find(p => p.id === participanteId);
+    _detalleAlumnoActual = {
+        id: participanteId,
+        nombre: nombre,
+        puntajeActual: part ? (part.puntaje || 0) : 0,
+        respuestaId: null
+    };
+
+    // Consultar última respuesta procesada del alumno
+    const { data } = await supabaseClient
+        .from('respuestas')
+        .select('*')
+        .eq('participante_id', participanteId)
+        .eq('procesado', true)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+    if (!data) {
+        document.getElementById('tdm-puntaje').textContent = '—';
+        document.getElementById('tdm-transcripcion').textContent = 'Sin respuesta evaluada aún.';
+        document.getElementById('tdm-feedback').textContent = '—';
+        _detalleAlumnoActual.respuestaId = null;
+        _detalleAlumnoActual.url_foto = null;
+        _detalleAlumnoActual.feedback = null;
+        _detalleAlumnoActual.pregunta_id = null;
+        _detalleAlumnoActual.created_at = null;
+        return;
+    }
+
+    // Actualizar con la respuesta cargada
+    _detalleAlumnoActual.respuestaId = data.id;
+    _detalleAlumnoActual.puntajeActual = data.puntaje_asignado ?? 0;
+    _detalleAlumnoActual.url_foto = data.url_foto;
+    _detalleAlumnoActual.feedback = data.feedback;
+    _detalleAlumnoActual.pregunta_id = data.pregunta_id;
+    _detalleAlumnoActual.created_at = data.created_at;
+
+    const scoreColors = { 5: '#46d369', 4: '#46d369', 3: '#f59e0b', 2: '#e50914', 1: '#e50914', 0: '#e50914' };
+    const puntajeEl = document.getElementById('tdm-puntaje');
+    puntajeEl.textContent = data.puntaje_asignado ?? '—';
+    puntajeEl.style.color = scoreColors[data.puntaje_asignado] || '#b3b3b3';
+
+    document.getElementById('tdm-pregunta-label').textContent =
+        `Pregunta ${data.pregunta_id} · ${data.puntaje_asignado ?? '?'}/5 puntos`;
+    document.getElementById('tdm-transcripcion').textContent =
+        data.transcripcion_interna || '(sin transcripción disponible)';
+    document.getElementById('tdm-feedback').textContent =
+        data.feedback || '(sin feedback disponible)';
+
+    if (data.url_foto) {
+        document.getElementById('tdm-foto').src = data.url_foto;
+        document.getElementById('tdm-foto').style.display = 'block';
+    }
+}
+
+function cerrarDetalleAlumnoModal() {
+    const modal = document.getElementById('torneo-detalle-alumno-modal');
+    if (modal) modal.style.display = 'none';
+}
+
+// ── Global bindings extras (nuevas funciones) ──────────────────────────────────
+window.editarPuntajeAlumnoManual = editarPuntajeAlumnoManual;
+window.abrirHistorialRondas = abrirHistorialRondas;
+window.cerrarHistorialRondas = cerrarHistorialRondas;
+window.exportarRondaPDF = exportarRondaPDF;
+
+// ── Seguridad del mando a distancia ─────────────────────────────────────────────
+async function _generarObtenerRemoteKey() {
+    if (!supabaseClient) return 'no-key';
+    const { data } = await supabaseClient.from('estado_juego').select('remote_key').eq('id', 'global').single();
+    if (data?.remote_key) return data.remote_key;
+    const array = new Uint8Array(16);
+    crypto.getRandomValues(array);
+    const newKey = Array.from(array).map(b => b.toString(16).padStart(2, '0')).join('');
+    await supabaseClient.from('estado_juego').update({ remote_key: newKey }).eq('id', 'global');
+    return newKey;
+}
+
+// ── Archivar ronda actual en Supabase ────────────────────────────────────────────
+async function archivarRondaActual(nombreRonda) {
+    if (!supabaseClient) return false;
+    const pregId = torneoEstado.pregunta_actual_id || 1;
+    const { data: ronda, error } = await supabaseClient
+        .from('historial_rondas').insert({ nombre_ronda: nombreRonda, pregunta_id: pregId }).select().single();
+    if (error || !ronda) {
+        showToast('Error archivando ronda: ' + (error?.message || ''), 'error');
+        return false;
+    }
+
+    const { data: respuestas } = await supabaseClient.from('respuestas')
+        .select('*, participantes(nombre, puntaje)').eq('procesado', true);
+
+    if (respuestas?.length) {
+        const histRows = respuestas.map(r => ({
+            ronda_id: ronda.id, nombre_alumno: r.participantes?.nombre || 'Desconocido',
+            pregunta_id: r.pregunta_id, puntaje_asignado: r.puntaje_asignado,
+            feedback: r.feedback, transcripcion_interna: r.transcripcion_interna, url_foto: r.url_foto
+        }));
+        const { error: histErr } = await supabaseClient.from('historial_respuestas').insert(histRows);
+        if (histErr) {
+            showToast('Error insertando respuestas en el historial: ' + histErr.message, 'error');
+            // Intentar borrar la ronda vacía para no dejar basura
+            await supabaseClient.from('historial_rondas').delete().eq('id', ronda.id);
+            return false;
+        }
+    }
+    return true;
+}
+
+// ── Modal: Historial de Rondas ───────────────────────────────────────────────────
+async function abrirHistorialRondas() {
+    const modal = document.getElementById('torneo-historial-modal');
+    if (!modal || !supabaseClient) return;
+    modal.style.display = 'flex';
+    const list = document.getElementById('historial-rondas-list');
+    if (!list) return;
+    list.innerHTML = '<div style="color:#6d6d6e;font-size:0.85rem;text-align:center;padding:24px;">Cargando...</div>';
+
+    const { data: rondas } = await supabaseClient.from('historial_rondas').select('*').order('archivado_at', { ascending: false });
+    if (!rondas?.length) {
+        list.innerHTML = '<div style="color:#6d6d6e;font-size:0.85rem;text-align:center;padding:24px;">Aún no hay rondas archivadas.</div>';
+        return;
+    }
+    list.innerHTML = rondas.map(r => `
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;
+                    background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;gap:12px;">
+            <div>
+                <div style="font-size:0.88rem;font-weight:700;color:#fff;">${r.nombre_ronda}</div>
+                <div style="font-size:0.65rem;color:#6d6d6e;margin-top:2px;">Pregunta ${r.pregunta_id} · ${new Date(r.archivado_at).toLocaleString()}</div>
+            </div>
+            <button onclick="exportarRondaPDF('${r.id}','${r.nombre_ronda.replace(/'/g, '').replace(/"/g, '')}')" style="
+                flex-shrink:0;padding:6px 14px;background:rgba(229,9,20,0.15);border:1px solid rgba(229,9,20,0.3);
+                color:#e50914;border-radius:8px;font-size:0.75rem;font-weight:700;cursor:pointer;">
+                <i class="fa-solid fa-file-pdf"></i> PDF</button>
+        </div>`).join('');
+}
+
+function cerrarHistorialRondas() {
+    const modal = document.getElementById('torneo-historial-modal');
+    if (modal) modal.style.display = 'none';
+}
+
+async function exportarRondaPDF(rondaId, nombreRonda) {
+    if (!supabaseClient) return;
+    const { data: respuestas } = await supabaseClient.from('historial_respuestas').select('*')
+        .eq('ronda_id', rondaId).order('puntaje_asignado', { ascending: false });
+    const win = window.open('', '_blank');
+    if (!win) { showToast('Permite ventanas emergentes para exportar PDF', 'error'); return; }
+    const rows = (respuestas || []).map((r, i) => `<tr>
+        <td>${i + 1}</td><td>${r.nombre_alumno}</td><td>P${r.pregunta_id}</td>
+        <td style="font-weight:800;color:${r.puntaje_asignado >= 4 ? '#16a34a' : r.puntaje_asignado >= 2 ? '#d97706' : '#dc2626'}">${r.puntaje_asignado ?? '-'}/5</td>
+        <td>${r.transcripcion_interna || '-'}</td><td>${r.feedback || '-'}</td>
+        ${r.url_foto ? `<td><img src="${r.url_foto}" style="max-width:100px;border-radius:6px;"></td>` : '<td>-</td>'}
+    </tr>`).join('');
+    win.document.write(`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Ronda: ${nombreRonda}</title><style>
+        body{font-family:'Segoe UI',sans-serif;margin:32px;color:#111}
+        h1{font-size:1.5rem;color:#e50914;margin-bottom:4px}
+        h2{font-size:.85rem;color:#555;margin-bottom:24px;font-weight:400}
+        table{width:100%;border-collapse:collapse;font-size:.82rem}
+        th{background:#f3f3f3;padding:10px 12px;text-align:left;border-bottom:2px solid #ddd}
+        td{padding:10px 12px;border-bottom:1px solid #eee;vertical-align:top}
+        tr:nth-child(even){background:#fafafa}
+        @media print{body{margin:16px}}</style></head><body>
+        <h1>&#x1F3C6; Math-Flix — ${nombreRonda}</h1>
+        <h2>Archivado: ${new Date().toLocaleString()}</h2>
+        <table><thead><tr><th>#</th><th>Alumno</th><th>Pregunta</th><th>Puntaje</th><th>Transcripción IA</th><th>Feedback</th><th>Foto</th></tr></thead>
+        <tbody>${rows}</tbody></table>
+        <script>window.onload=()=>window.print()<\/script></body></html>`);
+    win.document.close();
+}
+
+// ── Edición manual de puntaje ────────────────────────────────────────────────────
+let _detalleAlumnoActual = { id: null, nombre: null, puntajeActual: 0, respuestaId: null, url_foto: null, feedback: null, pregunta_id: null, created_at: null };
+
+async function editarPuntajeAlumnoManual() {
+    const { id, nombre, puntajeActual, respuestaId } = _detalleAlumnoActual;
+    if (!id || !supabaseClient) return;
+    const input = prompt(`Editar calificación de ${nombre}\n(0 a 5 puntos)`, puntajeActual);
+    if (input === null) return;
+    const nuevoPuntaje = parseInt(input);
+    if (isNaN(nuevoPuntaje) || nuevoPuntaje < 0 || nuevoPuntaje > 5) {
+        showToast('El puntaje debe ser un número entre 0 y 5', 'error'); return;
+    }
+    const diff = nuevoPuntaje - puntajeActual;
+    if (respuestaId) await supabaseClient.from('respuestas').update({ puntaje_asignado: nuevoPuntaje }).eq('id', respuestaId);
+    if (diff !== 0) await supabaseClient.rpc('sumar_puntaje_alumno', { alumno_id: id, puntos: diff });
+
+    _detalleAlumnoActual.puntajeActual = nuevoPuntaje;
+    const puntajeEl = document.getElementById('tdm-puntaje');
+    if (puntajeEl) {
+        puntajeEl.textContent = nuevoPuntaje;
+        const sc = { 5: '#46d369', 4: '#46d369', 3: '#f59e0b', 2: '#e50914', 1: '#e50914', 0: '#e50914' };
+        puntajeEl.style.color = sc[nuevoPuntaje] || '#b3b3b3';
+    }
+    const labelEl = document.getElementById('tdm-pregunta-label');
+    if (labelEl) labelEl.textContent = labelEl.textContent.replace(/\d+\/5/, `${nuevoPuntaje}/5`);
+
+    showToast(`Puntaje de ${nombre} actualizado a ${nuevoPuntaje}/5`, 'success');
+    await _torneoRecargarParticipantes();
+    if (torneoEstado.pantalla_actual === 'leaderboard') _torneoRenderLeaderboard();
+}
+
+// ── Exportación de Reportes PDF (Funcionalidades del Docente) ──────────────────────
+
+async function descargarAlumnoPDF(participanteId, nombre) {
+    if (!supabaseClient || !participanteId) return;
+
+    // Consultar última respuesta procesada de este alumno
+    const { data: resp } = await supabaseClient
+        .from('respuestas')
+        .select('*')
+        .eq('participante_id', participanteId)
+        .eq('procesado', true)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+    if (!resp) {
+        showToast('Este alumno no tiene respuestas evaluadas aún.', 'error');
+        return;
+    }
+
+    // Buscar enunciado
+    let preguntaTexto = '';
+    if (resp.pregunta_id === (torneoEstado.pregunta_actual_id || 1) && torneoEstado.pregunta_custom_texto) {
+        preguntaTexto = torneoEstado.pregunta_custom_texto;
+    } else {
+        const preg = TORNEO_PREGUNTAS.find(p => p.id === resp.pregunta_id);
+        preguntaTexto = preg ? preg.texto : `Problema ${resp.pregunta_id}`;
+    }
+
+    const win = window.open('', '_blank');
+    if (!win) {
+        showToast('Permite ventanas emergentes para descargar el PDF', 'error');
+        return;
+    }
+
+    const logoUrl = new URL('assets/logo_educacion_myf.png', window.location.href).href;
+
+    const html = `
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Reporte de Participación - ${nombre}</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 40px;
+            color: #1a1a1a;
+            background-color: #ffffff;
+            line-height: 1.6;
+        }
+        .header-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 3px solid #e50914;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .header-title-box {
+            flex: 1;
+        }
+        .school-logo {
+            height: 70px;
+            object-fit: contain;
+            margin-left: 20px;
+        }
+        h1 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #e50914;
+            margin: 0 0 4px 0;
+            text-transform: uppercase;
+        }
+        .sub-header {
+            font-size: 0.9rem;
+            color: #555;
+            font-weight: 600;
+            margin: 0;
+        }
+        .academic-info {
+            background-color: #f8f9fa;
+            border-left: 4px solid #54b3d6;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 30px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            font-size: 0.9rem;
+        }
+        .info-item span.label {
+            font-weight: 700;
+            color: #4b5563;
+            display: block;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+        }
+        .info-item span.value {
+            color: #111827;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        .section-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #111827;
+            margin-top: 0;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .content-box {
+            background-color: #fdfdfd;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+        .solution-image-container {
+            text-align: center;
+            margin-bottom: 30px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 15px;
+            background: #fafafa;
+        }
+        .solution-image {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 6px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            object-fit: contain;
+        }
+        .evaluation-box {
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 30px;
+            display: flex;
+            gap: 24px;
+            align-items: center;
+        }
+        .evaluation-box.score-5, .evaluation-box.score-4 {
+            background-color: #f0fdf4;
+            border: 1px solid #bbf7d0;
+        }
+        .evaluation-box.score-3 {
+            background-color: #fffbeb;
+            border: 1px solid #fef3c7;
+        }
+        .evaluation-box.score-2, .evaluation-box.score-1, .evaluation-box.score-0 {
+            background-color: #fef2f2;
+            border: 1px solid #fecaca;
+        }
+        .score-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            flex-shrink: 0;
+        }
+        .evaluation-box.score-5 .score-circle, .evaluation-box.score-4 .score-circle {
+            background-color: #dcfce7;
+            color: #15803d;
+            border: 2px solid #bbf7d0;
+        }
+        .evaluation-box.score-3 .score-circle {
+            background-color: #fef3c7;
+            color: #b45309;
+            border: 2px solid #fcd34d;
+        }
+        .evaluation-box.score-2 .score-circle, .evaluation-box.score-1 .score-circle, .evaluation-box.score-0 .score-circle {
+            background-color: #fee2e2;
+            color: #b91c1c;
+            border: 2px solid #fecaca;
+        }
+        .score-val {
+            font-size: 2.2rem;
+            line-height: 1;
+        }
+        .score-max {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
+        .feedback-text {
+            font-size: 0.95rem;
+            color: #374151;
+            font-weight: 500;
+        }
+        .footer-note {
+            text-align: center;
+            font-size: 0.7rem;
+            color: #9ca3af;
+            margin-top: 50px;
+            border-top: 1px solid #f3f4f6;
+            padding-top: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        @media print {
+            body { padding: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header-container">
+        <div class="header-title-box">
+            <h1>Torneo Math-Flix</h1>
+            <div class="sub-header">UNHEVAL — Huánuco · Reporte de Participación</div>
+        </div>
+        <img class="school-logo" src="${logoUrl}" alt="Logo">
+    </div>
+
+    <div class="academic-info">
+        <div class="info-item">
+            <span class="label">Alumno</span>
+            <span class="value">${nombre}</span>
+        </div>
+        <div class="info-item">
+            <span class="label">Docente</span>
+            <span class="value">Joel Cipriano Tarazona Bardales</span>
+        </div>
+        <div class="info-item">
+            <span class="label">Fecha y Hora</span>
+            <span class="value">${new Date(resp.created_at).toLocaleString()}</span>
+        </div>
+        <div class="info-item">
+            <span class="label">Actividad</span>
+            <span class="value">Pregunta ${resp.pregunta_id} · Torneo en Vivo</span>
+        </div>
+    </div>
+
+    <div class="section-title">Pregunta / Enunciado</div>
+    <div class="content-box">
+        ${preguntaTexto}
+    </div>
+
+    ${resp.url_foto ? `
+    <div class="section-title">Resolución del Alumno</div>
+    <div class="solution-image-container">
+        <img class="solution-image" src="${resp.url_foto}" alt="Resolución">
+    </div>
+    ` : ''}
+
+    <div class="section-title">Calificación y Corrección IA</div>
+    <div class="evaluation-box score-${resp.puntaje_asignado}">
+        <div class="score-circle">
+            <span class="score-val">${resp.puntaje_asignado}</span>
+            <span class="score-max">de 5</span>
+        </div>
+        <div class="feedback-text">
+            <strong>Retroalimentación del Evaluador IA:</strong><br>
+            ${resp.feedback || 'Sin retroalimentación.'}
+        </div>
+    </div>
+
+    <div class="footer-note">
+        Desarrollado por Pablito_DP y su grupo · © 2026 PABLITO_DP
+    </div>
+
+    <script>
+        window.onload = () => {
+            setTimeout(() => {
+                window.print();
+            }, 650);
+        };
+    <\/script>
+</body>
+</html>
+    `;
+
+    win.document.write(html);
+    win.document.close();
+}
+
+function descargarAlumnoPDFActual() {
+    if (!_detalleAlumnoActual || !_detalleAlumnoActual.id) {
+        showToast('No hay ningún alumno seleccionado.', 'error');
+        return;
+    }
+    descargarAlumnoPDF(_detalleAlumnoActual.id, _detalleAlumnoActual.nombre);
+}
+
+async function descargarRondaCompletaPDF(sortBy) {
+    if (!supabaseClient) return;
+    const pid = torneoEstado.pregunta_actual_id || 1;
+
+    // Cargar todas las respuestas procesadas de esta ronda con el nombre del participante
+    const { data: respuestas, error } = await supabaseClient
+        .from('respuestas')
+        .select('*, participantes(nombre, puntaje)')
+        .eq('pregunta_id', pid)
+        .eq('procesado', true);
+
+    if (error) {
+        showToast('Error al cargar las respuestas: ' + error.message, 'error');
+        return;
+    }
+
+    if (!respuestas || respuestas.length === 0) {
+        showToast('No hay respuestas evaluadas en esta ronda para descargar.', 'error');
+        return;
+    }
+
+    // Ordenar respuestas
+    if (sortBy === 'alfabetico') {
+        respuestas.sort((a, b) => {
+            const nameA = (a.participantes?.nombre || '').toLowerCase();
+            const nameB = (b.participantes?.nombre || '').toLowerCase();
+            return nameA.localeCompare(nameB);
+        });
+    } else if (sortBy === 'puntaje') {
+        respuestas.sort((a, b) => {
+            const scoreA = a.puntaje_asignado ?? 0;
+            const scoreB = b.puntaje_asignado ?? 0;
+            if (scoreB !== scoreA) return scoreB - scoreA;
+            const nameA = (a.participantes?.nombre || '').toLowerCase();
+            const nameB = (b.participantes?.nombre || '').toLowerCase();
+            return nameA.localeCompare(nameB);
+        });
+    }
+
+    // Enunciado
+    const preguntaTexto = torneoEstado.pregunta_custom_texto || 
+        (TORNEO_PREGUNTAS.find(p => p.id === pid)?.texto || `Pregunta ${pid}`);
+
+    const win = window.open('', '_blank');
+    if (!win) {
+        showToast('Permite ventanas emergentes para exportar PDF', 'error');
+        return;
+    }
+
+    const logoUrl = new URL('assets/logo_educacion_myf.png', window.location.href).href;
+
+    // Generar el HTML con page breaks
+    const studentSections = respuestas.map((resp, i) => {
+        const alumnoNombre = resp.participantes?.nombre || 'Alumno';
+        return `
+        <div class="student-report">
+            <div class="header-container">
+                <div class="header-title-box">
+                    <h1>Torneo Math-Flix</h1>
+                    <div class="sub-header">UNHEVAL — Huánuco · Reporte de Participación</div>
+                </div>
+                <img class="school-logo" src="${logoUrl}" alt="Logo">
+            </div>
+
+            <div class="academic-info">
+                <div class="info-item">
+                    <span class="label">Alumno</span>
+                    <span class="value">${alumnoNombre}</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Docente</span>
+                    <span class="value">Joel Cipriano Tarazona Bardales</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Fecha y Hora</span>
+                    <span class="value">${new Date(resp.created_at).toLocaleString()}</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Actividad</span>
+                    <span class="value">Pregunta ${resp.pregunta_id} · Torneo en Vivo</span>
+                </div>
+            </div>
+
+            <div class="section-title">Pregunta / Enunciado</div>
+            <div class="content-box">
+                ${preguntaTexto}
+            </div>
+
+            ${resp.url_foto ? `
+            <div class="section-title">Resolución del Alumno</div>
+            <div class="solution-image-container">
+                <img class="solution-image" src="${resp.url_foto}" alt="Resolución">
+            </div>
+            ` : ''}
+
+            <div class="section-title">Calificación y Corrección IA</div>
+            <div class="evaluation-box score-${resp.puntaje_asignado}">
+                <div class="score-circle">
+                    <span class="score-val">${resp.puntaje_asignado}</span>
+                    <span class="score-max">de 5</span>
+                </div>
+                <div class="feedback-text">
+                    <strong>Retroalimentación del Evaluador IA:</strong><br>
+                    ${resp.feedback || 'Sin retroalimentación.'}
+                </div>
+            </div>
+
+            <div class="footer-note">
+                Desarrollado por Pablito_DP y su grupo · © 2026 PABLITO_DP
+            </div>
+        </div>
+        `;
+    }).join('');
+
+    const html = `
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Reporte Completo - Pregunta ${pid} (${sortBy === 'alfabetico' ? 'A-Z' : 'Puntaje'})</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #1a1a1a;
+            background-color: #ffffff;
+            line-height: 1.6;
+        }
+        .student-report {
+            padding: 40px;
+            page-break-after: always;
+            box-sizing: border-box;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .student-report:last-child {
+            page-break-after: avoid;
+        }
+        .header-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 3px solid #e50914;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .header-title-box {
+            flex: 1;
+        }
+        .school-logo {
+            height: 70px;
+            object-fit: contain;
+            margin-left: 20px;
+        }
+        h1 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #e50914;
+            margin: 0 0 4px 0;
+            text-transform: uppercase;
+        }
+        .sub-header {
+            font-size: 0.9rem;
+            color: #555;
+            font-weight: 600;
+            margin: 0;
+        }
+        .academic-info {
+            background-color: #f8f9fa;
+            border-left: 4px solid #54b3d6;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 30px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            font-size: 0.9rem;
+        }
+        .info-item span.label {
+            font-weight: 700;
+            color: #4b5563;
+            display: block;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+        }
+        .info-item span.value {
+            color: #111827;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        .section-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #111827;
+            margin-top: 0;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .content-box {
+            background-color: #fdfdfd;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+        .solution-image-container {
+            text-align: center;
+            margin-bottom: 30px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 15px;
+            background: #fafafa;
+        }
+        .solution-image {
+            max-width: 100%;
+            max-height: 380px;
+            border-radius: 6px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            object-fit: contain;
+        }
+        .evaluation-box {
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 30px;
+            display: flex;
+            gap: 24px;
+            align-items: center;
+        }
+        .evaluation-box.score-5, .evaluation-box.score-4 {
+            background-color: #f0fdf4;
+            border: 1px solid #bbf7d0;
+        }
+        .evaluation-box.score-3 {
+            background-color: #fffbeb;
+            border: 1px solid #fef3c7;
+        }
+        .evaluation-box.score-2, .evaluation-box.score-1, .evaluation-box.score-0 {
+            background-color: #fef2f2;
+            border: 1px solid #fecaca;
+        }
+        .score-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            flex-shrink: 0;
+        }
+        .evaluation-box.score-5 .score-circle, .evaluation-box.score-4 .score-circle {
+            background-color: #dcfce7;
+            color: #15803d;
+            border: 2px solid #bbf7d0;
+        }
+        .evaluation-box.score-3 .score-circle {
+            background-color: #fef3c7;
+            color: #b45309;
+            border: 2px solid #fcd34d;
+        }
+        .evaluation-box.score-2 .score-circle, .evaluation-box.score-1 .score-circle, .evaluation-box.score-0 .score-circle {
+            background-color: #fee2e2;
+            color: #b91c1c;
+            border: 2px solid #fecaca;
+        }
+        .score-val {
+            font-size: 2.2rem;
+            line-height: 1;
+        }
+        .score-max {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
+        .feedback-text {
+            font-size: 0.95rem;
+            color: #374151;
+            font-weight: 500;
+        }
+        .footer-note {
+            text-align: center;
+            font-size: 0.7rem;
+            color: #9ca3af;
+            margin-top: auto;
+            border-top: 1px solid #f3f4f6;
+            padding-top: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        @media print {
+            .student-report {
+                padding: 0;
+                min-height: 100vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    ${studentSections}
+
+    <script>
+        window.onload = () => {
+            setTimeout(() => {
+                window.print();
+            }, 700);
+        };
+    <\/script>
+</body>
+</html>
+    `;
+
+    win.document.write(html);
+    win.document.close();
+}
+
+window.descargarAlumnoPDF = descargarAlumnoPDF;
+window.descargarAlumnoPDFActual = descargarAlumnoPDFActual;
+window.descargarRondaCompletaPDF = descargarRondaCompletaPDF;
