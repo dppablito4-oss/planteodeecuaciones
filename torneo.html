@@ -774,10 +774,16 @@ let torneoActiveBlockIdx = 0;
 let editorImg     = null;   // HTMLImageElement cargado originalmente
 let editorRotDeg  = 0;      // Rotación acumulada en múltiplos de 90°
 let editorCropMode = false; // ¿Modo recorte activo?
-let editorCropBox  = null;  // { x, y, w, h } en coordenadas del canvas
-let editorDragState = null; // { handle, startX, startY, origBox }
+let editorPoints   = null;  // [{x, y}, {x, y}, {x, y}, {x, y}] en coordenadas del canvas (TL, TR, BR, BL)
+let editorDragState = null; // { index, startX, startY, origPoint }
+let editorActivePointIdx = -1;
 let editorEventsInitialized = false;
-const HANDLE_HALF  = 14;    // Radio del handle de recorte en px
+let editorScaleX  = 1;
+let editorScaleY  = 1;
+let editorOriginalWidth = 0;
+let editorOriginalHeight = 0;
+const HANDLE_RADIUS = 16;   // Radio del handle visualmente
+const HIT_RADIUS   = 32;   // Área de toque expandida para móviles
 
 function editorRenderFrame() {
     const baseCanvas = document.getElementById('editor-base-canvas');
@@ -791,17 +797,49 @@ function editorRenderFrame() {
     const nW    = Math.round(editorImg.naturalWidth * cos + editorImg.naturalHeight * sin);
     const nH    = Math.round(editorImg.naturalWidth * sin + editorImg.naturalHeight * cos);
 
-    baseCanvas.width  = nW;
-    baseCanvas.height = nH;
-    ov.width  = nW;
-    ov.height = nH;
+    // Dimensiones óptimas de visualización en pantalla
+    const DISPLAY_MAX_W = 600;
+    const DISPLAY_MAX_H = 450;
+    let dW = nW;
+    let dH = nH;
+    
+    if (dW > DISPLAY_MAX_W) {
+        const scale = DISPLAY_MAX_W / dW;
+        dW = DISPLAY_MAX_W;
+        dH = dH * scale;
+    }
+    if (dH > DISPLAY_MAX_H) {
+        const scale = DISPLAY_MAX_H / dH;
+        dH = DISPLAY_MAX_H;
+        dW = dW * scale;
+    }
+    dW = Math.round(dW);
+    dH = Math.round(dH);
+
+    baseCanvas.width  = dW;
+    baseCanvas.height = dH;
+    ov.width  = dW;
+    ov.height = dH;
+
+    // Guardar factores de escala para remapear coordenadas a la imagen real
+    editorScaleX = nW / dW;
+    editorScaleY = nH / dH;
+    editorOriginalWidth = nW;
+    editorOriginalHeight = nH;
 
     const ctx = baseCanvas.getContext('2d');
-    ctx.clearRect(0, 0, nW, nH);
+    ctx.clearRect(0, 0, dW, dH);
     ctx.save();
-    ctx.translate(nW / 2, nH / 2);
+    ctx.translate(dW / 2, dH / 2);
     ctx.rotate(rad);
-    ctx.drawImage(editorImg, -editorImg.naturalWidth / 2, -editorImg.naturalHeight / 2);
+    
+    // Dibujar la imagen escalada
+    const scaleImage = dW / nW;
+    ctx.drawImage(editorImg, 
+                  -(editorImg.naturalWidth * scaleImage) / 2, 
+                  -(editorImg.naturalHeight * scaleImage) / 2,
+                  editorImg.naturalWidth * scaleImage,
+                  editorImg.naturalHeight * scaleImage);
     ctx.restore();
 
     editorRenderOverlay();
@@ -812,47 +850,50 @@ function editorRenderOverlay() {
     if (!ov) return;
     const ctx = ov.getContext('2d');
     ctx.clearRect(0, 0, ov.width, ov.height);
-    if (!editorCropMode || !editorCropBox) return;
+    if (!editorCropMode || !editorPoints || editorPoints.length !== 4) return;
 
-    const { x, y, w, h } = editorCropBox;
-    // Oscurecer fuera del recorte
-    ctx.fillStyle = 'rgba(0,0,0,0.5)';
+    // 1. Oscurecer el área exterior
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.55)';
     ctx.fillRect(0, 0, ov.width, ov.height);
-    ctx.clearRect(x, y, w, h);
 
-    // Borde del recorte
+    // Recortar la parte del cuadrilátero para iluminar
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(editorPoints[0].x, editorPoints[0].y);
+    ctx.lineTo(editorPoints[1].x, editorPoints[1].y);
+    ctx.lineTo(editorPoints[2].x, editorPoints[2].y);
+    ctx.lineTo(editorPoints[3].x, editorPoints[3].y);
+    ctx.closePath();
+    ctx.clip();
+    ctx.clearRect(0, 0, ov.width, ov.height);
+    ctx.restore();
+
+    // 2. Dibujar líneas rojas del contorno
     ctx.strokeStyle = '#e50914';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(x, y, w, h);
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(editorPoints[0].x, editorPoints[0].y);
+    ctx.lineTo(editorPoints[1].x, editorPoints[1].y);
+    ctx.lineTo(editorPoints[2].x, editorPoints[2].y);
+    ctx.lineTo(editorPoints[3].x, editorPoints[3].y);
+    ctx.closePath();
+    ctx.stroke();
 
-    // Dibuja los 4 handles de esquina + 4 de borde
-    const handles = editorGetHandlePositions();
-    handles.forEach(pt => {
+    // 3. Dibujar los 4 handles de esquina
+    editorPoints.forEach((pt, idx) => {
         ctx.beginPath();
-        ctx.arc(pt.x, pt.y, HANDLE_HALF, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(229,9,20,0.85)';
+        ctx.arc(pt.x, pt.y, HANDLE_RADIUS, 0, Math.PI * 2);
+        ctx.fillStyle = editorActivePointIdx === idx ? 'rgba(229,9,20,0.85)' : 'rgba(229,9,20,0.55)';
         ctx.fill();
-        ctx.strokeStyle = '#fff';
-        ctx.lineWidth = 1.5;
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2.5;
         ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(pt.x, pt.y, 4, 0, Math.PI * 2);
+        ctx.fillStyle = '#ffffff';
+        ctx.fill();
     });
-}
-
-function editorGetHandlePositions() {
-    if (!editorCropBox) return [];
-    const { x, y, w, h } = editorCropBox;
-    const cx = x + w / 2, cy = y + h / 2;
-    return [
-        { id: 'tl', x, y },            { id: 'tc', x: cx, y },      { id: 'tr', x: x + w, y },
-        { id: 'ml', x, y: cy },                                       { id: 'mr', x: x + w, y: cy },
-        { id: 'bl', x, y: y + h },     { id: 'bc', x: cx, y: y + h },{ id: 'br', x: x + w, y: y + h }
-    ];
-}
-
-function editorHitHandle(px, py) {
-    return editorGetHandlePositions().find(h =>
-        Math.hypot(h.x - px, h.y - py) <= HANDLE_HALF + 4
-    );
 }
 
 function editorTouchToCanvas(e, canvas) {
@@ -870,11 +911,11 @@ function editorInitOverlayEvents() {
     if (editorEventsInitialized) return;
     const ov = document.getElementById('editor-overlay-canvas');
     if (!ov) return;
-    // Touch
+    
+    // Registrar eventos touch y mouse
     ov.addEventListener('touchstart', editorPointerDown, { passive: false });
     ov.addEventListener('touchmove',  editorPointerMove, { passive: false });
     ov.addEventListener('touchend',   editorPointerUp,   { passive: false });
-    // Mouse (para pruebas en escritorio)
     ov.addEventListener('mousedown', editorPointerDown);
     document.addEventListener('mousemove', editorPointerMove);
     document.addEventListener('mouseup',   editorPointerUp);
@@ -882,53 +923,79 @@ function editorInitOverlayEvents() {
 }
 
 function editorPointerDown(e) {
-    if (!editorCropMode) return;
-    e.preventDefault();
+    if (!editorCropMode || !editorPoints || editorPoints.length !== 4) return;
+    
+    // Evitar scroll o drag nativo en móviles
+    if (e.cancelable) e.preventDefault();
+
     const ov = document.getElementById('editor-overlay-canvas');
     const pt = editorTouchToCanvas(e, ov);
-    const hit = editorHitHandle(pt.x, pt.y);
-    if (hit) {
-        editorDragState = { handle: hit.id, startX: pt.x, startY: pt.y, origBox: { ...editorCropBox } };
+
+    let bestIdx = -1;
+    let bestDist = HIT_RADIUS;
+
+    editorPoints.forEach((p, idx) => {
+        const dist = Math.hypot(p.x - pt.x, p.y - pt.y);
+        if (dist < bestDist) {
+            bestDist = dist;
+            bestIdx = idx;
+        }
+    });
+
+    if (bestIdx !== -1) {
+        editorActivePointIdx = bestIdx;
+        editorDragState = { 
+            index: bestIdx, 
+            startX: pt.x, 
+            startY: pt.y, 
+            origPoint: { ...editorPoints[bestIdx] } 
+        };
+        editorRenderOverlay();
     }
 }
 
 function editorPointerMove(e) {
-    if (!editorDragState || !editorCropMode) return;
-    e.preventDefault && e.preventDefault();
+    if (!editorDragState || !editorCropMode || !editorPoints) return;
+    
+    if (e.cancelable) e.preventDefault();
+
     const ov = document.getElementById('editor-overlay-canvas');
     const pt = editorTouchToCanvas(e, ov);
     const dx = pt.x - editorDragState.startX;
     const dy = pt.y - editorDragState.startY;
-    const ob = editorDragState.origBox;
-    const MIN = 30;
-    let { x, y, w, h } = ob;
-    const id = editorDragState.handle;
-    if (id.includes('l')) { x = Math.min(ob.x + dx, ob.x + ob.w - MIN); w = ob.w - (x - ob.x); }
-    if (id.includes('r')) { w = Math.max(MIN, ob.w + dx); }
-    if (id.includes('t')) { y = Math.min(ob.y + dy, ob.y + ob.h - MIN); h = ob.h - (y - ob.y); }
-    if (id.includes('b')) { h = Math.max(MIN, ob.h + dy); }
-    // Clamp
-    x = Math.max(0, x); y = Math.max(0, y);
-    w = Math.min(ov.width  - x, w);
-    h = Math.min(ov.height - y, h);
-    editorCropBox = { x, y, w, h };
+
+    let newX = editorDragState.origPoint.x + dx;
+    let newY = editorDragState.origPoint.y + dy;
+
+    // Clampear coordenadas
+    newX = Math.max(0, Math.min(ov.width, newX));
+    newY = Math.max(0, Math.min(ov.height, newY));
+
+    editorPoints[editorDragState.index] = { x: newX, y: newY };
     editorRenderOverlay();
 }
 
 function editorPointerUp(e) {
     editorDragState = null;
+    editorActivePointIdx = -1;
+    editorRenderOverlay();
 }
 
 function editorRotar() {
     editorRotDeg = (editorRotDeg + 90) % 360;
-    // Resetear recorte al rotar
-    editorCropBox = null;
-    editorCropMode = false;
-    document.getElementById('btn-toggle-crop').style.background = '';
     editorRenderFrame();
-    // Resetear cropBox a tamaño completo si crop activo
+    
+    // Inicializar de nuevo los 4 puntos en el canvas rotado
     const ov = document.getElementById('editor-overlay-canvas');
-    editorCropBox = { x: ov.width * 0.08, y: ov.height * 0.08, w: ov.width * 0.84, h: ov.height * 0.84 };
+    const marginW = ov.width * 0.08;
+    const marginH = ov.height * 0.08;
+    editorPoints = [
+        { x: marginW,             y: marginH },
+        { x: ov.width - marginW,  y: marginH },
+        { x: ov.width - marginW,  y: ov.height - marginH },
+        { x: marginW,             y: ov.height - marginH }
+    ];
+    editorRenderOverlay();
 }
 
 function editorToggleCrop() {
@@ -937,8 +1004,15 @@ function editorToggleCrop() {
     if (editorCropMode) {
         btn.style.background = 'rgba(229,9,20,0.2)';
         const ov = document.getElementById('editor-overlay-canvas');
-        if (!editorCropBox) {
-            editorCropBox = { x: ov.width * 0.08, y: ov.height * 0.08, w: ov.width * 0.84, h: ov.height * 0.84 };
+        if (!editorPoints) {
+            const marginW = ov.width * 0.08;
+            const marginH = ov.height * 0.08;
+            editorPoints = [
+                { x: marginW,             y: marginH },
+                { x: ov.width - marginW,  y: marginH },
+                { x: ov.width - marginW,  y: ov.height - marginH },
+                { x: marginW,             y: ov.height - marginH }
+            ];
         }
     } else {
         btn.style.background = '';
@@ -946,27 +1020,194 @@ function editorToggleCrop() {
     editorRenderOverlay();
 }
 
+// Resuelve sistema lineal A * h = B para homografía de 8 parámetros
+function solveHomographyMatrix(dst, src) {
+    const A = [];
+    const B = [];
+
+    for (let i = 0; i < 4; i++) {
+        const u = dst[i].x;
+        const v = dst[i].y;
+        const x = src[i].x;
+        const y = src[i].y;
+
+        A.push([u, v, 1, 0, 0, 0, -u * x, -v * x]);
+        B.push(x);
+        A.push([0, 0, 0, u, v, 1, -u * y, -v * y]);
+        B.push(y);
+    }
+
+    const n = 8;
+    for (let i = 0; i < n; i++) {
+        let maxRow = i;
+        for (let j = i + 1; j < n; j++) {
+            if (Math.abs(A[j][i]) > Math.abs(A[maxRow][i])) {
+                maxRow = j;
+            }
+        }
+        
+        const tempRow = A[i];
+        A[i] = A[maxRow];
+        A[maxRow] = tempRow;
+
+        const tempB = B[i];
+        B[i] = B[maxRow];
+        B[maxRow] = tempB;
+
+        for (let j = i + 1; j < n; j++) {
+            const factor = A[j][i] / A[i][i];
+            for (let k = i; k < n; k++) {
+                A[j][k] -= factor * A[i][k];
+            }
+            B[j] -= factor * B[i];
+        }
+    }
+
+    const h = new Array(n);
+    for (let i = n - 1; i >= 0; i--) {
+        let sum = 0;
+        for (let j = i + 1; j < n; j++) {
+            sum += A[i][j] * h[j];
+        }
+        h[i] = (B[i] - sum) / A[i][i];
+    }
+    return h;
+}
+
 function editorConfirmar() {
     const baseCanvas = document.getElementById('editor-base-canvas');
+    if (!editorImg || !baseCanvas) return;
+
     let srcCanvas = baseCanvas;
 
-    // Si hay recorte activo, aplicarlo
-    if (editorCropMode && editorCropBox) {
-        const { x, y, w, h } = editorCropBox;
-        const cropped = document.createElement('canvas');
-        cropped.width  = Math.round(w);
-        cropped.height = Math.round(h);
-        cropped.getContext('2d').drawImage(baseCanvas, Math.round(x), Math.round(y), Math.round(w), Math.round(h), 0, 0, Math.round(w), Math.round(h));
-        srcCanvas = cropped;
+    // Si hay puntos de recorte activos, aplicar deformación de perspectiva en la imagen original
+    if (editorCropMode && editorPoints && editorPoints.length === 4) {
+        // 1. Traducir puntos del editor al espacio original de la imagen rotada
+        const origPoints = editorPoints.map(p => ({
+            x: p.x * editorScaleX,
+            y: p.y * editorScaleY
+        }));
+
+        const [tl, tr, br, bl] = origPoints;
+        const widthTop = Math.hypot(tr.x - tl.x, tr.y - tl.y);
+        const widthBottom = Math.hypot(br.x - bl.x, br.y - bl.y);
+        const maxWidth = Math.round(Math.max(widthTop, widthBottom));
+
+        const heightLeft = Math.hypot(bl.x - tl.x, bl.y - tl.y);
+        const heightRight = Math.hypot(br.x - tr.x, br.y - tr.y);
+        const maxHeight = Math.round(Math.max(heightLeft, heightRight));
+
+        // Clampear tamaño de salida para evitar lags
+        const LIMIT = 1200;
+        let destW = maxWidth;
+        let destH = maxHeight;
+        if (destW > LIMIT || destH > LIMIT) {
+            const ratio = Math.min(LIMIT / destW, LIMIT / destH);
+            destW = Math.round(destW * ratio);
+            destH = Math.round(destH * ratio);
+        }
+
+        // 2. Crear un canvas temporal del tamaño original de la imagen rotada
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = editorOriginalWidth;
+        tempCanvas.height = editorOriginalHeight;
+        const tempCtx = tempCanvas.getContext('2d');
+        
+        const rad = (editorRotDeg % 360) * Math.PI / 180;
+        tempCtx.translate(editorOriginalWidth / 2, editorOriginalHeight / 2);
+        tempCtx.rotate(rad);
+        tempCtx.drawImage(editorImg, -editorImg.naturalWidth / 2, -editorImg.naturalHeight / 2);
+
+        // Obtener pixeles origen
+        const srcImgData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
+        
+        // 3. Crear canvas destino y su buffer de pixeles
+        const destCanvas = document.createElement('canvas');
+        destCanvas.width = destW;
+        destCanvas.height = destH;
+        const destCtx = destCanvas.getContext('2d');
+        const destImgData = destCtx.createImageData(destW, destH);
+
+        // Estimar homografía inversa (mapeo del plano destino al plano original)
+        const h = solveHomographyMatrix(
+            [ { x: 0, y: 0 }, { x: destW, y: 0 }, { x: destW, y: destH }, { x: 0, y: destH } ],
+            origPoints
+        );
+
+        const srcW = tempCanvas.width;
+        const srcH = tempCanvas.height;
+        const srcPixels = srcImgData.data;
+        const destPixels = destImgData.data;
+
+        // Bucle de deformación con interpolación bilineal
+        for (let v = 0; v < destH; v++) {
+            for (let u = 0; u < destW; u++) {
+                const w_coord = h[6] * u + h[7] * v + 1.0;
+                const x = (h[0] * u + h[1] * v + h[2]) / w_coord;
+                const y = (h[3] * u + h[4] * v + h[5]) / w_coord;
+
+                if (x >= 0 && x < srcW - 1 && y >= 0 && y < srcH - 1) {
+                    const x1 = Math.floor(x);
+                    const y1 = Math.floor(y);
+                    const x2 = x1 + 1;
+                    const y2 = y1 + 1;
+
+                    const fx = x - x1;
+                    const fy = y - y1;
+
+                    const idx11 = (y1 * srcW + x1) * 4;
+                    const idx12 = (y1 * srcW + x2) * 4;
+                    const idx21 = (y2 * srcW + x1) * 4;
+                    const idx22 = (y2 * srcW + x2) * 4;
+
+                    const destIdx = (v * destW + u) * 4;
+
+                    // Interpolación lineal de cada canal RGBA
+                    destPixels[destIdx]     = Math.round((1 - fx) * (1 - fy) * srcPixels[idx11] + fx * (1 - fy) * srcPixels[idx12] + (1 - fx) * fy * srcPixels[idx21] + fx * fy * srcPixels[idx22]);
+                    destPixels[destIdx + 1] = Math.round((1 - fx) * (1 - fy) * srcPixels[idx11 + 1] + fx * (1 - fy) * srcPixels[idx12 + 1] + (1 - fx) * fy * srcPixels[idx21 + 1] + fx * fy * srcPixels[idx22 + 1]);
+                    destPixels[destIdx + 2] = Math.round((1 - fx) * (1 - fy) * srcPixels[idx11 + 2] + fx * (1 - fy) * srcPixels[idx12 + 2] + (1 - fx) * fy * srcPixels[idx21 + 2] + fx * fy * srcPixels[idx22 + 2]);
+                    destPixels[destIdx + 3] = Math.round((1 - fx) * (1 - fy) * srcPixels[idx11 + 3] + fx * (1 - fy) * srcPixels[idx12 + 3] + (1 - fx) * fy * srcPixels[idx21 + 3] + fx * fy * srcPixels[idx22 + 3]);
+                } else {
+                    const destIdx = (v * destW + u) * 4;
+                    // Rellenar con color blanco fuera de límites
+                    destPixels[destIdx]     = 255;
+                    destPixels[destIdx + 1] = 255;
+                    destPixels[destIdx + 2] = 255;
+                    destPixels[destIdx + 3] = 255;
+                }
+            }
+        }
+
+        destCtx.putImageData(destImgData, 0, 0);
+        srcCanvas = destCanvas;
     }
 
     // Convertir a blob JPEG
     srcCanvas.toBlob(blob => {
         archivoSeleccionado = blob;
-        // Mostrar preview de lo editado
-        const url = URL.createObjectURL(blob);
-        // No hay preview-img separado; el editor ya es el preview
+        
+        // Renderizar la vista final corregida en pantalla
+        const baseCanvas = document.getElementById('editor-base-canvas');
+        const ov         = document.getElementById('editor-overlay-canvas');
+        
+        // Ajustar canvases de visualización al resultado recortado
+        baseCanvas.width = srcCanvas.width;
+        baseCanvas.height = srcCanvas.height;
+        ov.width = srcCanvas.width;
+        ov.height = srcCanvas.height;
+        
+        const baseCtx = baseCanvas.getContext('2d');
+        baseCtx.drawImage(srcCanvas, 0, 0);
+        
+        const ovCtx = ov.getContext('2d');
+        ovCtx.clearRect(0, 0, ov.width, ov.height);
+        
+        // Desactivar el modo recorte y limpiar estilos
+        editorCropMode = false;
+        document.getElementById('btn-toggle-crop').style.background = '';
+        
         document.getElementById('btn-enviar').disabled = false;
+        showToast('📸 Resolución recortada y alineada con éxito.', 'success');
     }, 'image/jpeg', 0.88);
 }
 
@@ -977,14 +1218,26 @@ function editorMostrar(src) {
         document.getElementById('editor-wrap').style.display   = 'block';
         document.getElementById('btn-enviar').disabled = true;
         editorRotDeg  = 0;
-        editorCropMode = false;
-        editorCropBox  = null;
+        editorCropMode = true; // Auto-activar recorte para guiar al estudiante
         editorDragState = null;
+        editorActivePointIdx = -1;
+        
         editorRenderFrame();
         editorInitOverlayEvents();
-        // Pre-setear cropBox
+        
+        // Inicializar los puntos con margen
         const ov = document.getElementById('editor-overlay-canvas');
-        editorCropBox = { x: ov.width * 0.08, y: ov.height * 0.08, w: ov.width * 0.84, h: ov.height * 0.84 };
+        const marginW = ov.width * 0.08;
+        const marginH = ov.height * 0.08;
+        editorPoints = [
+            { x: marginW,             y: marginH },
+            { x: ov.width - marginW,  y: marginH },
+            { x: ov.width - marginW,  y: ov.height - marginH },
+            { x: marginW,             y: ov.height - marginH }
+        ];
+        
+        document.getElementById('btn-toggle-crop').style.background = 'rgba(229,9,20,0.2)';
+        editorRenderOverlay();
     };
     editorImg.src = src;
 }
@@ -1186,7 +1439,7 @@ async function mostrarPregunta(id, tiempoInicial, preguntaCustomTexto) {
     document.getElementById('status-card').style.display    = 'none';
     document.getElementById('foto-input').value = '';
     document.getElementById('btn-enviar').disabled = true;
-    editorImg = null; editorRotDeg = 0; editorCropMode = false; editorCropBox = null;
+    editorImg = null; editorRotDeg = 0; editorCropMode = false; editorPoints = null;
 
     // Verificar si ya entregó respuesta para esta pregunta
     const respuestaExistente = await obtenerRespuestaActual(preguntaActualId);
