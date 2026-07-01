@@ -1758,11 +1758,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ── Banco de preguntas del torneo ────────────────────────────────────────────
 const TORNEO_PREGUNTAS = [
-    { id: 1, texto: 'La suma de tres números consecutivos es 72. Halla los números.' },
-    { id: 2, texto: 'El doble de un número aumentado en 5 es igual a 21. Encuentra el número.' },
-    { id: 3, texto: 'La edad de Ana es el triple de la de su hijo. Dentro de 10 años será el doble. ¿Qué edad tiene cada uno?' },
-    { id: 4, texto: 'En un rectángulo el largo es 4 cm mayor que el ancho y su perímetro es 32 cm. Halla sus dimensiones.' },
-    { id: 5, texto: 'Se reparten 50 caramelos entre dos niños de modo que uno recibe 10 más que el otro. ¿Cuántos recibe cada uno?' },
+    { id: 1, texto: 'El doble de un número, aumentado en 12, es igual a 42. Hallar el número.' },
+    { id: 2, texto: 'La suma de tres números enteros consecutivos es igual a 105. ¿Cuál es el número mayor?' },
+    { id: 3, texto: 'En una granja hay gallinas y conejos. Si en total se cuentan 35 cabezas y 116 patas, ¿cuántos conejos hay?' },
+    { id: 4, texto: 'Un grupo de amigos decide comprar un regalo de cumpleaños. Al principio, cada uno iba a aportar una cantidad fija, pero 2 de ellos no pudieron pagar, por lo que cada uno de los restantes tuvo que poner 5 soles más de lo previsto. Si inicialmente eran 10 amigos, ¿cuánto costó el regalo?' },
+    { id: 5, texto: 'Yo tengo el triple de la edad que tú tenías cuando yo tenía la edad que tú tienes. Cuando tú tengas la edad que yo tengo, la suma de nuestras edades será 70 años. ¿Qué edad tengo actualmente?' },
 ];
 
 // ── Estado local del torneo ───────────────────────────────────────────────────
