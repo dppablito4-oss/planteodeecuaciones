@@ -1491,7 +1491,7 @@ async function analyzeUserProblem() {
 // ── QR Modal ──────────────────────────────────────────────────────────────────
 async function openQRModal() {
     const base = window.location.origin + window.location.pathname.replace(/[^\/]*$/, '');
-    const key = await _generarObtenerRemoteKey();
+    const key = await _generarObtenerRemoteKey(false);
     const remoteURL = base + 'remote.html?key=' + encodeURIComponent(key);
     const encoded = encodeURIComponent(remoteURL);
     const qrAPI = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&color=141414&bgcolor=ffffff&data=${encoded}`;
@@ -1844,8 +1844,8 @@ async function openTorneoOverlay() {
     const base = window.location.origin + window.location.pathname.replace(/[^/]*$/, '');
     const torneoURL = base + 'torneo.html';
 
-    // Generar/obtener clave de seguridad del mando
-    _remoteKeyActual = await _generarObtenerRemoteKey();
+    // Generar/obtener clave de seguridad del mando sin forzar rotación
+    _remoteKeyActual = await _generarObtenerRemoteKey(false);
     const remoteURL = base + 'remote.html?key=' + encodeURIComponent(_remoteKeyActual);
 
     document.getElementById('torneo-qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&color=141414&bgcolor=ffffff&data=${encodeURIComponent(torneoURL)}`;
@@ -2180,14 +2180,34 @@ window.cerrarHistorialRondas = cerrarHistorialRondas;
 window.exportarRondaPDF = exportarRondaPDF;
 
 // ── Seguridad del mando a distancia ─────────────────────────────────────────────
-async function _generarObtenerRemoteKey() {
+async function _generarObtenerRemoteKey(forceNew = false) {
     if (!supabaseClient) return 'no-key';
+    if (!forceNew) {
+        const { data } = await supabaseClient.from('estado_juego').select('remote_key').eq('id', 'global').single();
+        if (data?.remote_key) return data.remote_key;
+    }
     const array = new Uint8Array(16);
     crypto.getRandomValues(array);
     const newKey = Array.from(array).map(b => b.toString(16).padStart(2, '0')).join('');
     await supabaseClient.from('estado_juego').update({ remote_key: newKey }).eq('id', 'global');
     return newKey;
 }
+
+async function regenerarRemoteKey() {
+    if (!confirm('¿Estás seguro de que deseas regenerar el acceso del mando? Esto desvinculará de inmediato el control remoto actual.')) return;
+    
+    const base = window.location.origin + window.location.pathname.replace(/[^\/]*$/, '');
+    const newKey = await _generarObtenerRemoteKey(true);
+    const remoteURL = base + 'remote.html?key=' + encodeURIComponent(newKey);
+    const encoded = encodeURIComponent(remoteURL);
+    const qrAPI = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&color=141414&bgcolor=ffffff&data=${encoded}`;
+
+    document.getElementById('qr-img').src = qrAPI;
+    document.getElementById('qr-url-text').textContent = remoteURL;
+    
+    showToast('🔑 Nuevo acceso de mando generado. Sesión anterior revocada.', 'success');
+}
+window.regenerarRemoteKey = regenerarRemoteKey;
 
 function switchTorneoBlock(blockIdx) {
     if (blockIdx < 0 || blockIdx >= TORNEO_BLOCKS_PREGUNTAS.length) return;
