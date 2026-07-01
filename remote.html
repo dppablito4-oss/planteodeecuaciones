@@ -459,13 +459,131 @@
             text-transform: uppercase;
             margin: 2px 0 0 0;
         }
+
+        /* ── Side Drawer ── */
+        .drawer-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .drawer-overlay.open {
+            opacity: 1;
+            pointer-events: all;
+        }
+        .drawer-box {
+            position: absolute;
+            top: 0; right: 0; bottom: 0;
+            width: 290px;
+            background: #141414;
+            border-left: 1px solid var(--border);
+            box-shadow: -10px 0 30px rgba(0,0,0,0.6);
+            display: flex;
+            flex-direction: column;
+            transform: translateX(100%);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .drawer-overlay.open .drawer-box {
+            transform: translateX(0);
+        }
+        .drawer-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(0,0,0,0.2);
+        }
+        .drawer-title {
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #a78bfa;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .drawer-close {
+            background: transparent;
+            border: none;
+            color: var(--muted);
+            font-size: 1.15rem;
+            cursor: pointer;
+        }
+        .drawer-body {
+            padding: 20px;
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        /* Grid del Torneo en el Drawer */
+        .torneo-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+        .btn-torneo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            padding: 12px 6px;
+            background: rgba(167,139,250,0.06);
+            border: 2px solid rgba(167,139,250,0.2);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .btn-torneo:active { transform: scale(0.94); }
+        .btn-torneo.active-block {
+            background: rgba(167,139,250,0.18);
+            border-color: #a78bfa;
+            box-shadow: 0 0 12px rgba(167,139,250,0.25);
+        }
+        .torneo-num {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: #a78bfa;
+            line-height: 1;
+        }
+        .btn-torneo.active-block .torneo-num { color: #c4b5fd; }
+        .torneo-label {
+            font-size: 0.52rem;
+            font-weight: 600;
+            color: var(--muted);
+            text-align: center;
+            line-height: 1.2;
+        }
+        .btn-torneo.active-block .torneo-label { color: #c4b5fd; }
+        .torneo-active-label {
+            font-size: 0.62rem;
+            color: var(--muted);
+            text-align: center;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
     </style>
 </head>
 <body>
 
 <header>
     <div class="logo">ECUACIONES<span>.io</span></div>
-    <div id="status-dot" class="status-dot connecting" title="Estado de conexión"></div>
+    <div style="display:flex;align-items:center;gap:12px;">
+        <button onclick="toggleDrawer(true)" style="background:transparent;border:none;color:#fff;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:4px;" title="Atajos y Bloques">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+        <div id="status-dot" class="status-dot connecting" title="Estado de conexión"></div>
+    </div>
 </header>
 
 <div id="status-banner">Conectando al servidor...</div>
@@ -692,6 +810,47 @@
     </p>
 </div>
 
+<!-- ── SIDE DRAWER (Atajos y Gestión de Bloques) ─────────────────────────── -->
+<div id="side-drawer" class="drawer-overlay" onclick="if(event.target===this)toggleDrawer(false)">
+    <div class="drawer-box">
+        <div class="drawer-header">
+            <div class="drawer-title"><i class="fa-solid fa-bolt" style="color:#a78bfa;"></i> Atajos y Bloques</div>
+            <button class="drawer-close" onclick="toggleDrawer(false)"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="drawer-body">
+            <div class="torneo-section-title" style="margin-top:0;padding-top:0;"><i class="fa-solid fa-trophy"></i> Bloque Activo</div>
+            <div class="torneo-grid">
+                <button class="btn-torneo active-block" id="btn-block-0" onclick="sendBlockChange(0)">
+                    <span class="torneo-num">1</span>
+                    <span class="torneo-label">Bloque 1<br>Clásicos</span>
+                </button>
+                <button class="btn-torneo" id="btn-block-1" onclick="sendBlockChange(1)">
+                    <span class="torneo-num">2</span>
+                    <span class="torneo-label">Bloque 2<br>Mixtos</span>
+                </button>
+                <button class="btn-torneo" id="btn-block-2" onclick="sendBlockChange(2)">
+                    <span class="torneo-num">3</span>
+                    <span class="torneo-label">Bloque 3<br>Nivel UNI</span>
+                </button>
+            </div>
+            <div class="torneo-active-label" id="torneo-active-label" style="margin-bottom:18px;">Bloque activo: 1</div>
+            
+            <div class="torneo-section-title" style="border-top:1px solid rgba(255,255,255,0.05);padding-top:14px;"><i class="fa-solid fa-gears"></i> Atajos de Control</div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+                <button class="btn btn-exit" onclick="toggleDrawer(false);sendTorneoCmd('lobby')" style="padding:10px;font-size:0.75rem;justify-content:flex-start;background:rgba(255,255,255,0.03);">
+                    <i class="fa-solid fa-house" style="color:#54b3d6;width:16px;margin-right:6px;"></i> Ir a Lobby
+                </button>
+                <button class="btn btn-exit" onclick="toggleDrawer(false);sendTorneoCmd('pregunta')" style="padding:10px;font-size:0.75rem;justify-content:flex-start;background:rgba(255,255,255,0.03);">
+                    <i class="fa-solid fa-play" style="color:#46d369;width:16px;margin-right:6px;"></i> Lanzar Pregunta
+                </button>
+                <button class="btn btn-exit" onclick="toggleDrawer(false);sendTorneoCmd('leaderboard')" style="padding:10px;font-size:0.75rem;justify-content:flex-start;background:rgba(255,255,255,0.03);">
+                    <i class="fa-solid fa-trophy" style="color:#f59e0b;width:16px;margin-right:6px;"></i> Mostrar Leaderboard
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 // ── Config ──────────────────────────────────────────────────────────────────
 const SUPABASE_URL  = 'https://dyuadrzdrphzywbnxnhz.supabase.co';
@@ -703,11 +862,46 @@ const CHANNEL_NAME  = 'presentation-planteo-ecuaciones';
 const client  = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const channel = client.channel(CHANNEL_NAME);
 
+// ── Drawer Management ────────────────────────────────────────────────────────
+function toggleDrawer(isOpen) {
+    const drawer = document.getElementById('side-drawer');
+    if (drawer) {
+        drawer.classList.toggle('open', isOpen);
+    }
+}
+
+// ── Torneito Block Management ───────────────────────────────────────────────
+let activeBlockIndex = 0;
+
+function _setLocalActiveBlock(idx) {
+    activeBlockIndex = idx;
+    const label = document.getElementById('torneo-active-label');
+    if (label) {
+        label.textContent = `Bloque activo: ${idx + 1}`;
+    }
+    // Actualizar estados visuales de los botones
+    [0, 1, 2].forEach(i => {
+        const btn = document.getElementById(`btn-block-${i}`);
+        if (btn) {
+            btn.classList.toggle('active-block', i === idx);
+        }
+    });
+}
+
+async function sendBlockChange(blockIdx) {
+    try {
+        await client.from('estado_juego').update({ bloque_activo: blockIdx }).eq('id', 'global');
+        _setLocalActiveBlock(blockIdx);
+    } catch (e) {
+        console.error('Error al cambiar bloque:', e);
+    }
+}
+
 // ── Validación de clave de seguridad del mando ──────────────────────────────
 (async () => {
     const params = new URLSearchParams(window.location.search);
     const keyParam = params.get('key');
-    const { data } = await client.from('estado_juego').select('remote_key').eq('id', 'global').single();
+    const { data } = await client.from('estado_juego').select('*').eq('id', 'global').single();
     if (data?.remote_key && data.remote_key !== keyParam) {
         document.body.innerHTML = `
             <div style="min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -716,7 +910,24 @@ const channel = client.channel(CHANNEL_NAME);
                 <h1 style="font-size:1.4rem;font-weight:800;color:#e50914;margin-bottom:8px;">Acceso Denegado</h1>
                 <p style="color:#6d6d6e;font-size:0.88rem;max-width:280px;">Este enlace no es válido o ha caducado. Pide al profesor que genere un nuevo código QR.</p>
             </div>`;
+        return;
     }
+    
+    if (data && typeof data.bloque_activo === 'number') {
+        _setLocalActiveBlock(data.bloque_activo);
+    }
+
+    client
+        .channel('remote-key-watcher')
+        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'estado_juego', filter: 'id=eq.global' }, ({ new: payload }) => {
+            if (payload.remote_key && payload.remote_key !== keyParam) {
+                window.location.reload();
+            }
+            if (typeof payload.bloque_activo === 'number') {
+                _setLocalActiveBlock(payload.bloque_activo);
+            }
+        })
+        .subscribe();
 })();
 
 const statusDot    = document.getElementById('status-dot');

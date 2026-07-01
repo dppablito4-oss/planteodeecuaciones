@@ -38,6 +38,7 @@ CREATE TABLE IF NOT EXISTS public.estado_juego (
     pregunta_actual_id     INT  DEFAULT 1,
     tiempo_restante        INT  DEFAULT 60,
     pregunta_custom_texto  TEXT,
+    bloque_activo          INT  DEFAULT 0,
     updated_at             TIMESTAMPTZ DEFAULT NOW()
 );
 

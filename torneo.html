@@ -740,13 +740,35 @@ let ultimaFotoUrl = '';
 let ultimaPreguntaTexto = '';
 
 // Banco de preguntas sincronizado con app.js
-const PREGUNTAS_TORNEO = [
-    { id: 1, texto: 'Resolver: El doble de un número, aumentado en 12, es igual a 42. Hallar el número.' },
-    { id: 2, texto: 'Resolver: La suma de tres números enteros consecutivos es igual a 105. ¿Cuál es el número mayor?' },
-    { id: 3, texto: 'Resolver: En una granja hay gallinas y conejos. Si en total se cuentan 35 cabezas y 116 patas, ¿cuántos conejos hay?' },
-    { id: 4, texto: 'Resolver: Un grupo de amigos decide comprar un regalo de cumpleaños. Al principio, cada uno iba a aportar una cantidad fija, pero 2 de ellos no pudieron pagar, por lo que cada uno de los restantes tuvo que poner 5 soles más de lo previsto. Si inicialmente eran 10 amigos, ¿cuánto costó el regalo?' },
-    { id: 5, texto: 'Resolver: Yo tengo el triple de la edad que tú tenías cuando yo tenía la edad que tú tienes. Cuando tú tengas la edad que yo tengo, la suma de nuestras edades será 70 años. ¿Qué edad tengo actualmente?' },
+const PREGUNTAS_TORNEO_BLOCKS = [
+    // Bloque 1
+    [
+        { id: 1, texto: 'Resolver: El doble de un número, aumentado en 12, es igual a 42. Hallar el número.' },
+        { id: 2, texto: 'Resolver: La suma de tres números enteros consecutivos es igual a 105. ¿Cuál es el número mayor?' },
+        { id: 3, texto: 'Resolver: En una granja hay gallinas y conejos. Si en total se cuentan 35 cabezas y 116 patas, ¿cuántos conejos hay?' },
+        { id: 4, texto: 'Resolver: Un grupo de amigos decide comprar un regalo de cumpleaños. Al principio, cada uno iba a aportar una cantidad fija, pero 2 de ellos no pudieron pagar, por lo que cada uno de los restantes tuvo que poner 5 soles más de lo previsto. Si inicialmente eran 10 amigos, ¿cuánto costó el regalo?' },
+        { id: 5, texto: 'Resolver: Yo tengo el triple de la edad que tú tenías cuando yo tenía la edad que tú tienes. Cuando tú tengas la edad que yo tengo, la suma de nuestras edades será 70 años. ¿Qué edad tengo actualmente?' }
+    ],
+    // Bloque 2
+    [
+        { id: 1, texto: 'Resolver: La mitad de un número aumentada en 8 es igual a 22. ¿Cuál es el número?' },
+        { id: 2, texto: 'Resolver: La suma de tres números pares consecutivos es 90. Halla el mayor.' },
+        { id: 3, texto: 'Resolver: El largo de una piscina excede al doble del ancho en 5 m. El perímetro es 70 m. Halla el largo.' },
+        { id: 4, texto: 'Resolver: Un tren parte a 60 km/h. Una hora después sale otro a 80 km/h por la misma ruta. ¿Cuánto tarda el segundo en alcanzar al primero?' },
+        { id: 5, texto: 'Resolver: Se invierten S/. 20,000 en dos cuentas: una al 5% y otra al 8% anual. Los intereses suman S/. 1,300. ¿Cuánto se invirtió en cada cuenta?' }
+    ],
+    // Bloque 3
+    [
+        { id: 1, texto: 'Resolver: Dividir 80 en dos partes de forma que una sea el triple de la otra. Halla la parte mayor.' },
+        { id: 2, texto: 'Resolver: Una alcancía tiene 30 monedas de 50 céntimos y 1 sol. En total hay S/. 20. ¿Cuántas monedas de 1 sol hay?' },
+        { id: 3, texto: 'Resolver: Un artículo tiene un descuento del 15%. Si el precio final es S/. 510, ¿cuál era el precio original?' },
+        { id: 4, texto: 'Resolver: Se mezclan litros de una solución al 30% y al 70% para obtener 10 L al 50%. ¿Cuántos litros de cada una se necesitan?' },
+        { id: 5, texto: 'Resolver: La suma de edades de A y B es 46 y su diferencia es 4. Hace a años la razón era 5:4. Dentro de b años será 7:6. Calcule a+b.' }
+    ]
 ];
+
+let PREGUNTAS_TORNEO = [...PREGUNTAS_TORNEO_BLOCKS[0]];
+let torneoActiveBlockIdx = 0;
 
 // ── Editor de imagen (Canvas): estado ────────────────────────────────────────
 let editorImg     = null;   // HTMLImageElement cargado originalmente
@@ -1007,9 +1029,27 @@ async function cargarEstadoInicial() {
     if (data) aplicarEstado(data);
 }
 
+function switchStudentTorneoBlock(blockIdx) {
+    if (blockIdx < 0 || blockIdx >= PREGUNTAS_TORNEO_BLOCKS.length) return;
+    torneoActiveBlockIdx = blockIdx;
+    PREGUNTAS_TORNEO = PREGUNTAS_TORNEO_BLOCKS[blockIdx];
+    
+    // Si estamos en la pantalla de pregunta, refrescar enunciado
+    const screenPregunta = document.getElementById('screen-pregunta');
+    if (screenPregunta && screenPregunta.classList.contains('active')) {
+        const pregunta = PREGUNTAS_TORNEO.find(p => p.id === preguntaActualId) || PREGUNTAS_TORNEO[0];
+        document.getElementById('pregunta-texto').textContent = pregunta.texto;
+    }
+}
+
 function aplicarEstado(estado) {
     if (!alumnoId) return; // Aún en login
     preguntaActualId = estado.pregunta_actual_id || 1;
+
+    // Sincronizar el bloque activo
+    if (typeof estado.bloque_activo === 'number' && estado.bloque_activo !== torneoActiveBlockIdx) {
+        switchStudentTorneoBlock(estado.bloque_activo);
+    }
 
     switch (estado.pantalla_actual) {
         case 'lobby': {

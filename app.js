@@ -1756,17 +1756,39 @@ document.addEventListener('DOMContentLoaded', () => {
 // MÓDULO: TORNEO EN VIVO "MATH-FLIX"
 // ═══════════════════════════════════════════════════════════════════════════
 
-// ── Banco de preguntas del torneo ────────────────────────────────────────────
-const TORNEO_PREGUNTAS = [
-    { id: 1, texto: 'El doble de un número, aumentado en 12, es igual a 42. Hallar el número.' },
-    { id: 2, texto: 'La suma de tres números enteros consecutivos es igual a 105. ¿Cuál es el número mayor?' },
-    { id: 3, texto: 'En una granja hay gallinas y conejos. Si en total se cuentan 35 cabezas y 116 patas, ¿cuántos conejos hay?' },
-    { id: 4, texto: 'Un grupo de amigos decide comprar un regalo de cumpleaños. Al principio, cada uno iba a aportar una cantidad fija, pero 2 de ellos no pudieron pagar, por lo que cada uno de los restantes tuvo que poner 5 soles más de lo previsto. Si inicialmente eran 10 amigos, ¿cuánto costó el regalo?' },
-    { id: 5, texto: 'Yo tengo el triple de la edad que tú tenías cuando yo tenía la edad que tú tienes. Cuando tú tengas la edad que yo tengo, la suma de nuestras edades será 70 años. ¿Qué edad tengo actualmente?' },
+// ── Bloques de preguntas del torneo ──────────────────────────────────────────
+const TORNEO_BLOCKS_PREGUNTAS = [
+    // Bloque 1
+    [
+        { id: 1, texto: 'El doble de un número, aumentado en 12, es igual a 42. Hallar el número.' },
+        { id: 2, texto: 'La suma de tres números enteros consecutivos es igual a 105. ¿Cuál es el número mayor?' },
+        { id: 3, texto: 'En una granja hay gallinas y conejos. Si en total se cuentan 35 cabezas y 116 patas, ¿cuántos conejos hay?' },
+        { id: 4, texto: 'Un grupo de amigos decide comprar un regalo de cumpleaños. Al principio, cada uno iba a aportar una cantidad fija, pero 2 de ellos no pudieron pagar, por lo que cada uno de los restantes tuvo que poner 5 soles más de lo previsto. Si inicialmente eran 10 amigos, ¿cuánto costó el regalo?' },
+        { id: 5, texto: 'Yo tengo el triple de la edad que tú tenías cuando yo tenía la edad que tú tienes. Cuando tú tengas la edad que yo tengo, la suma de nuestras edades será 70 años. ¿Qué edad tengo actualmente?' }
+    ],
+    // Bloque 2
+    [
+        { id: 1, texto: 'La mitad de un número aumentada en 8 es igual a 22. ¿Cuál es el número?' },
+        { id: 2, texto: 'La suma de tres números pares consecutivos es 90. Halla el mayor.' },
+        { id: 3, texto: 'El largo de una piscina excede al doble del ancho en 5 m. El perímetro es 70 m. Halla el largo.' },
+        { id: 4, texto: 'Un tren parte a 60 km/h. Una hora después sale otro a 80 km/h por la misma ruta. ¿Cuánto tarda el segundo en alcanzar al primero?' },
+        { id: 5, texto: 'Se invierten S/. 20,000 en dos cuentas: una al 5% y otra al 8% anual. Los intereses suman S/. 1,300. ¿Cuánto se invirtió en cada cuenta?' }
+    ],
+    // Bloque 3
+    [
+        { id: 1, texto: 'Dividir 80 en dos partes de forma que una sea el triple de la otra. Halla la parte mayor.' },
+        { id: 2, texto: 'Una alcancía tiene 30 monedas de 50 céntimos y 1 sol. En total hay S/. 20. ¿Cuántas monedas de 1 sol hay?' },
+        { id: 3, texto: 'Un artículo tiene un descuento del 15%. Si el precio final es S/. 510, ¿cuál era el precio original?' },
+        { id: 4, texto: 'Se mezclan litros de una solución al 30% y al 70% para obtener 10 L al 50%. ¿Cuántos litros de cada una se necesitan?' },
+        { id: 5, texto: 'La suma de edades de A y B es 46 y su diferencia es 4. Hace a años la razón era 5:4. Dentro de b años será 7:6. Calcule a+b.' }
+    ]
 ];
 
+let TORNEO_PREGUNTAS = [...TORNEO_BLOCKS_PREGUNTAS[0]];
+let torneoActiveBlockIdx = 0;
+
 // ── Estado local del torneo ───────────────────────────────────────────────────
-let torneoEstado = { pantalla_actual: 'lobby', pregunta_actual_id: 1, tiempo_restante: 60 };
+let torneoEstado = { pantalla_actual: 'lobby', pregunta_actual_id: 1, tiempo_restante: 60, bloque_activo: 0 };
 let torneoTimerInterval = null;
 let torneoParticipantes = [];
 let torneoRespuestasActuales = 0;
@@ -1781,6 +1803,9 @@ function initTorneo() {
         .channel('torneo-estado-grande')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'estado_juego' }, ({ new: payload }) => {
             torneoEstado = payload;
+            if (payload && typeof payload.bloque_activo === 'number') {
+                switchTorneoBlock(payload.bloque_activo);
+            }
             if (document.getElementById('tournament-overlay').style.display !== 'none') {
                 _torneoRenderPanel(payload);
             }
@@ -1837,7 +1862,13 @@ async function openTorneoOverlay() {
     // Cargar estado actual
     if (supabaseClient) {
         const { data } = await supabaseClient.from('estado_juego').select('*').eq('id', 'global').single();
-        if (data) { torneoEstado = data; _torneoRenderPanel(data); }
+        if (data) { 
+            torneoEstado = data; 
+            if (typeof data.bloque_activo === 'number') {
+                switchTorneoBlock(data.bloque_activo);
+            }
+            _torneoRenderPanel(data); 
+        }
         else _torneoRenderPanel(torneoEstado);
     } else {
         _torneoRenderPanel(torneoEstado);
@@ -2151,13 +2182,29 @@ window.exportarRondaPDF = exportarRondaPDF;
 // ── Seguridad del mando a distancia ─────────────────────────────────────────────
 async function _generarObtenerRemoteKey() {
     if (!supabaseClient) return 'no-key';
-    const { data } = await supabaseClient.from('estado_juego').select('remote_key').eq('id', 'global').single();
-    if (data?.remote_key) return data.remote_key;
     const array = new Uint8Array(16);
     crypto.getRandomValues(array);
     const newKey = Array.from(array).map(b => b.toString(16).padStart(2, '0')).join('');
     await supabaseClient.from('estado_juego').update({ remote_key: newKey }).eq('id', 'global');
     return newKey;
+}
+
+function switchTorneoBlock(blockIdx) {
+    if (blockIdx < 0 || blockIdx >= TORNEO_BLOCKS_PREGUNTAS.length) return;
+    torneoActiveBlockIdx = blockIdx;
+    TORNEO_PREGUNTAS = TORNEO_BLOCKS_PREGUNTAS[blockIdx];
+    
+    // Si la pantalla actual del presentador es "pregunta", refrescar el enunciado en pantalla
+    if (torneoEstado.pantalla_actual === 'pregunta') {
+        const badge = document.getElementById('torneo-p-badge');
+        const textEl = document.getElementById('torneo-p-texto');
+        const pid = torneoEstado.pregunta_actual_id || 1;
+        const pregunta = TORNEO_PREGUNTAS.find(p => p.id === pid) || TORNEO_PREGUNTAS[0];
+        const textoFinal = torneoEstado.pregunta_custom_texto || pregunta.texto;
+        
+        if (badge) badge.textContent = `Pregunta ${pid}`;
+        if (textEl) textEl.textContent = textoFinal;
+    }
 }
 
 // ── Archivar ronda actual en Supabase ────────────────────────────────────────────

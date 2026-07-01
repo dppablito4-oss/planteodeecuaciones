@@ -27,3 +27,6 @@ CREATE POLICY "Eliminación pública historial_respuestas" ON public.historial_r
 -- 6. Permitir eliminación pública de fotos en el storage (bucket 'examenes')
 DROP POLICY IF EXISTS "Eliminación pública de exámenes" ON storage.objects;
 CREATE POLICY "Eliminación pública de exámenes" ON storage.objects FOR DELETE USING (bucket_id = 'examenes');
+
+-- 7. Agregar columna de bloque activo al estado del juego
+ALTER TABLE public.estado_juego ADD COLUMN IF NOT EXISTS bloque_activo INT DEFAULT 0;
