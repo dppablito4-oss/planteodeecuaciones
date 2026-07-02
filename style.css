@@ -2397,3 +2397,71 @@ textarea:focus-visible {
     text-transform: uppercase;
     margin: 2px 0 0 0;
 }
+
+/* ==========================================================================
+   Glowing Problem Box for Slide Presentation (Exposiciones Premium)
+   ========================================================================== */
+.modal-problem-box {
+    background: rgba(255, 255, 255, 0.03);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.05);
+    transition: all 0.3s ease;
+}
+
+.modal-problem-box h3 {
+    font-size: 1.25rem !important;
+    line-height: 1.6 !important;
+    margin: 0 !important;
+    color: #ffffff !important;
+    font-weight: 600 !important;
+}
+
+.modal-problem-box h3 strong {
+    color: var(--color-accent);
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    display: block;
+    margin-bottom: 8px;
+}
+
+/* Theme variants for glowing boxes */
+.modal-problem-box.glow-red {
+    border-color: rgba(229, 9, 20, 0.55) !important;
+    background: rgba(229, 9, 20, 0.06) !important;
+    box-shadow: 0 0 30px rgba(229, 9, 20, 0.25) !important;
+}
+.modal-problem-box.glow-red h3 strong {
+    color: #ef4444 !important;
+}
+
+.modal-problem-box.glow-blue {
+    border-color: rgba(59, 130, 246, 0.55) !important;
+    background: rgba(59, 130, 246, 0.06) !important;
+    box-shadow: 0 0 30px rgba(59, 130, 246, 0.25) !important;
+}
+.modal-problem-box.glow-blue h3 strong {
+    color: #60a5fa !important;
+}
+
+.modal-problem-box.glow-green {
+    border-color: rgba(16, 185, 129, 0.55) !important;
+    background: rgba(16, 185, 129, 0.06) !important;
+    box-shadow: 0 0 30px rgba(16, 185, 129, 0.25) !important;
+}
+.modal-problem-box.glow-green h3 strong {
+    color: #34d399 !important;
+}
+
+.modal-problem-box.glow-purple {
+    border-color: rgba(167, 139, 250, 0.55) !important;
+    background: rgba(167, 139, 250, 0.06) !important;
+    box-shadow: 0 0 30px rgba(167, 139, 250, 0.25) !important;
+}
+.modal-problem-box.glow-purple h3 strong {
+    color: #c084fc !important;
+}
+

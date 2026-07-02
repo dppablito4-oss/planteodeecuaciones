@@ -147,9 +147,9 @@ const SLIDES_DATA = {
         coverImage: 'assets/images/math_blue_cover.png',
         description: 'Problema clásico de aritmética: la suma de tres números enteros consecutivos es 72.',
         content: `
-            <h3 style="font-size:1.1rem;color:var(--color-text-secondary);margin-bottom:20px;">
-                <strong>Problema:</strong> La suma de tres números consecutivos es 72. Hallar los números.
-            </h3>
+            <div class="modal-problem-box glow-blue">
+                <h3><strong>Problema:</strong> La suma de tres números consecutivos es 72. Hallar los números.</h3>
+            </div>
             <div class="modal-math-box">
                 <p><span class="modal-step-pill">Paso 1</span> Variables: Sean los números $x$, $x+1$, $x+2$</p>
                 <p style="margin-top:10px;"><span class="modal-step-pill">Paso 2</span> Ecuación: $$x + (x+1) + (x+2) = 72$$</p>
@@ -167,9 +167,9 @@ const SLIDES_DATA = {
         coverImage: 'assets/images/math_olive_cover.png',
         description: 'El doble de un número aumentado en 5 es igual a 21. Encuentra el número.',
         content: `
-            <h3 style="font-size:1.1rem;color:var(--color-text-secondary);margin-bottom:20px;">
-                <strong>Problema:</strong> El doble de un número aumentado en 5 es igual a 21.
-            </h3>
+            <div class="modal-problem-box glow-green">
+                <h3><strong>Problema:</strong> El doble de un número aumentado en 5 es igual a 21. Encuentra el número.</h3>
+            </div>
             <div class="modal-math-box">
                 <p><span class="modal-step-pill">Ecuación</span> $$2x + 5 = 21$$</p>
                 <p style="margin-top:12px;"><span class="modal-step-pill">Solución</span> $$2x = 16 \\Rightarrow x = 8$$</p>
@@ -186,9 +186,9 @@ const SLIDES_DATA = {
         coverImage: 'assets/images/math_green_cover.png',
         description: 'Problema clásico de edades con desplazamiento temporal futuro.',
         content: `
-            <h3 style="font-size:1rem;color:var(--color-text-secondary);margin-bottom:16px;">
-                <strong>Problema:</strong> La edad de Ana es el triple de la de su hijo. Dentro de 10 años será el doble. ¿Qué edad tiene cada uno?
-            </h3>
+            <div class="modal-problem-box glow-green">
+                <h3><strong>Problema:</strong> La edad de Ana es el triple de la de su hijo. Dentro de 10 años será el doble. ¿Qué edad tiene cada uno?</h3>
+            </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
                 <div style="background:rgba(255,255,255,0.04);border-radius:8px;padding:16px;text-align:center;">
                     <div style="font-size:0.7rem;text-transform:uppercase;color:var(--color-text-faint);font-weight:700;margin-bottom:10px;">Estado Actual</div>
@@ -211,11 +211,11 @@ const SLIDES_DATA = {
         icon: '4️⃣',
         heroColor: 'linear-gradient(135deg, #00102d, #001a45)',
         coverImage: 'assets/images/math_blue_cover.png',
-        description: 'Hallar las dimensiones de un rectángulo dado su perímetro.',
+        description: 'Hallar las dimensions de un rectángulo dado su perímetro.',
         content: `
-            <h3 style="font-size:1rem;color:var(--color-text-secondary);margin-bottom:16px;">
-                <strong>Problema:</strong> En un rectángulo, el largo es 4 cm mayor que el ancho y su perímetro es 32 cm.
-            </h3>
+            <div class="modal-problem-box glow-blue">
+                <h3><strong>Problema:</strong> En un rectángulo, el largo es 4 cm mayor que el ancho y su perímetro es 32 cm.</h3>
+            </div>
             <div class="modal-math-box">
                 <p>Ancho: $x$ · Largo: $x + 4$</p>
                 <p style="margin-top:8px;"><span class="modal-step-pill">Perímetro</span> $$2(x) + 2(x + 4) = 32$$</p>
@@ -230,9 +230,9 @@ const SLIDES_DATA = {
         coverImage: 'assets/images/math_red_cover.png',
         description: 'Se reparten 50 caramelos entre dos niños: uno recibe 10 más que el otro.',
         content: `
-            <h3 style="font-size:1rem;color:var(--color-text-secondary);margin-bottom:16px;">
-                <strong>Problema:</strong> Se reparten 50 caramelos entre dos niños de modo que uno recibe 10 más que el otro.
-            </h3>
+            <div class="modal-problem-box glow-red">
+                <h3><strong>Problema:</strong> Se reparten 50 caramelos entre dos niños de modo que uno recibe 10 más que el otro.</h3>
+            </div>
             <div class="modal-math-box">
                 <p>Niño A: $x$ · Niño B: $x + 10$</p>
                 <p style="margin-top:8px;"><span class="modal-step-pill">Ecuación</span> $$x + (x + 10) = 50$$</p>
@@ -247,9 +247,9 @@ const SLIDES_DATA = {
         coverImage: 'assets/images/math_blue_cover.png',
         description: 'Modelado multivariable para determinar la mayor cantidad de fondos entre cuatro socios.',
         content: `
-            <h3 style="font-size:0.95rem;color:var(--color-text-secondary);margin-bottom:16px;">
-                <strong>Problema:</strong> Entre Aldo, Beto, Carlos y David tienen S/. 20 000. Beto tiene el doble de lo que tiene Carlos, Aldo tiene S/.1000 más que Beto, y David el triple de la diferencia entre lo que tiene Aldo y Carlos. ¿Quién tiene la mayor cantidad de dinero?
-            </h3>
+            <div class="modal-problem-box glow-blue">
+                <h3><strong>Problema:</strong> Entre Aldo, Beto, Carlos y David tienen S/. 20 000. Beto tiene el doble de lo que tiene Carlos, Aldo tiene S/.1000 más que Beto, y David el triple de la diferencia entre lo que tiene Aldo y Carlos. ¿Quién tiene la mayor cantidad de dinero?</h3>
+            </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
                 <div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:12px;font-size:0.85rem;border:1px solid rgba(255,255,255,0.05);">
                     <div style="font-weight:700;color:var(--color-accent);margin-bottom:6px;">1. Declaración de Variables:</div>
@@ -283,9 +283,9 @@ const SLIDES_DATA = {
         coverImage: 'assets/images/math_green_cover.png',
         description: 'Distribución proporcional equivalente de bienes y dinero en partes iguales.',
         content: `
-            <h3 style="font-size:0.95rem;color:var(--color-text-secondary);margin-bottom:16px;">
-                <strong>Problema:</strong> Tres estudiantes se reparten equitativamente S/. 17, una calculadora, 6 libros y 9 plumones de S/. 3 cada uno. Si uno de ellos recibe 4 libros y el dinero, otro la calculadora y el tercero lo restante. ¿Cuánto vale la calculadora?
-            </h3>
+            <div class="modal-problem-box glow-green">
+                <h3><strong>Problema:</strong> Tres estudiantes se reparten equitativamente S/. 17, una calculadora, 6 libros y 9 plumones de S/. 3 cada uno. Si uno de ellos recibe 4 libros y el dinero, otro la calculadora y el tercero lo restante. ¿Cuánto vale la calculadora?</h3>
+            </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
                 <div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:12px;font-size:0.85rem;border:1px solid rgba(255,255,255,0.05);">
                     <div style="font-weight:700;color:var(--color-accent);margin-bottom:6px;">1. Reparto del Inventario:</div>
@@ -316,9 +316,9 @@ const SLIDES_DATA = {
         coverImage: 'assets/math_problem_solving.png',
         description: 'Problema de preselección UNHEVAL con razones temporales. Calcular a+b.',
         content: `
-            <p style="font-size:0.9rem;color:var(--color-text-muted);margin-bottom:16px;border-left:3px solid #a78bfa;padding-left:12px;">
-                <strong>Problema (UNHEVAL):</strong> La edad de A hace $a$ años era a la de B como 5:4. Dentro de $b$ años la razón será 7:6. La suma de edades es 46 y la diferencia es 4. Calcule $a+b$.
-            </p>
+            <div class="modal-problem-box glow-purple">
+                <h3><strong>Problema (UNHEVAL):</strong> La edad de A hace $a$ años era a la de B como 5:4. Dentro de $b$ años la razón será 7:6. La suma de edades es 46 y la diferencia es 4. Calcule $a+b$.</h3>
+            </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
                 <div style="background:rgba(167,139,250,0.05);border:1px solid rgba(167,139,250,0.2);border-radius:10px;padding:16px;">
                     <p style="font-weight:700;color:#a78bfa;margin-bottom:8px;font-size:0.85rem;">1. Invariante Temporal:</p>
@@ -344,9 +344,9 @@ const SLIDES_DATA = {
         coverImage: 'assets/math_logic_concept.png',
         description: 'Ecuación diofántica con restricción de enteros positivos. Cantidad máxima de textos.',
         content: `
-            <p style="font-size:0.9rem;color:var(--color-text-muted);margin-bottom:16px;border-left:3px solid #a78bfa;padding-left:12px;">
-                <strong>Problema (UNHEVAL):</strong> Textos de Física a $30 y de Química a $20. Gastó $500. Los de Química exceden al doble de Física. Determina la cantidad máxima de textos de Química.
-            </p>
+            <div class="modal-problem-box glow-purple">
+                <h3><strong>Problema (UNHEVAL):</strong> Textos de Física a $30 y de Química a $20. Gastó $500. Los de Química exceden al doble de Física. Determina la cantidad máxima de textos de Química.</h3>
+            </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
                 <div style="background:rgba(167,139,250,0.05);border:1px solid rgba(167,139,250,0.2);border-radius:10px;padding:16px;">
                     <p style="font-weight:700;color:#a78bfa;margin-bottom:8px;font-size:0.85rem;">1. Ecuación Diofántica:</p>
