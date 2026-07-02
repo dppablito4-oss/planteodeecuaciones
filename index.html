@@ -157,8 +157,20 @@
 
         if (btn && overlay && prompt && wrapper && logo) {
             btn.addEventListener("click", () => {
-                // 1. Play synthetic Netflix tudum sound
-                playNetflixTudum();
+                // 1. Play real audio file (assets/tudum.mp3) or fallback to synthesized audio
+                let audioPlayed = false;
+                const audio = new Audio('assets/tudum.mp3');
+                
+                audio.play()
+                    .then(() => {
+                        audioPlayed = true;
+                    })
+                    .catch(err => {
+                        console.warn("Could not play assets/tudum.mp3, falling back to Web Audio API synthesis:", err);
+                        if (!audioPlayed) {
+                            playNetflixTudum();
+                        }
+                    });
 
                 // 2. Switch prompt with animated logo
                 prompt.style.display = "none";
