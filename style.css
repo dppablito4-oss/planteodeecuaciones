@@ -2465,3 +2465,107 @@ textarea:focus-visible {
     color: #c084fc !important;
 }
 
+/* ==========================================================================
+   Netflix-Style "MATHFLIX" Intro Overlay Animation
+   ========================================================================== */
+#netflix-intro-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #000000;
+    z-index: 999999; /* Overlay absolutely everything */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#netflix-intro-overlay.fade-out {
+    opacity: 0;
+    pointer-events: none;
+}
+
+#intro-prompt-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    animation: fadeInPrompt 0.8s ease forwards;
+}
+
+@keyframes fadeInPrompt {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+#btn-start-intro:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(229, 9, 20, 0.55);
+}
+
+#btn-start-intro:active {
+    transform: scale(0.98);
+}
+
+.netflix-intro-wrapper {
+    perspective: 1200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+.netflix-intro-logo {
+    font-family: 'Poppins', 'Helvetica Neue', Arial, sans-serif;
+    font-size: 6.5rem;
+    font-weight: 900;
+    color: #e50914;
+    letter-spacing: -3px;
+    margin: 0;
+    text-transform: uppercase;
+    transform-origin: center center;
+    opacity: 0;
+    filter: blur(15px);
+}
+
+/* Triggered when starting animation */
+.netflix-intro-logo.animate {
+    animation: netflixLogoIntro 3.6s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+@keyframes netflixLogoIntro {
+    0% {
+        transform: scale(0.6) translateZ(-400px);
+        opacity: 0;
+        filter: blur(15px);
+        text-shadow: 0 0 0px rgba(229, 9, 20, 0);
+    }
+    12% {
+        transform: scale(0.9) translateZ(-100px);
+        opacity: 1;
+        filter: blur(0px);
+        text-shadow: 0 0 15px rgba(229, 9, 20, 0.65), 0 0 40px rgba(229, 9, 20, 0.45);
+    }
+    45% {
+        transform: scale(1.04) translateZ(50px);
+        opacity: 1;
+        filter: blur(0px);
+        text-shadow: 0 0 25px rgba(229, 9, 20, 0.85), 0 0 60px rgba(229, 9, 20, 0.65);
+    }
+    82% {
+        transform: scale(1.5) translateZ(250px);
+        opacity: 1;
+        filter: blur(3px);
+    }
+    100% {
+        transform: scale(2.5) translateZ(500px);
+        opacity: 0;
+        filter: blur(20px);
+    }
+}

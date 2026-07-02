@@ -31,6 +31,155 @@
 </head>
 <body>
 
+<!-- NETFLIX INTRO SCREEN OVERLAY -->
+<div id="netflix-intro-overlay">
+    <!-- Click to play prompt -->
+    <div id="intro-prompt-container">
+        <h2 style="font-family:'Poppins', sans-serif; font-size: 2.2rem; font-weight:800; color: #fff; margin-bottom: 24px; letter-spacing: 0.5px;">
+            MATHFLIX<span style="color:#e50914">.io</span>
+        </h2>
+        <button id="btn-start-intro" style="font-size: 1.15rem; padding: 14px 28px; border-radius: 8px; font-weight: 700; cursor: pointer; border: none; background: #e50914; color: white; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 15px rgba(229,9,20,0.4); transition: transform 0.2s, box-shadow 0.2s;">
+            <i class="fa-solid fa-play"></i> INICIAR EXPOSICIÓN
+        </button>
+    </div>
+    <!-- The actual Netflix-like logo that will animate -->
+    <div class="netflix-intro-wrapper" style="display: none;">
+        <h1 class="netflix-intro-logo" id="netflix-intro-logo-el">MATHFLIX</h1>
+    </div>
+</div>
+
+<script>
+    // Audio synthesizer for Netflix "Tu-Dum"
+    function playNetflixTudum() {
+        try {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (!AudioContext) return;
+            const ctx = new AudioContext();
+
+            // Master Gain
+            const masterGain = ctx.createGain();
+            masterGain.gain.setValueAtTime(0.7, ctx.currentTime);
+            masterGain.connect(ctx.destination);
+
+            // Low Pass Filter for cinematic rumble
+            const filter = ctx.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(140, ctx.currentTime);
+            filter.connect(masterGain);
+
+            // --- FIRST THUD (t = 0.0s) ---
+            const osc1 = ctx.createOscillator();
+            const gain1 = ctx.createGain();
+            osc1.type = 'triangle';
+            osc1.frequency.setValueAtTime(95, ctx.currentTime);
+            osc1.frequency.exponentialRampToValueAtTime(50, ctx.currentTime + 0.4);
+            
+            gain1.gain.setValueAtTime(0.01, ctx.currentTime);
+            gain1.gain.linearRampToValueAtTime(1.0, ctx.currentTime + 0.04);
+            gain1.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.7);
+
+            osc1.connect(gain1);
+            gain1.connect(filter);
+
+            // Pluck 1 (high metallic overtone)
+            const pluck1 = ctx.createOscillator();
+            const pluckGain1 = ctx.createGain();
+            pluck1.type = 'sine';
+            pluck1.frequency.setValueAtTime(190, ctx.currentTime);
+            
+            pluckGain1.gain.setValueAtTime(0.01, ctx.currentTime);
+            pluckGain1.gain.linearRampToValueAtTime(0.4, ctx.currentTime + 0.02);
+            pluckGain1.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+
+            pluck1.connect(pluckGain1);
+            pluckGain1.connect(masterGain);
+
+            // --- SECOND THUD (t = 0.15s) ---
+            const t2 = ctx.currentTime + 0.15;
+            const osc2 = ctx.createOscillator();
+            const gain2 = ctx.createGain();
+            osc2.type = 'triangle';
+            osc2.frequency.setValueAtTime(120, t2);
+            osc2.frequency.exponentialRampToValueAtTime(55, t2 + 0.7);
+            
+            gain2.gain.setValueAtTime(0.01, t2);
+            gain2.gain.linearRampToValueAtTime(1.0, t2 + 0.04);
+            gain2.gain.exponentialRampToValueAtTime(0.001, t2 + 1.4);
+
+            osc2.connect(gain2);
+            gain2.connect(filter);
+
+            // Pluck 2 (high sawtooth overtone)
+            const pluck2 = ctx.createOscillator();
+            const pluckGain2 = ctx.createGain();
+            pluck2.type = 'sawtooth';
+            pluck2.frequency.setValueAtTime(240, t2);
+            
+            pluckGain2.gain.setValueAtTime(0.01, t2);
+            pluckGain2.gain.linearRampToValueAtTime(0.3, t2 + 0.02);
+            pluckGain2.gain.exponentialRampToValueAtTime(0.001, t2 + 0.3);
+
+            pluck2.connect(pluckGain2);
+            pluckGain2.connect(masterGain);
+
+            // --- CINEMATIC LOW RUMBLE ---
+            const rumble = ctx.createOscillator();
+            const rumbleGain = ctx.createGain();
+            rumble.type = 'sine';
+            rumble.frequency.setValueAtTime(55, ctx.currentTime + 0.1);
+            
+            rumbleGain.gain.setValueAtTime(0.01, ctx.currentTime + 0.1);
+            rumbleGain.gain.linearRampToValueAtTime(0.25, ctx.currentTime + 0.4);
+            rumbleGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 2.0);
+
+            rumble.connect(rumbleGain);
+            rumbleGain.connect(filter);
+
+            // Start & Stop
+            osc1.start(); pluck1.start(); osc2.start(); pluck2.start(); rumble.start();
+            osc1.stop(ctx.currentTime + 0.8);
+            pluck1.stop(ctx.currentTime + 0.2);
+            osc2.stop(t2 + 1.5);
+            pluck2.stop(t2 + 0.4);
+            rumble.stop(ctx.currentTime + 2.2);
+        } catch (e) {
+            console.warn("Audio Context failed:", e);
+        }
+    }
+
+    // Logic to handle intro click and fade away
+    document.addEventListener("DOMContentLoaded", () => {
+        const btn = document.getElementById("btn-start-intro");
+        const overlay = document.getElementById("netflix-intro-overlay");
+        const prompt = document.getElementById("intro-prompt-container");
+        const wrapper = document.querySelector(".netflix-intro-wrapper");
+        const logo = document.getElementById("netflix-intro-logo-el");
+
+        if (btn && overlay && prompt && wrapper && logo) {
+            btn.addEventListener("click", () => {
+                // 1. Play synthetic Netflix tudum sound
+                playNetflixTudum();
+
+                // 2. Switch prompt with animated logo
+                prompt.style.display = "none";
+                wrapper.style.display = "flex";
+                logo.classList.add("animate");
+
+                // 3. Fade out overlay after 3.0 seconds
+                setTimeout(() => {
+                    overlay.classList.add("fade-out");
+                }, 3000);
+
+                // 4. Remove overlay completely after fade out completes (3.8 seconds)
+                setTimeout(() => {
+                    overlay.style.display = "none";
+                    overlay.remove();
+                }, 3800);
+            });
+        }
+    });
+</script>
+
 <!-- VIRTUAL LASER POINTER -->
 <div id="virtual-laser" aria-hidden="true"></div>
 
