@@ -345,7 +345,7 @@ const SLIDES_DATA = {
         description: 'Ecuación diofántica con restricción de enteros positivos. Cantidad máxima de textos.',
         content: `
             <div class="modal-problem-box glow-purple">
-                <h3><strong>Problema (UNHEVAL):</strong> Textos de Física a $30 y de Química a $20. Gastó $500. Los de Química exceden al doble de Física. Determina la cantidad máxima de textos de Química.</h3>
+                <h3><strong>Problema (UNHEVAL):</strong> Textos de Física a S/. 30 y de Química a S/. 20. Gastó S/. 500. Los de Química exceden al doble de Física. Determina la cantidad máxima de textos de Química.</h3>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
                 <div style="background:rgba(167,139,250,0.05);border:1px solid rgba(167,139,250,0.2);border-radius:10px;padding:16px;">
