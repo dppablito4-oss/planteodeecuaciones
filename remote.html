@@ -1246,7 +1246,8 @@ async function sendTorneoCmd(cmd) {
             _torneoFaseActual = 'lobby';
         }
 
-        const btn = event && event.target ? event.target.closest('.btn, .btn-run') : null;
+        const e = (typeof event !== 'undefined') ? event : (typeof window !== 'undefined' ? window.event : null);
+        const btn = e && e.target ? e.target.closest('.btn, .btn-run') : null;
         if (btn) rippleEffect(btn);
         _actualizarFaseBanner(_torneoFaseActual, _torneoPreguntaId);
 
