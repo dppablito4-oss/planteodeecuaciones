@@ -165,10 +165,10 @@ const SLIDES_DATA = {
         icon: '2️⃣',
         heroColor: 'linear-gradient(135deg, #00102d, #001a45)',
         coverImage: 'assets/images/math_olive_cover.png',
-        description: 'El doble de un número aumentado en 5 es igual a 21. Encuentra el número.',
+        description: 'El doble de un número, aumentado en 5 es igual a 21. Encuentra el número.',
         content: `
             <div class="modal-problem-box glow-green">
-                <h3><strong>Problema:</strong> El doble de un número aumentado en 5 es igual a 21. Encuentra el número.</h3>
+                <h3><strong>Problema:</strong> El doble de un número, aumentado en 5 es igual a 21. Encuentra el número.</h3>
             </div>
             <div class="modal-math-box">
                 <p><span class="modal-step-pill">Ecuación</span> $$2x + 5 = 21$$</p>
